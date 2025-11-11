@@ -1,0 +1,30 @@
+This software consists of two distinct parts, each governed by its own license.
+
+───────────────────────────────
+1. MIT-LICENSED COMPONENTS
+───────────────────────────────
+Common files (e.g., in /framework,/tools, or explicitly marked) are 
+licensed under the MIT License. These components are free to use, modify, 
+and distribute, even commercially, subject to the terms below.
+
+See LICENSE-MIT for the full MIT License text.
+
+───────────────────────────────
+2. NON-COMMERCIAL USE ONLY COMPONENTS
+───────────────────────────────
+All other files — including but not limited to the game UI, game logic, 
+entity systems, gameplay rules, scene management code and guide doc 
+(e.g., in /game, or similar directories) — are provided under a 
+non-commercial license for research and personal use only.
+
+You may:
+- View the code for learning
+- Compile and run the unmodified software locally
+
+You may NOT:
+- Modify the code
+- Embed it into any other project (even non-commercial ones)
+- Redistribute source or binaries
+- Use it in academic submissions, portfolios, game jams, or commercial contexts
+
+See LICENSE-NONCOMMERCIAL for full terms.
