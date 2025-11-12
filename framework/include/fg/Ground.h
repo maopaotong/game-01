@@ -2,8 +2,7 @@
 #include "State.h"
 #include "util/Polygon2.h"
 #include <Ogre.h>
-#include <OgreVector2.h>
-#include <OgreVector3.h>
+#include <OgreVector.h>
 using namespace Ogre;
 
 class Ground

@@ -2,30 +2,35 @@
 #include <OgreApplicationContext.h>
 #include <OgreLogManager.h>
 #include <OgreMaterialManager.h>
-
+#include <imgui.h>
+// #include "imgui/imgui_impl_sdl2.h"
+// #include "imgui_impl_opengl3.h"
+#include "ImGuiAppContext.h"
 #include "fg/util/HexGridPrinter.h"
 #include "fg/CostMapControl.h"
 #include "fg/Module.h"
 #include <unordered_map>
 using namespace OgreBites;
 using namespace Ogre;
+
 class SimpleCore : public Core
 {
 private:
     Ogre::Camera *camera;
     Ogre::SceneNode *cameraNode;
     Ogre::Viewport *vp;
-    ApplicationContextSDL *appCtx;
+    ImGuiAppContext *appCtx;
     Ogre::SceneManager *sceMgr;
     Ogre::Root *root;
     std::unordered_map<std::string, std::any> userObjs;
     MaterialManager *matMgr;
+
 public:
     SimpleCore()
     {
 
-        appCtx = new ApplicationContextSDL("HexagonalGridVisualizer");
-        std::cout << "ApplicationContext Type: " << typeid(*appCtx).name() << std::endl;
+        appCtx = new ImGuiAppContext("HexagonalGridVisualizer");
+
         appCtx->initApp();
         this->matMgr = MaterialManager::getSingletonPtr();
         this->root = appCtx->getRoot();
@@ -37,6 +42,7 @@ public:
         log->setLogDetail(Ogre::LL_LOW);
         //
         InputListener *ls = appCtx->getImGuiInputListener();
+        std::cout << "appCtx.imGuiInputListener:" << ls << std::endl;
 
         RenderWindow *window = appCtx->getRenderWindow();
 
@@ -80,7 +86,6 @@ public:
         // Create viewport
         vp = window->addViewport(camera);
         vp->setBackgroundColour(Ogre::ColourValue(0.2f, 0.2f, 0.2f));
-        // Create world state and controls.
     }
 
     ApplicationContext *getAppContext() { return this->appCtx; }
@@ -88,17 +93,15 @@ public:
     Viewport *getViewport() { return this->vp; }
     Camera *getCamera() { return this->camera; }
     Root *getRoot() { return this->root; };
-    
+
     RenderWindow *getWindow()
     {
         return this->appCtx->getRenderWindow();
     }
     MaterialManager *getMaterialManager() override
     {
-        return this -> matMgr;
+        return this->matMgr;
     }
-   
-
 
     void addInputListener(InputListener *listener) override
     {
@@ -125,7 +128,8 @@ public:
         }
         return false;
     }
-    State* getRootState() override{
+    State *getRootState() override
+    {
         return State::get(this->sceMgr->getRootSceneNode());
     }
 };
