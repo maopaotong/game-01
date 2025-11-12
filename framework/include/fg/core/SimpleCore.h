@@ -88,12 +88,15 @@ public:
         vp->setBackgroundColour(Ogre::ColourValue(0.2f, 0.2f, 0.2f));
     }
 
-    ApplicationContext *getAppContext() { return this->appCtx; }
-    SceneManager *getSceneManager() { return this->sceMgr; }
-    Viewport *getViewport() { return this->vp; }
-    Camera *getCamera() { return this->camera; }
-    Root *getRoot() { return this->root; };
-
+    ApplicationContext *getAppContext()  override{ return this->appCtx; }
+    SceneManager *getSceneManager()  override{ return this->sceMgr; }
+    Viewport *getViewport()  override{ return this->vp; }
+    Camera *getCamera()  override{ return this->camera; }
+    Root *getRoot()  override{ return this->root; };
+    ImGuiApp *getImGuiApp() override
+    {
+        return this->appCtx->getImGuiApp();
+    }
     RenderWindow *getWindow()
     {
         return this->appCtx->getRenderWindow();
@@ -105,8 +108,9 @@ public:
 
     void addInputListener(InputListener *listener) override
     {
-        this->appCtx->addInputListener(listener);
+        this->appCtx->getImGuiApp()->addInputListener(listener);
     }
+
     void addFrameListener(FrameListener *listener) override
     {
 

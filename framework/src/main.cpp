@@ -45,6 +45,7 @@ int main()
         auto app = std::make_unique<SimpleApp>();
         app->add(new Example::CostMapMod());
         app->add(new Example::WorldStateMod());
+        app->add(new Example::UIMod());
 
         app->setup();
         app->startRendering();

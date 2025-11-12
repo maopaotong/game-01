@@ -2,6 +2,7 @@
 #include <OgreInput.h>
 #include <OgreApplicationContext.h>
 #include <any>
+#include "ImGuiApp.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -10,6 +11,7 @@ class Core
 {
 public:
     virtual ApplicationContext *getAppContext() = 0;
+    virtual ImGuiApp *getImGuiApp() = 0;
     virtual SceneManager *getSceneManager() = 0;
     virtual Viewport *getViewport() = 0;
     virtual Camera *getCamera() = 0;
@@ -21,7 +23,7 @@ public:
 
     virtual void setUserObject(const std::string key, std::any value) = 0;
     virtual bool getUserObject(const std::string key, std::any &value) = 0;
-    virtual State* getRootState() = 0;
+    virtual State *getRootState() = 0;
 
     template <typename T>
     void setUserObject(const std::string key, T *obj)

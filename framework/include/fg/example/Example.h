@@ -3,6 +3,8 @@
 #include "fg/Module.h"
 #include "WorldStateControl.h"
 #include "ExampleGround.h"
+#include "imgui.h"
+
 class Example
 {
 public:
@@ -39,15 +41,40 @@ public:
 
         void active(Core *core) override
         {
-            
+
             // Create materials before buding mesh?
             MaterialFactory::createMaterials(core->getMaterialManager());
 
             CostMap *costMap = core->getUserObject<CostMap>("costMap", true);
-            Ground * ground = new ExampleGround(costMap);
-            State* world = new WorldStateControl(costMap,ground, core);
-            SceneNode* node = core->getSceneManager()->getRootSceneNode();
+            Ground *ground = new ExampleGround(costMap);
+            State *world = new WorldStateControl(costMap, ground, core);
+            SceneNode *node = core->getSceneManager()->getRootSceneNode();
             world->setSceneNode(node);
+        }
+    };
+
+    class UIMod : public Module, public ImGuiApp::FrameListener
+    {
+
+    public:
+        UIMod()
+        {
+        }
+        std::string getName() override
+        {
+            return "example.uiMod";
+        }
+
+        void active(Core *core) override
+        {
+            core->getImGuiApp()->addFrameListener(this);
+        }
+
+        void onFrame(const FrameEvent &evt)
+        {
+            ImGui::Begin("Hello");
+            ImGui::Button("World!");
+            ImGui::End();
         }
     };
 };
