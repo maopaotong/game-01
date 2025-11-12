@@ -7,6 +7,9 @@
 // #include "imgui/imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
 #include <fmt/format.h>
+#include "DispatchInputListener.h"
+#include "ImGuiInputListener.h"
+
 #define MAO_IMGUI_BUTTON_LEFT 0
 #define MAO_IMGUI_BUTTON_RIGHT 1
 #define MAO_IMGUI_BUTTON_OTHER 2
@@ -14,18 +17,19 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-class ImGuiAppContext : public ApplicationContextSDL, public InputListener, public WindowEventListener
+class ImGuiAppContext : public ApplicationContextSDL, public WindowEventListener
 {
-    
+
 protected:
-    struct ListenerPair{
-        InputListenerList dispatcher;
-        NativeWindowType *win;
-    };
-    
+    DispatchInputListener *dispatch;
+    ImGuiInputListener *guiListener;
+
 public:
     ImGuiAppContext(std::string name) : ApplicationContextSDL(name)
     {
+        this->dispatch = new DispatchInputListener();
+        this->guiListener = new ImGuiInputListener();
+        this->dispatch->addInputListener(this->guiListener);
     }
     // ========== 清理 ==========
     virtual ~ImGuiAppContext() override
@@ -33,6 +37,8 @@ public:
         Ogre::WindowEventUtilities::removeWindowEventListener(getRenderWindow(), this);
         ImGui_ImplOpenGL3_Shutdown();
         ImGui::DestroyContext();
+        delete this->dispatch;
+        delete this->guiListener;
     }
 
     void initApp()
@@ -44,10 +50,11 @@ public:
         ImGuiIO &io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
-        
-        if(mWindows.empty()){
+
+        if (mWindows.empty())
+        {
             throw new std::runtime_error("no window created?");
-        } 
+        }
         NativeWindowPair window = mWindows[0];
         syncWindowSize(io, window.render);
         // Setup Dear ImGui style
@@ -62,10 +69,16 @@ public:
 
         Ogre::WindowEventUtilities::addWindowEventListener(getRenderWindow(), this);
         // 注册自己为输入监听器
-        
-        ApplicationContextSDL::addInputListener(window.native, this);
-
+        ApplicationContextSDL::addInputListener(window.native, dispatch);
     }
+
+    void addInputListener(NativeWindowType *window, InputListener *listener) override
+    {
+        // to take over the dispathing task,so do not add to the entry listener list, 
+        //only the dispatcher listener can be there.
+        dispatch->addInputListener(listener);
+    }
+
     // ========== 渲染循环 ==========
     bool frameRenderingQueued(const FrameEvent &evt) override
     {
@@ -86,65 +99,6 @@ public:
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         return true;
-    }
-
-    void addInputListener(NativeWindowType *win, InputListener *lis) override
-    {
-       //take over the listener dispating op here
-
-    }
-
-    // ========== 输入事件转发给 ImGui ==========
-    bool keyPressed(const KeyboardEvent &evt) override
-    {
-        ImGuiIO &io = ImGui::GetIO();
-        if (evt.keysym.sym >= 0 && evt.keysym.sym < 256)
-            io.AddKeyEvent(ImGuiKey(evt.keysym.sym), true);
-        return io.WantCaptureKeyboard;
-    }
-
-    bool keyReleased(const KeyboardEvent &evt) override
-    {
-        ImGuiIO &io = ImGui::GetIO();
-        if (evt.keysym.sym >= 0 && evt.keysym.sym < 256)
-            io.AddKeyEvent(ImGuiKey(evt.keysym.sym), false);
-        bool ret = io.WantCaptureKeyboard;
-
-        log(fmt::format("io.WantCapterKeyboard is {}", ret));
-        return ret;
-    }
-
-    void log(std::string msg)
-    {
-        std::cout << msg << std::endl;
-    }
-
-    bool mouseMoved(const MouseMotionEvent &evt) override
-    {
-        ImGuiIO &io = ImGui::GetIO();
-        io.AddMousePosEvent((float)evt.x, (float)evt.y);
-        return io.WantCaptureMouse;
-    }
-
-    bool mousePressed(const MouseButtonEvent &evt) override
-    {
-        ImGuiIO &io = ImGui::GetIO();
-        int button = evt.button == ButtonType::BUTTON_LEFT ? MAO_IMGUI_BUTTON_LEFT : (evt.button == ButtonType::BUTTON_RIGHT ? MAO_IMGUI_BUTTON_RIGHT : MAO_IMGUI_BUTTON_OTHER);
-        io.AddMouseButtonEvent(button, true);
-        bool ret = io.WantCaptureMouse;
-        log(fmt::format("io.WantCaptureMouse is {}", ret));
-        return ret;
-    }
-
-    bool mouseReleased(const MouseButtonEvent &evt) override
-    {
-        ImGuiIO &io = ImGui::GetIO();
-        int button = evt.button == ButtonType::BUTTON_LEFT ? MAO_IMGUI_BUTTON_LEFT : (evt.button == ButtonType::BUTTON_RIGHT ? MAO_IMGUI_BUTTON_LEFT : MAO_IMGUI_BUTTON_OTHER);
-        io.AddMouseButtonEvent(button, false);
-
-        bool ret = io.WantCaptureMouse;
-        log(fmt::format("io.WantCaptureMouse is {}", ret));
-        return ret;
     }
 
     //
@@ -174,4 +128,11 @@ public:
         if (rw == getRenderWindow())
             Ogre::WindowEventUtilities::removeWindowEventListener(rw, this);
     }
+
+    void addInputListener(InputListener *lis)
+    {
+        dispatch->addInputListener(lis);
+    }
+
+protected:
 };

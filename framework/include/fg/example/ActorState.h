@@ -66,12 +66,12 @@ public:
         // cout << "ActorState::afterPick" << endl;
 
         SceneNode *node = actorMo->getParentSceneNode();
-        const Vector3 &pos = node->getPosition();
-        cout << "actor.pos:" << pos << "" << endl;
+        const Vector3 &actorPosition = node->getPosition();
+        cout << "actor.pos:" << actorPosition << "" << endl;
         CellKey cKey;
-        bool hitCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(pos), cKey);
+        bool hitActorCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(actorPosition), cKey);
         ActorState *actor = this;
-        if (hitCell)
+        if (hitActorCell)
         {
             bool active = this->isActive();
             if (!active)
@@ -90,8 +90,9 @@ public:
                     this->pathState->clearPath();
                 }
             }
+            return true;//
         }
-        return true;
+        return false;
     }
 
     bool setTargetCell(CellKey &cKey2) override

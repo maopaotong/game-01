@@ -59,7 +59,7 @@ public:
             setTargetByMouse(evt.x, evt.y);
         }
 
-        return true;
+        return false;
     }
 
     void setTargetByMouse(int mx, int my)
@@ -109,7 +109,7 @@ public:
         if (evt.button == ButtonType::BUTTON_LEFT)
         {
         }
-        return true;
+        return false;
     }
 
     bool mouseWheelRolled(const MouseWheelEvent &evt) override
@@ -118,6 +118,6 @@ public:
         float speed = 20.0f;
         node->translate(Ogre::Vector3::UNIT_Y * evt.y * speed);
 
-        return true;
+        return false;
     }
 };
