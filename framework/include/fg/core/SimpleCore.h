@@ -15,7 +15,7 @@ private:
     Ogre::Camera *camera;
     Ogre::SceneNode *cameraNode;
     Ogre::Viewport *vp;
-    ApplicationContext *appCtx;
+    ApplicationContextSDL *appCtx;
     Ogre::SceneManager *sceMgr;
     Ogre::Root *root;
     std::unordered_map<std::string, std::any> userObjs;
@@ -24,8 +24,8 @@ public:
     SimpleCore()
     {
 
-        appCtx = new ApplicationContext("HexagonalGridVisualizer");
-
+        appCtx = new ApplicationContextSDL("HexagonalGridVisualizer");
+        std::cout << "ApplicationContext Type: " << typeid(*appCtx).name() << std::endl;
         appCtx->initApp();
         this->matMgr = MaterialManager::getSingletonPtr();
         this->root = appCtx->getRoot();

@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 查找Ogre
 find_package(OGRE CONFIG REQUIRED)
-find_package(SDL2 CONFIG REQUIRED)
+#find_package(SDL2 CONFIG REQUIRED)
     
 file(GLOB SOURCES "src/*.cpp")
 add_compile_definitions(UNICODE _UNICODE)
@@ -19,10 +19,10 @@ target_link_libraries(Study_Ogre PRIVATE
     OgreBites
     Codec_STBI
 )
-if(TARGET SDL2::SDL2main)
-    target_link_libraries(Study_Ogre PRIVATE SDL2::SDL2main)
-endif()
-target_link_libraries(Study_Ogre PRIVATE SDL2::SDL2)
+#if(TARGET SDL2::SDL2main)
+#    target_link_libraries(Study_Ogre PRIVATE SDL2::SDL2main)
+#endif()
+#target_link_libraries(Study_Ogre PRIVATE SDL2::SDL2)
 # 包含Ogre头文件
 target_include_directories(Study_Ogre PRIVATE ${OGRE_INCLUDE_DIRS})
 target_include_directories(Study_Ogre PRIVATE include)

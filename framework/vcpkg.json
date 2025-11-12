@@ -4,11 +4,19 @@
   "dependencies": [
     {
       "name": "ogre",
+      "features": [],
       "platform": "windows"
     },
     {
       "name": "fmt",
       "platform": "windows"
+    },
+    {
+      "name": "imgui",
+      "platform": "windows",
+      "features": [
+        "opengl3-binding"
+      ]
     }
   ]
 }
