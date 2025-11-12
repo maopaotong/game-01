@@ -16,6 +16,13 @@ using namespace OgreBites;
 
 class ImGuiAppContext : public ApplicationContextSDL, public InputListener, public WindowEventListener
 {
+    
+protected:
+    struct ListenerPair{
+        InputListenerList dispatcher;
+        NativeWindowType *win;
+    };
+    
 public:
     ImGuiAppContext(std::string name) : ApplicationContextSDL(name)
     {
@@ -37,8 +44,12 @@ public:
         ImGuiIO &io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
-        RenderWindow *window = this->getRenderWindow();
-        syncWindowSize(io, window);
+        
+        if(mWindows.empty()){
+            throw new std::runtime_error("no window created?");
+        } 
+        NativeWindowPair window = mWindows[0];
+        syncWindowSize(io, window.render);
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
         // ImGui::StyleColorsLight();
@@ -51,7 +62,9 @@ public:
 
         Ogre::WindowEventUtilities::addWindowEventListener(getRenderWindow(), this);
         // 注册自己为输入监听器
-        addInputListener(this);
+        
+        ApplicationContextSDL::addInputListener(window.native, this);
+
     }
     // ========== 渲染循环 ==========
     bool frameRenderingQueued(const FrameEvent &evt) override
@@ -66,7 +79,6 @@ public:
         // 你的 UI
         static bool show_demo = true;
         ImGui::ShowDemoWindow(&show_demo);
-
         // 渲染 3D 场景（由 OGRE 自动处理）
 
         // 渲染 ImGui
@@ -74,6 +86,12 @@ public:
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         return true;
+    }
+
+    void addInputListener(NativeWindowType *win, InputListener *lis) override
+    {
+       //take over the listener dispating op here
+
     }
 
     // ========== 输入事件转发给 ImGui ==========
@@ -91,7 +109,7 @@ public:
         if (evt.keysym.sym >= 0 && evt.keysym.sym < 256)
             io.AddKeyEvent(ImGuiKey(evt.keysym.sym), false);
         bool ret = io.WantCaptureKeyboard;
-        
+
         log(fmt::format("io.WantCapterKeyboard is {}", ret));
         return ret;
     }
