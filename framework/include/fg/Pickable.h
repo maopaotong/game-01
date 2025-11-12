@@ -5,5 +5,5 @@ using namespace Ogre;
 class Pickable
 {
 public:
-    virtual bool afterPick(MovableObject *) = 0;
+    virtual bool pickUp(MovableObject *) = 0;
 };

@@ -24,11 +24,12 @@ private:
     Ogre::Root *root;
     std::unordered_map<std::string, std::any> userObjs;
     MaterialManager *matMgr;
+    Global *global;
 
 public:
     SimpleCore()
     {
-
+        this->global = new Global();
         appCtx = new ImGuiAppContext("HexagonalGridVisualizer");
 
         appCtx->initApp();
@@ -88,11 +89,15 @@ public:
         vp->setBackgroundColour(Ogre::ColourValue(0.2f, 0.2f, 0.2f));
     }
 
-    ApplicationContext *getAppContext()  override{ return this->appCtx; }
-    SceneManager *getSceneManager()  override{ return this->sceMgr; }
-    Viewport *getViewport()  override{ return this->vp; }
-    Camera *getCamera()  override{ return this->camera; }
-    Root *getRoot()  override{ return this->root; };
+    ApplicationContext *getAppContext() override { return this->appCtx; }
+    SceneManager *getSceneManager() override { return this->sceMgr; }
+    Viewport *getViewport() override { return this->vp; }
+    Camera *getCamera() override { return this->camera; }
+    Root *getRoot() override { return this->root; };
+    Global *getGlobal() override
+    {
+        return this->global;
+    }
     ImGuiApp *getImGuiApp() override
     {
         return this->appCtx->getImGuiApp();

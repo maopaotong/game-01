@@ -7,7 +7,7 @@
 #include "imgui_impl_opengl3.h"
 using namespace Ogre;
 using namespace OgreBites;
-class ImGuiAppImpl : public ImGuiApp, public WindowEventListener, public DispatchInputListener
+class ImGuiAppImpl : public ImGuiApp, public DispatchInputListener
 {
 public:
     class FrameDispatch : public ImGuiApp::FrameListener
@@ -34,6 +34,8 @@ public:
     // If a event is consumed by the first listener, it will not be delivered to the next one.
     FrameDispatch frameDispatch;
     NativeWindowPair window;
+    bool glInited = false;
+    ImGuiContext *igc = nullptr;
 
 public:
     ImGuiAppImpl(NativeWindowPair &window)
@@ -43,16 +45,22 @@ public:
     }
     virtual ~ImGuiAppImpl()
     {
-        Ogre::WindowEventUtilities::removeWindowEventListener(window.render, this);
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui::DestroyContext();
+        if (glInited)
+        {
+            ImGui_ImplOpenGL3_Shutdown();
+        }
+        if (igc)
+        {
+            ImGui::DestroyContext(igc);
+        }
     }
 
     void initApp()
     {
         // Create world state and controls.
         IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
+        igc = ImGui::CreateContext();
+
         ImGuiIO &io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
@@ -66,9 +74,11 @@ public:
         // SDL_Window * window = wp.native;
         // // // Setup Platform/Renderer backends
         // 初始化 OpenGL3 后端（OGRE 已激活 OpenGL context）
-        ImGui_ImplOpenGL3_Init("#version 130");
+        if (ImGui_ImplOpenGL3_Init("#version 130"))
+        {
+            glInited = true;
+        }
 
-        Ogre::WindowEventUtilities::addWindowEventListener(window.render, this);
         // 注册自己为输入监听器
     }
     void addInputListener(InputListener *lis) override
@@ -98,7 +108,7 @@ public:
     }
 
     //
-    void windowResized(Ogre::RenderWindow *rw) override
+    void windowResized(Ogre::RenderWindow *rw)
     {
 
         if (rw != window.render)
@@ -116,12 +126,5 @@ public:
         window->getMetrics(width, height, left, top); // 👈 获取当前窗口尺寸
 
         io.DisplaySize = ImVec2(static_cast<float>(width), static_cast<float>(height));
-    }
-
-    // 可选：窗口关闭时清理
-    void windowClosed(Ogre::RenderWindow *rw) override
-    {
-        if (rw == window.render)
-            Ogre::WindowEventUtilities::removeWindowEventListener(rw, this);
     }
 };

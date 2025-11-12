@@ -73,4 +73,8 @@ public:
         // only the dispatcher listener can be there.
         this->imGuiApp->addInputListener(listener);
     }
+    void windowResized(Ogre::RenderWindow* rw) {
+        ApplicationContextSDL::windowResized(rw);
+        this->imGuiApp->windowResized(rw);
+    }
 };

@@ -59,7 +59,7 @@ public:
         MainInputListener *keyHandler = new MainInputListener(this, core);
         core->getAppContext()->addInputListener(keyHandler);
         core->getAppContext()->addInputListener(inputState);
-        core->getAppContext()->addInputListener(new MouseClickPicker(core->getCamera(), core->getSceneManager(), core->getViewport()));
+        core->getAppContext()->addInputListener(new MouseClickPicker(core->getGlobal(), core->getCamera(), core->getSceneManager(), core->getViewport()));
     }
 
     CostMap *getCostMap()

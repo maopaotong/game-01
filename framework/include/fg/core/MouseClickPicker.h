@@ -29,6 +29,7 @@
 #include "fg/util/CellUtil.h"
 #include "fg/IWorld.h"
 #include "fg/Pickable.h"
+#include "fg/Global.h"
 
 using namespace OgreBites;
 using namespace Ogre;
@@ -42,10 +43,12 @@ private:
     Viewport *viewport;
     Camera *camera;
     SceneManager *sMgr;
+    Global *global;
 
 public:
-    MouseClickPicker(Camera *cam, SceneManager *sMgr, Viewport *vp)
+    MouseClickPicker(Global *global, Camera *cam, SceneManager *sMgr, Viewport *vp)
     {
+        this->global = global;
         this->camera = cam;
         this->sMgr = sMgr;
         this->viewport = vp;
@@ -62,10 +65,17 @@ public:
         float ndcX = evt.x / (float)viewport->getActualWidth();
         float ndcY = evt.y / (float)viewport->getActualHeight();
         Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
-        return pick(ray);
+        Pickable *picked = pick(ray);
+        Actor *actor = nullptr;
+        if (picked)
+        {
+            actor = dynamic_cast<Actor *>(picked);
+        }
+        global->setActiveActor(actor);
+        return actor;
     }
 
-    bool pick(Ray &ray)
+    Pickable *pick(Ray &ray)
     {
         // 创建射线查询对象
         Ogre::RaySceneQuery *rayQuery = sMgr->createRayQuery(ray);
@@ -98,10 +108,14 @@ public:
         sMgr->destroyQuery(rayQuery);
         if (!picked)
         {
-            return false;
+            return nullptr;
         }
         //
-        return picked->afterPick(actorMo);
+        if (picked->pickUp(actorMo))
+        {
+            return picked;
+        }
+        return nullptr;
         // high light the cell in which the actor stand.
     }
 };

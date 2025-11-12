@@ -55,6 +55,7 @@ public:
 
     class UIMod : public Module, public ImGuiApp::FrameListener
     {
+        Global *global;
 
     public:
         UIMod()
@@ -67,13 +68,23 @@ public:
 
         void active(Core *core) override
         {
+            this->global = core->getGlobal();
             core->getImGuiApp()->addFrameListener(this);
         }
 
         void onFrame(const FrameEvent &evt)
         {
             ImGui::Begin("Hello");
-            ImGui::Button("World!");
+            Actor *actor = global->getActiveActor();
+            if (actor)
+            {
+                ImGui::Button(":Right click a cell as the destination!");
+            }
+            else
+            {
+                ImGui::Button(":Left click to pick an actor!");
+            }
+
             ImGui::End();
         }
     };

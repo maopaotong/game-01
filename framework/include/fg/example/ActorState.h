@@ -10,8 +10,10 @@
 #include "fg/core/PathFollow2MissionState.h"
 #include "fg/util/CollectionUtil.h"
 #include "fg/Movable.h"
+#include "fg/Actor.h"
 using namespace Ogre;
-class ActorState : public State, public Pickable, public Ogre::FrameListener, public Movable
+
+class ActorState : public State, public Pickable, public Ogre::FrameListener, public Movable,public Actor
 {
 
 protected:
@@ -61,7 +63,7 @@ public:
     {
         this->pathFolow = path;
     }
-    bool afterPick(MovableObject *actorMo) override
+    bool pickUp(MovableObject *actorMo) override
     {
         // cout << "ActorState::afterPick" << endl;
 
@@ -77,7 +79,6 @@ public:
             if (!active)
             {
                 actor->setActive(true);
-                // markStateControls[MarkType::ACTIVE]->mark(cKey, true);
             }
             else
             {
@@ -90,9 +91,8 @@ public:
                     this->pathState->clearPath();
                 }
             }
-            return true;//
         }
-        return false;
+        return this->active;
     }
 
     bool setTargetCell(CellKey &cKey2) override
