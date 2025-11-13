@@ -29,6 +29,7 @@
 #include "fg/util/CellUtil.h"
 #include "fg/IWorld.h"
 #include "fg/Ground.h"
+#include "fg/Core.h"
 
 using namespace OgreBites;
 using namespace Ogre;

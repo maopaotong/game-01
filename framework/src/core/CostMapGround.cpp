@@ -1,8 +1,8 @@
 #pragma once
 
-#include "fg/demo/DemoGround.h"
+#include "fg/core/CostMapGround.h"
 
-DemoGround::DemoGround(CostMap *costMap)
+CostMapGround::CostMapGround(CostMap *costMap)
 {
     this->costMap = costMap;
 
@@ -16,15 +16,15 @@ DemoGround::DemoGround(CostMap *costMap)
     polygon.add(rX, rZ);
     polygon.add(rX, 0);
 }
-CostMap *DemoGround::getCostMap()
+CostMap *CostMapGround::getCostMap()
 {
     return costMap;
 }
-bool DemoGround::isPointInside(float x, float y)
+bool CostMapGround::isPointInside(float x, float y)
 {
     return polygon.isPointInPolygon(x, y);
 }
-bool DemoGround::isPointInside(Vector2 &p)
+bool CostMapGround::isPointInside(Vector2 &p)
 {
     return polygon.isPointInPolygon(p.x, p.y);
 }

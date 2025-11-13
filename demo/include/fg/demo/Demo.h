@@ -1,9 +1,9 @@
 #pragma once
 #include "fg/Module.h"
-#include "WorldStateControl.h"
-#include "DemoGround.h"
+#include "fg/demo/WorldStateControl.h"
+#include "fg/core/CostMapGround.h"
 #include "imgui.h"
-#include "MaterialFactory.h"
+#include "fg/core/MaterialFactory.h"
 class Demo
 {
 public:
@@ -45,7 +45,7 @@ public:
             MaterialFactory::createMaterials(core->getMaterialManager());
 
             CostMap *costMap = core->getUserObject<CostMap>("costMap", true);
-            Ground *ground = new DemoGround(costMap);
+            Ground *ground = new CostMapGround(costMap);
             State *world = new WorldStateControl(costMap, ground, core);
             SceneNode *node = core->getSceneManager()->getRootSceneNode();
             world->setSceneNode(node);

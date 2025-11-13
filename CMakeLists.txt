@@ -12,4 +12,5 @@ endif()
 # 添加子项目（顺序很重要：先 framework，后 demo）
 add_subdirectory(framework)
 add_subdirectory(demo)
+add_subdirectory(game)
 add_subdirectory(tools)
