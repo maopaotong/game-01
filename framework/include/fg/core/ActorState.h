@@ -26,10 +26,12 @@ protected:
 
     PathFollow2MissionState *mission = nullptr;
     std::vector<std::string> aniNames = {"RunBase", "RunTop"};
+    Global * global;
 
 public:
     ActorState(CostMap *costMap, Core *core) : State()
     {
+        this->global = core->getGlobal();
         this->costMap = costMap;
         pathState = new PathState(costMap, core);
 
@@ -126,7 +128,7 @@ public:
             AnimationStateSet *anisSet = entity->getAllAnimationStates();
 
             // new child state.
-            PathFollow2MissionState *missionState = new PathFollow2MissionState(path, anisSet, aniNames, height);
+            PathFollow2MissionState *missionState = new PathFollow2MissionState(global, path, anisSet, aniNames, height);
             // delete missionState;
 
             if (this->mission)

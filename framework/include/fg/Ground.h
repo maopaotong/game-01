@@ -65,7 +65,7 @@ public:
 
 public:
     static inline const Vector3 DEFAULT_FORWARD = Ogre::Vector3::UNIT_Z;
-
+    static inline const Vector3 DIRECTION_DOWN = Ogre::Vector3::NEGATIVE_UNIT_Y;
     static Quaternion getRotationTo(Vector2 &direction)
     {
         Vector3 d3 = Transfer::to3D(direction);

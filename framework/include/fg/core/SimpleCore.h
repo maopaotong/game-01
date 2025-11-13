@@ -64,18 +64,19 @@ public:
         // Sand: cost 2
 
         // 假设你已经有 sceneMgr 和 camera
-        Ogre::Light *light = sceMgr->createLight("MyPointLight");
-        light->setType(Ogre::Light::LT_POINT);
+        Ogre::Light *light = sceMgr->createLight("MyLight");
+        //light->setType(Ogre::Light::LT_POINT);
+        light->setType(Ogre::Light::LT_DIRECTIONAL);
         light->setDiffuseColour(Ogre::ColourValue(1.0, 1.0, 1.0));  // 白色漫反射
         light->setSpecularColour(Ogre::ColourValue(1.0, 1.0, 1.0)); // 白色镜面光
-
         Ogre::SceneNode *lightNode = sceMgr->getRootSceneNode()->createChildSceneNode();
         lightNode->setPosition(0, 500, 0);
+        lightNode->setDirection(Ground::DIRECTION_DOWN);
         lightNode->attachObject(light);
         // Create camera
         camera = sceMgr->createCamera("HexMapCamera");
         camera->setNearClipDistance(0.1f);
-        camera->setFarClipDistance(1000.0f);
+        camera->setFarClipDistance(0.0f);
         camera->setAutoAspectRatio(true);
 
         // Create camera node and set position and direction

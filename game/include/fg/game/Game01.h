@@ -9,10 +9,13 @@
 #include "fg/demo/WorldStateControl.h"
 
 #include "imgui.h"
+#include <fmt/format.h>
+#include <random>
 
 class Game01 : public Module, public ImGuiApp::FrameListener
 {
     Global *global;
+    Core *core;
 
 public:
     Game01()
@@ -25,7 +28,8 @@ public:
 
     void active(Core *core) override
     {
-        CostMap *costMap = new CostMap(12, 10);
+        this->core = core;
+        CostMap *costMap = createCostMap();
         // Create materials before buding mesh?
         MaterialFactory::createMaterials(core->getMaterialManager());
         Ground *ground = new CostMapGround(costMap);
@@ -38,6 +42,8 @@ public:
 
     void onFrame(const FrameEvent &evt)
     {
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.7f));
+
         ImGui::Begin("Hello");
         Actor *actor = global->getActiveActor();
         if (actor)
@@ -48,7 +54,37 @@ public:
         {
             ImGui::Button(":Left click to pick an actor!");
         }
+        Viewport *vp = core->getViewport();
+        RenderWindow *window = core->getWindow();
+
+        ImGui::Text(fmt::format("Viewport.norm:{},{},{},{}", vp->getLeft(), vp->getTop(), vp->getWidth(), vp->getHeight()).c_str());
+        ImGui::Text(fmt::format("Viewport.pixel:{},{},{},{}", vp->getActualLeft(), vp->getActualTop(), vp->getActualWidth(), vp->getActualHeight()).c_str());
+        ImGui::Text(fmt::format("Window.pixel:{},{}", window->getWidth(), window->getHeight()).c_str());
+
+        global->forEachVar([](std::string name, float *vPtr, float min, float max)
+                           { ImGui::SliderFloat(name.c_str(), vPtr, min, max); });
 
         ImGui::End();
+        ImGui::PopStyleColor();
+    }
+
+    CostMap *createCostMap()
+    {
+        int width = 30;
+        int height = 25;
+        CostMap *cm = new CostMap(60, 50);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+
+        std::uniform_int_distribution<int> rPosX(0, width - 1);  //
+        std::uniform_int_distribution<int> rPosY(0, height - 1); //
+        std::uniform_int_distribution<int> rCost(0, 3);          //
+
+        for (int i = 0; i < (width * height) / 10; i++)
+        {
+            cm->setCost(rPosX(gen), rPosY(gen), rCost(gen));
+        }
+
+        return cm;
     }
 };

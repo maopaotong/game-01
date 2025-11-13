@@ -16,9 +16,14 @@ class PathFollow2MissionState : public MissionState, public FrameListener
     AnimationStateSet *aniSet;
     float heightOffset = 0.0f;
 
+    float animateTimeSpeedFactor = 0.75f;
+
 public:
-    PathFollow2MissionState(PathFollow2 *path, AnimationStateSet *aniSet, std::vector<std::string> &aniNames, float heightOffset = 0.0f)
+    PathFollow2MissionState(Global *global, PathFollow2 *path, AnimationStateSet *aniSet, std::vector<std::string> &aniNames, float heightOffset = 0.0f)
     {
+        global->bindVar(".aniSpeed", &animateTimeSpeedFactor,0,2);
+        global->bindVar(".speed", path->getSpeedPtr(),0, 10);
+
         this->path = path;
         this->aniSet = aniSet;
         this->heightOffset = heightOffset;
@@ -55,13 +60,15 @@ public:
                 Vector3 prevPos = pNode->getPosition();
                 Vector3 currentPos = Ground::Transfer::to3D(currentPos2D, heightOffset); //
 
+                // position
                 pNode->translate(currentPos - prevPos); // new position
                 // animation
                 AnimationStateIterator it = this->aniSet->getAnimationStateIterator();
                 while (it.hasMoreElements())
                 {
                     AnimationState *as = it.getNext();
-                    as->addTime(evt.timeSinceLastFrame);
+                    float aniTimeFactor = this->animateTimeSpeedFactor * (*path->getSpeedPtr());
+                    as->addTime(evt.timeSinceLastFrame * aniTimeFactor);
                 }
 
                 Quaternion orientation = Ground::getRotationTo(direction2D);
