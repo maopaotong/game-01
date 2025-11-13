@@ -32,7 +32,6 @@
 
 using namespace OgreBites;
 using namespace Ogre;
-using namespace std;
 // === Custom hash function ===
 //
 // === Input handler for closing application ===
@@ -69,7 +68,7 @@ public:
         this->back = (y >= height - edgeSize);
         if (this->isMoving())
         {
-            cout << "(" << x << "," << y << "),(" << width << "," << height << ")" << endl;
+            std::cout << "(" << x << "," << y << "),(" << width << "," << height << ")" << std::endl;
             // try pick.
         }
         else

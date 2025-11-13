@@ -1,5 +1,4 @@
 #pragma once
-#include "fg/core/SimpleApp.h"
 #include "fg/Module.h"
 #include "WorldStateControl.h"
 #include "DemoGround.h"

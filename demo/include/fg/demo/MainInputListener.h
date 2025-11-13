@@ -32,7 +32,6 @@
 
 using namespace OgreBites;
 using namespace Ogre;
-using namespace std;
 // === Custom hash function ===
 //
 // === Input handler for closing application ===
@@ -76,7 +75,7 @@ public:
 
         Ogre::Plane ground(Ogre::Vector3::UNIT_Y, 0); // Y = 0
         auto hitGrd = ray.intersects(ground);
-        cout << "ndc:(" << ndcX << "," << ndcY << ")" << "hit:" << hitGrd.first << endl;
+        std::cout << "ndc:(" << ndcX << "," << ndcY << ")" << "hit:" << hitGrd.first << std::endl;
         if (hitGrd.first)
         {
             Ogre::Vector3 pos = ray.getPoint(hitGrd.second);

@@ -77,7 +77,7 @@ public:
 
         SceneNode *node = actorMo->getParentSceneNode();
         const Vector3 &actorPosition = node->getPosition();
-        cout << "actor.pos:" << actorPosition << "" << endl;
+        std::cout << "actor.pos:" << actorPosition << "" << std::endl;
         CellKey cKey;
         bool hitActorCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(actorPosition), cKey);
         ActorState *actor = this;

@@ -22,7 +22,6 @@
 #include "fg/core/SimpleInputState.h"
 #include "fg/core/MouseClickPicker.h"
 using namespace Ogre;
-using namespace std;
 // root state & control.
 class WorldStateControl : public WorldState, public IWorld
 {

@@ -10,22 +10,8 @@
 #include <algorithm>
 #include <functional>
 
-// === Include OgreBites for modern initialization ===
-#include <Bites/OgreApplicationContext.h>
-#include <OgreRoot.h>
-#include <OgreSceneManager.h>
-#include <OgreRenderWindow.h>
-#include <OgreCamera.h>
-#include <OgreViewport.h>
-#include <OgreEntity.h>
-#include <OgreManualObject.h>
-#include <OgreSceneNode.h>
-#include <OgreFrameListener.h>
-#include <OgreRTShaderSystem.h>
-#include <OgreTechnique.h>
-#include "fg/util/CostMap.h"
-#include "fg/util/HexGridPrinter.h"
 #include "fg/demo/Demo.h"
+#include "fg/core/SimpleApp.h"
 // === Custom hash function ===
 //
 

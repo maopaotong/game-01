@@ -4,6 +4,7 @@
 #include <any>
 #include "ImGuiApp.h"
 #include "Global.h"
+#include "State.h"
 using namespace Ogre;
 using namespace OgreBites;
 

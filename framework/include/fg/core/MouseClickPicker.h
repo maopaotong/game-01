@@ -33,7 +33,6 @@
 
 using namespace OgreBites;
 using namespace Ogre;
-using namespace std;
 // === Custom hash function ===
 //
 // === Input handler for closing application ===

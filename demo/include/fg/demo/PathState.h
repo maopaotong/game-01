@@ -3,6 +3,7 @@
 #include <vector>
 #include <Ogre.h>
 #include <OgreColourValue.h>
+#include "fg/MaterialNames.h"
 #include "fg/util/CostMap.h"
 #include "fg/util/HexGridPrinter.h"
 #include "fg/util/CellMark.h"
