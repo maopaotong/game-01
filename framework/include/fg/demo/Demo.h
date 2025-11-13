@@ -2,10 +2,10 @@
 #include "fg/core/SimpleApp.h"
 #include "fg/Module.h"
 #include "WorldStateControl.h"
-#include "ExampleGround.h"
+#include "DemoGround.h"
 #include "imgui.h"
-
-class Example
+#include "MaterialFactory.h"
+class Demo
 {
 public:
     class CostMapMod : public Module
@@ -46,7 +46,7 @@ public:
             MaterialFactory::createMaterials(core->getMaterialManager());
 
             CostMap *costMap = core->getUserObject<CostMap>("costMap", true);
-            Ground *ground = new ExampleGround(costMap);
+            Ground *ground = new DemoGround(costMap);
             State *world = new WorldStateControl(costMap, ground, core);
             SceneNode *node = core->getSceneManager()->getRootSceneNode();
             world->setSceneNode(node);

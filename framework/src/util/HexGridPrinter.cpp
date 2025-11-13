@@ -1,5 +1,5 @@
 #include <iostream>
-#include "HexGridPrinter.h"
+#include "fg/util/HexGridPrinter.h"
 
 void HexGridPrinter::printCostGrid(CostMap &grid)
 {

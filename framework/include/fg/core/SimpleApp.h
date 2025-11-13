@@ -1,7 +1,7 @@
 #pragma once
 #include <OgreApplicationContext.h>
 #include <OgreLogManager.h>
-#include "fg/example/MaterialFactory.h"
+
 #include "fg/util/HexGridPrinter.h"
 #include "fg/CostMapControl.h"
 #include "fg/Module.h"

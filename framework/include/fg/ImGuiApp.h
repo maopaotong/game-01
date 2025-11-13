@@ -1,7 +1,7 @@
 #pragma once
 #include <OgreFrameListener.h>
 using namespace Ogre;
-
+using namespace OgreBites;
 class ImGuiApp
 {
 public:

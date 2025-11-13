@@ -4,11 +4,10 @@
 #include <OgreNode.h>
 #include <type_traits>
 #include <functional>
+#include <iostream>
 #include "PathFollow2.h"
 #include "Pickable.h"
 #include "OgreFrameListener.h"
-#include "util/CellUtil.h"
-#include "util/CostMap.h"
 #include "Movable.h"
 using namespace Ogre;
 

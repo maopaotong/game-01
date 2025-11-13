@@ -9,7 +9,7 @@ find_package(fmt CONFIG REQUIRED)
 find_package(OGRE CONFIG REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
     
-file(GLOB SOURCES "src/*.cpp"
+file(GLOB_RECURSE  SOURCES "src/*.cpp"
     "lib/*.cpp"
 )
 add_compile_definitions(UNICODE _UNICODE)

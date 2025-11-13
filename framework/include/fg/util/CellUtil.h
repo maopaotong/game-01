@@ -3,18 +3,25 @@
 #include <vector>
 #include <Ogre.h>
 #include "CostMap.h"
-#include "fg/Ground.h"
 
 class CellUtil
 {
 public:
+
+    static Ogre::Vector2 calculateCenter(int x, int y, float rad = CostMap::hexSize)
+    {
+        float centerX = x * 2 * rad + (y % 2 == 0 ? 0 : rad);
+        float centerY = y * rad * std::sqrt(3.0f);
+        return Ogre::Vector2(centerX, centerY);
+    }
+
     static void translatePathToCellCenter(std::vector<Vector2> &pathByKey, std::vector<Vector2> &pathByPosition)
     {
         for (int i = 0; i < pathByKey.size(); i++)
         {
             auto p = pathByKey[i];
             // auto center = CostMap::calculateCenterForXZ(static_cast<int>(p.x), static_cast<int>(p.y), CostMap::hexSize);
-            auto center = Ground::calculateCenter(static_cast<int>(p.x), static_cast<int>(p.y), CostMap::hexSize);
+            auto center = CellUtil::calculateCenter(static_cast<int>(p.x), static_cast<int>(p.y), CostMap::hexSize);
 
             pathByPosition[i] = Vector2(center.x, center.y);
         }
@@ -53,7 +60,7 @@ public:
     static bool isPointInCell(float px, float py, int cx, int cy)
     {
         // auto corners = CostMap::calculateVerticesForXZ(cx, cy, CostMap::hexSize);
-        auto corners = Ground::calculateVertices(cx, cy, CostMap::hexSize);
+        auto corners = CellUtil::calculateVertices(cx, cy, CostMap::hexSize);
 
         // 叉积判断是否在所有边的左侧
         for (int i = 0; i < 6; ++i)
@@ -72,5 +79,32 @@ public:
             }
         }
         return true;
+    }
+    
+    // Get hexagon vertices
+    // anti-clockwise
+    static std::vector<Ogre::Vector2> calculateVertices(float rad, float scale = 1.0f)
+    {
+        return calculateVertices(0, 0, rad, scale);
+    }
+
+    static std::vector<Ogre::Vector2> calculateVertices(int x, int y, float rad, float scale = 1.0f)
+    {
+        std::vector<Ogre::Vector2> vertices(6);
+
+        Ogre::Vector2 center = CellUtil::calculateCenter(x, y, rad);
+
+        float RAD = scale * 2 * rad / std::sqrt(3.0f);
+
+        for (int i = 0; i < 6; i++)
+        {
+            float angle_rad = (60.0f * i + 30.0f) * Ogre::Math::PI / 180.0f;
+            float dx = RAD * std::cos(angle_rad);
+            float dy = RAD * std::sin(angle_rad);
+
+            vertices[i] = Ogre::Vector2(center.x + dx, center.y + dy);
+        }
+
+        return vertices;
     }
 };

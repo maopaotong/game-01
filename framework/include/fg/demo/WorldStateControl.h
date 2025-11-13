@@ -10,7 +10,7 @@
 #include "fg/util/CellUtil.h"
 #include "fg/State.h"
 #include "fg/IWorld.h"
-#include "fg/example/MainInputListener.h"
+#include "MainInputListener.h"
 #include "ActorStateControl.h"
 #include "CellStateControl.h"
 #include "CellMarkStateControl.h"
