@@ -54,6 +54,7 @@ public:
 
         markStateControls[MarkType::ACTIVE] = new CellMarkStateControl(costMap, core, MarkType::ACTIVE);
         ActorStateControl *actor = new ActorStateControl( costMap, core);
+        actor->init(core);
         this->addChild(actor);
         root->addFrameListener(actor);
         MainInputListener *keyHandler = new MainInputListener(this, core);

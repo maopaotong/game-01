@@ -38,6 +38,14 @@ public:
         this->setMovable(this);
     }
 
+    void init(Core* core) {
+        SceneManager *sMgr = core->getSceneManager();
+        this->create(sMgr, this->entity, this->sceNode);
+        this->setSceneNode(sceNode);
+    }
+
+    virtual void create(SceneManager *sMgr, Entity *&entity, SceneNode *&node) = 0;
+
     void setEntity(Ogre::Entity *entity)
     {
         this->entity = entity;
