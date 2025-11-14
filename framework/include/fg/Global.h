@@ -14,13 +14,20 @@ public:
         T max;
     };
 
+    template<typename T>
+    class VarListener
+    {
+    public:
+        virtual void onVarChanged(const std::string name, T& ref) = 0;
+    };
+
 private:
     template <typename T>
     struct VarBind
     {
         T value;
         VarScope<T> *scope = nullptr;
-        std::unordered_set<T *> binds;
+        std::unordered_set<VarListener<T> *> listeners;
         VarBind(VarBind &vp)
         {
             VarPtr(vp.ptr);
@@ -35,26 +42,23 @@ private:
                 delete this->scope;
             }
         }
-        void bind(T *ptr)
+        void addListener(VarListener<T> *l)
         {
-            binds.insert(ptr);
-            sync(ptr);
+            listeners.insert(l);
         }
-        void unbind(T *ptr)
+        void removeListener(VarListener<T> *l)
         {
-            binds.erase(ptr);
+            listener.erase(l);
         }
-        void sync(T *ptr)
+
+        void notify(const std::string& name)
         {
-            *ptr = this->value;
-        }
-        void sync()
-        {
-            for (auto it : binds)
+            for (auto it : listeners)
             {
-                sync(it);
+                it->onVarChanged(name, value);
             }
         }
+        
     };
 
 private:
@@ -84,14 +88,14 @@ public:
         scope->min = min;
         scope->max = max;
         vb->value = value;
-        vb->sync();
+        vb->notify(name);
     }
     void setVar(const std::string name, float value)
     {
 
         VarBind<float> *vb = this->getOrCreate(name, value);
         vb->value = value;
-        vb->sync();
+        vb->notify(name);
     }
 
     VarBind<float> *getOrCreate(const std::string name, float value)
@@ -101,7 +105,7 @@ public:
         if (it == this->floatVarMap.end())
         {
             vp = new VarBind<float>(value);
-            this->floatVarMap.try_emplace(name, vp); //
+            this->floatVarMap.emplace(name, vp); //
         }
         else
         {
@@ -111,10 +115,13 @@ public:
         return vp;
     }
 
-    void bindVar(const std::string name, float *ptr)
+    float *getVarPtr(std::string name)
     {
-        VarBind<float> *vb = this->getOrCreate(name, *ptr);
-        vb->bind(ptr);
+        return &this->getOrCreate(name, 0.0f)->value;
+    }
+    float &getVarRef(std::string name)
+    {
+        return *this->getVarPtr(name);
     }
 
     void forEachVarPtr(std::function<void(const std::string, float *, VarScope<float> *scope)> func)

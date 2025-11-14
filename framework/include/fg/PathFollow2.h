@@ -10,12 +10,12 @@ class PathFollow2
 {
     std::vector<Ogre::Vector2> path;
     float speedFactor = 30.0f;
-    float speed = 1.0f;
+    float &speed;
     int next = 1; // ignore the first one.
     Vector2 position;
 
 public:
-    PathFollow2(Vector2 position, std::vector<Ogre::Vector2> path)
+    PathFollow2(Vector2 position, std::vector<Ogre::Vector2> path, float &speed) : speed(speed)
     {
         this->position = position;
         this->path = path;

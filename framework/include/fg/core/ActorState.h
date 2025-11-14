@@ -122,13 +122,14 @@ public:
             std::vector<Vector2> pathByKey = costMap->findPath(aCellKey, cKey2);
             std::vector<Vector2> pathByPosition(pathByKey.size());
             CellUtil::translatePathToCellCenter(pathByKey, pathByPosition);
-            PathFollow2 *path = new PathFollow2(aPos2, pathByPosition);
+            float &pathSpeed = this->global->getVarRef(".pathSpeed");
+            PathFollow2 *path = new PathFollow2(aPos2, pathByPosition,pathSpeed);
             this->setPath(path);
             pathState->setPath(pathByKey, aCellKey, cKey2);
             AnimationStateSet *anisSet = entity->getAllAnimationStates();
-
+            float &aniSpeed = this->global->getVarRef(".aniSpeed");
             // new child state.
-            PathFollow2MissionState *missionState = new PathFollow2MissionState(global, path, anisSet, aniNames, height);
+            PathFollow2MissionState *missionState = new PathFollow2MissionState(global, path, anisSet, aniNames, aniSpeed, height);
             // delete missionState;
 
             if (this->mission)

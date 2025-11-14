@@ -16,13 +16,11 @@ class PathFollow2MissionState : public MissionState, public FrameListener
     AnimationStateSet *aniSet;
     float heightOffset = 0.0f;
 
-    float animateTimeSpeedFactor = 0.75f;
+    float &animateTimeSpeedFactor;
 
 public:
-    PathFollow2MissionState(Global *global, PathFollow2 *path, AnimationStateSet *aniSet, std::vector<std::string> &aniNames, float heightOffset = 0.0f)
+    PathFollow2MissionState(Global *global, PathFollow2 *path, AnimationStateSet *aniSet, std::vector<std::string> &aniNames, float &aniSpeed, float heightOffset = 0.0f) : animateTimeSpeedFactor(aniSpeed)
     {
-        global->bindVar(".aniSpeed", &animateTimeSpeedFactor);
-        global->bindVar(".pathSpeed", path->getSpeedPtr());
 
         this->path = path;
         this->aniSet = aniSet;
