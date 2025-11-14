@@ -7,10 +7,24 @@
 #include <OgreSharedPtr.h>
 #include <stb_image_write.h>
 #include <fg/State.h>
+#include <OgreShaderSubRenderState.h>
+#include <OgreShaderRenderState.h>
+#include <OgreShaderGenerator.h>
 
 using namespace Ogre;
+
+//
+// SubRenderStateFactory::~SubRenderStateFactory()
+//{
+//    OgreAssert(mSubRenderStateList.empty(), "Sub render states still exists");
+//}
+// To fix the above unexpected exception when closing the app context:
+//- Do not delete the pointer by shared pointer.
+//- We need to detroy it before app closing.
+
 class GameTerrain : public State
 {
+    const String FFP_Transform = "FFP_Transform";
 private:
     long terrainX = 1;
     long terrainY = 1;
@@ -18,8 +32,16 @@ private:
     float worldSize = 1000.0f;
     Ogre::TerrainGroup *terrainGroup = nullptr;
     Ogre::TerrainGlobalOptions *options = nullptr;
+
+    TerrainMaterialGeneratorA *defaultTMG = nullptr;
+
+public:
     virtual ~GameTerrain()
     {
+        if (this->defaultTMG)
+        {
+            delete this->defaultTMG;
+        }
         if (terrainGroup)
         {
             delete terrainGroup;
@@ -28,6 +50,9 @@ private:
         {
             delete options;
         }
+
+        Ogre::RTShader::SubRenderStateFactory * fac  = Ogre::RTShader::ShaderGenerator::getSingleton().getSubRenderStateFactory(FFP_Transform);
+        fac->destroyAllInstances();
     }
 
 public:
@@ -46,8 +71,12 @@ public:
         options->setMaxPixelError(8);
         options->setCompositeMapDistance(3000);
 
+        defaultTMG = new TerrainMaterialGeneratorA();
+        TerrainMaterialGeneratorPtr defaultTMGPtr(defaultTMG, [](TerrainMaterialGenerator *) {});
+        options->setDefaultMaterialGenerator(defaultTMGPtr);
+
         TerrainMaterialGeneratorA::SM2Profile *matProfile = static_cast<TerrainMaterialGeneratorA::SM2Profile *>(
-            options->getDefaultMaterialGenerator()->getActiveProfile());
+            defaultTMG->getActiveProfile());
 
         // Disable the lightmap for OpenGL ES 2.0. The minimum number of samplers allowed is 8(as opposed to 16 on
         // desktop). Otherwise we will run over the limit by just one. The minimum was raised to 16 in GL ES 3.0.
@@ -94,7 +123,8 @@ public:
         // load
         terrainGroup->loadAllTerrains(true);
         // material
-        Ogre::Terrain::ImportData &data = terrainGroup->getDefaultImportSettings();
+        // Ogre::Terrain::ImportData &data =
+        terrainGroup->getDefaultImportSettings();
 
         // blend
 

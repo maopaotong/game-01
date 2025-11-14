@@ -18,7 +18,9 @@ public:
         {
             return "example.costMapMod";
         }
-
+        void disactive() override
+        {
+        }
         void active(Core *core) override
         {
             CostMap *costMap = new CostMapControl(12, 10);
@@ -37,7 +39,9 @@ public:
         {
             return "example.worldStateMod";
         }
-
+        void disactive() override
+        {
+        }
         void active(Core *core) override
         {
 
@@ -64,7 +68,9 @@ public:
         {
             return "example.uiMod";
         }
-
+        void disactive() override
+        {
+        }
         void active(Core *core) override
         {
             this->global = core->getGlobal();
