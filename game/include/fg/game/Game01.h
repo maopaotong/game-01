@@ -29,6 +29,7 @@ public:
     void active(Core *core) override
     {
         this->core = core;
+        this->initGlobalVarPtr(core->getGlobal());
         CostMap *costMap = createCostMap();
         // Create materials before buding mesh?
         MaterialFactory::createMaterials(core->getMaterialManager());
@@ -61,8 +62,11 @@ public:
         ImGui::Text(fmt::format("Viewport.pixel:{},{},{},{}", vp->getActualLeft(), vp->getActualTop(), vp->getActualWidth(), vp->getActualHeight()).c_str());
         ImGui::Text(fmt::format("Window.pixel:{},{}", window->getWidth(), window->getHeight()).c_str());
 
-        global->forEachVar([](std::string name, float *vPtr, float min, float max)
-                           { ImGui::SliderFloat(name.c_str(), vPtr, min, max); });
+        global->forEachVarPtr([](std::string name, float *vPtr, Global::VarScope<float> *scope)
+                              { 
+                            float min  = scope?scope->min:0;
+                            float max = scope?scope->max:100;
+                            ImGui::SliderFloat(name.c_str(), vPtr, min, max); });
 
         ImGui::End();
         ImGui::PopStyleColor();
@@ -86,5 +90,10 @@ public:
         }
 
         return cm;
+    }
+    void initGlobalVarPtr(Global *glb)
+    {
+        glb->setVarAndScope(".aniSpeed", 0.55f, 0.0f, 2.0f);
+        glb->setVarAndScope(".pathSpeed", 1.0f, 1.0f, 10.0f);
     }
 };
