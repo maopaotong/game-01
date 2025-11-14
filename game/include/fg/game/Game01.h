@@ -11,12 +11,18 @@
 #include "imgui.h"
 #include <fmt/format.h>
 #include <random>
+#include <OgreRenderWindow.h>
+#include "fg/demo/GameTerrain.h"
 
 class Game01 : public Module, public ImGuiApp::FrameListener
 {
     Global *global;
     Core *core;
     bool breakRenderRequested = false;
+    RenderWindow *window;
+    Viewport *vp;
+    SceneManager* sceMgr;
+    GameTerrain *terrain;
 
 public:
     Game01()
@@ -30,13 +36,26 @@ public:
     void active(Core *core) override
     {
         this->core = core;
+        this->window = core->getWindow();
+        this->vp = core->getViewport();
+        this->sceMgr = core->getSceneManager();
+
         this->initGlobalVarPtr(core->getGlobal());
         CostMap *costMap = createCostMap();
         // Create materials before buding mesh?
         MaterialFactory::createMaterials(core->getMaterialManager());
         Ground *ground = new CostMapGround(costMap);
         State *world = new WorldStateControl(costMap, ground, core);
-        SceneNode *node = core->getSceneManager()->getRootSceneNode();
+
+        //
+        /*
+        terrain = new GameTerrain();
+        RenderSystem* rSys = core->getRoot()->getRenderSystem();
+        Light * light = core->getLight();
+        terrain->load(rSys, sceMgr, light);
+        */
+
+        SceneNode *node = sceMgr->getRootSceneNode();
         world->setSceneNode(node);
         this->global = core->getGlobal();
         core->getImGuiApp()->addFrameListener(this);
@@ -56,18 +75,25 @@ public:
         {
             ImGui::Button(":Left click to pick an actor!");
         }
-        Viewport *vp = core->getViewport();
-        RenderWindow *window = core->getWindow();
+        vp = core->getViewport();      
 
-        ImGui::Text(fmt::format("Viewport.norm:{},{},{},{}", vp->getLeft(), vp->getTop(), vp->getWidth(), vp->getHeight()).c_str());
-        ImGui::Text(fmt::format("Viewport.pixel:{},{},{},{}", vp->getActualLeft(), vp->getActualTop(), vp->getActualWidth(), vp->getActualHeight()).c_str());
-        ImGui::Text(fmt::format("Window.pixel:{},{}", window->getWidth(), window->getHeight()).c_str());
+        ImGui::Text(fmt::format("Viewport.norm:     {},{},{},{}", vp->getLeft(), vp->getTop(), vp->getWidth(), vp->getHeight()).c_str());
+        ImGui::Text(fmt::format("Viewport.pixel:    {},{},{},{}", vp->getActualLeft(), vp->getActualTop(), vp->getActualWidth(), vp->getActualHeight()).c_str());
+        ImGui::Text(fmt::format("Window.pixel:      {},{}", window->getWidth(), window->getHeight()).c_str());
 
         global->forEachVarPtr([](std::string name, float *vPtr, Global::VarScope<float> *scope)
                               { 
                             float min  = scope?scope->min:0;
                             float max = scope?scope->max:100;
                             ImGui::SliderFloat(name.c_str(), vPtr, min, max); });
+        // stats
+
+        const Ogre::RenderTarget::FrameStats &fs = window->getStatistics();
+        ImGui::Text(fmt::format("FPS:     {:.2f}", fs.lastFPS).c_str());
+        ImGui::Text(fmt::format("Tris:    {}", fs.triangleCount).c_str());
+        ImGui::Text(fmt::format("Batches: {}", fs.batchCount).c_str());
+
+        // quit confirm popup
         char *confirmPopupId = "Confirm";
         if (ImGui::Button("Quit"))
         {

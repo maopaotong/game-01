@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 查找Ogre
 find_package(fmt CONFIG REQUIRED)
-find_package(OGRE CONFIG REQUIRED)
+find_package(OGRE CONFIG REQUIRED COMPONENTS Terrain)
 find_package(SDL2 CONFIG REQUIRED)
     
 file(GLOB_RECURSE  SOURCES "src/*.cpp"
@@ -24,10 +24,11 @@ target_link_libraries(framework
     PUBLIC
         OgreMain
         OgreBites
+        Codec_STBI
+        OgreTerrain
+        OgrePaging
     PRIVATE
         imgui::imgui   
-        Codec_STBI
-        OgrePaging
         fmt::fmt
 )
 #if(TARGET SDL2::SDL2main)

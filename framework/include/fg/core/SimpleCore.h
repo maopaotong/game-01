@@ -25,6 +25,7 @@ private:
     std::unordered_map<std::string, std::any> userObjs;
     MaterialManager *matMgr;
     Global *global;
+    Ogre::Light *light;
 
 public:
     SimpleCore()
@@ -64,8 +65,8 @@ public:
         // Sand: cost 2
 
         // 假设你已经有 sceneMgr 和 camera
-        Ogre::Light *light = sceMgr->createLight("MyLight");
-        //light->setType(Ogre::Light::LT_POINT);
+        light = sceMgr->createLight("MyLight");
+        // light->setType(Ogre::Light::LT_POINT);
         light->setType(Ogre::Light::LT_DIRECTIONAL);
         light->setDiffuseColour(Ogre::ColourValue(1.0, 1.0, 1.0));  // 白色漫反射
         light->setSpecularColour(Ogre::ColourValue(1.0, 1.0, 1.0)); // 白色镜面光
@@ -98,6 +99,10 @@ public:
     Global *getGlobal() override
     {
         return this->global;
+    }
+    Light *getLight()
+    {
+        return this->light;
     }
     ImGuiApp *getImGuiApp() override
     {
