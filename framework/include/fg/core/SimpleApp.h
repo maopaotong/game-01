@@ -47,7 +47,7 @@ public:
     void startRendering() override
     {
 
-        Ogre::Root *root = this->core->getRoot();
+        Ogre::Root *root = this->core->getRoot();        
         root->startRendering();
     }
 

@@ -14,4 +14,6 @@ public:
     virtual void addInputListener(InputListener *lis) = 0;
     //use this method to add the listener to draw UI.
     virtual void addFrameListener(FrameListener *l) = 0;
+
+    virtual void breakRender() = 0;
 };

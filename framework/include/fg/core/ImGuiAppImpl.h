@@ -36,7 +36,7 @@ public:
     NativeWindowPair window;
     bool glInited = false;
     ImGuiContext *igc = nullptr;
-
+    bool breakRenderRequested = false;
 public:
     ImGuiAppImpl(NativeWindowPair &window)
     {
@@ -104,7 +104,7 @@ public:
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        return true;
+        return !breakRenderRequested;
     }
 
     //
@@ -127,4 +127,8 @@ public:
 
         io.DisplaySize = ImVec2(static_cast<float>(width), static_cast<float>(height));
     }
+    void breakRender() override
+    {
+        breakRenderRequested = true;
+    }   
 };

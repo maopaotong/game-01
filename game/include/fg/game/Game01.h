@@ -16,6 +16,7 @@ class Game01 : public Module, public ImGuiApp::FrameListener
 {
     Global *global;
     Core *core;
+    bool breakRenderRequested = false;
 
 public:
     Game01()
@@ -67,7 +68,32 @@ public:
                             float min  = scope?scope->min:0;
                             float max = scope?scope->max:100;
                             ImGui::SliderFloat(name.c_str(), vPtr, min, max); });
+        char *confirmPopupId = "Confirm";
+        if (ImGui::Button("Quit"))
+        {
+            ImGui::OpenPopup(confirmPopupId);
+        }
 
+        if (ImGui::BeginPopupModal(confirmPopupId, nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("Quit? Are you sure?");
+            ImGui::Separator();
+
+            if (ImGui::Button("Yes"))
+            {
+                // 处理“确定”逻辑
+                core->getImGuiApp()->breakRender();
+                ImGui::CloseCurrentPopup(); // 关闭弹窗
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel"))
+            {
+                // 可选：处理“取消”逻辑
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
+        }
         ImGui::End();
         ImGui::PopStyleColor();
     }
