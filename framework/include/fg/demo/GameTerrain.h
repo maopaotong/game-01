@@ -25,11 +25,13 @@ using namespace Ogre;
 class GameTerrain : public State
 {
     const String FFP_Transform = "FFP_Transform";
+    const float flatHight = -10;
+
 private:
     long terrainX = 1;
     long terrainY = 1;
     int terrainSize = 513;
-    float worldSize = 1000.0f;
+    float worldSize = 2000.0f;
     Ogre::TerrainGroup *terrainGroup = nullptr;
     Ogre::TerrainGlobalOptions *options = nullptr;
 
@@ -51,7 +53,7 @@ public:
             delete options;
         }
 
-        Ogre::RTShader::SubRenderStateFactory * fac  = Ogre::RTShader::ShaderGenerator::getSingleton().getSubRenderStateFactory(FFP_Transform);
+        Ogre::RTShader::SubRenderStateFactory *fac = Ogre::RTShader::ShaderGenerator::getSingleton().getSubRenderStateFactory(FFP_Transform);
         fac->destroyAllInstances();
     }
 
@@ -117,7 +119,7 @@ public:
         {
             for (long y = 0; y < terrainY; ++y)
             {
-                terrainGroup->defineTerrain(x, y, 10.0f);
+                terrainGroup->defineTerrain(x, y, flatHight);
             }
         }
         // load

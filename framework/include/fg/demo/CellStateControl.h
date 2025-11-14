@@ -20,7 +20,7 @@ private:
     CostMap *costMap;
 
 public:
-    CellStateControl(CostMap *costMap, Core *core) 
+    CellStateControl(CostMap *costMap, Core *core)
     {
         Ogre::SceneManager *sceneMgr = core->getSceneManager();
         this->costMap = costMap;
@@ -40,15 +40,24 @@ public:
         obj->begin(MaterialNames::materialNameInUse, Ogre::RenderOperation::OT_TRIANGLE_LIST);
         int width = costMap->getWidth();
         int height = costMap->getHeight();
+        float offsetX = width/2 * CostMap::hexSize;
+        float offsetY = height/2 * CostMap::hexSize;
+        Vector2 offset(offsetX,offsetY);
+
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
                 int cost = costMap->getCost(x, y);
+                if (cost == CostMap::DEFAULT_COST)
+                {
+                    continue; // ignore this cell.
+                }
+
                 Ogre::ColourValue color = getCostColor(cost);
-                //auto vertices = CostMap::calculateVerticesForXZ(x, y, CostMap::hexSize);
-                auto vertices = Ground::calculateVertices3D(x, y, CostMap::hexSize);
-                
+                // auto vertices = CostMap::calculateVerticesForXZ(x, y, CostMap::hexSize);
+                auto vertices = Ground::calculateVertices3D(x, y, costMap, CostMap::hexSize);
+
                 DrawerUtil::drawHexagonTo(obj, vertices, color);
             }
         }

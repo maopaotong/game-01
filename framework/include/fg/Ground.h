@@ -72,12 +72,16 @@ public:
         return DEFAULT_FORWARD.getRotationTo(d3);
     }
 
-    static std::vector<Ogre::Vector3> calculateVertices3D(int x, int y, float rad, float scale = 1.0f)
+    static std::vector<Ogre::Vector3> calculateVertices3D(int x, int y, CostMap *costMap, float rad, float scale = 1.0f)
     {
-        std::vector<Ogre::Vector2> vec2Vec = CellUtil::calculateVertices(x, y, rad, scale);
+        Vector2 offset = CellUtil::offset(costMap);
+        return calculateVertices3D(x, y, offset, rad, scale);
+    }
+    static std::vector<Ogre::Vector3> calculateVertices3D(int x, int y, Vector2 &offset, float rad, float scale = 1.0f)
+    {
+        std::vector<Ogre::Vector2> vec2Vec = CellUtil::calculateVertices(x, y, offset, rad, scale);
         return Transfer::to3D(vec2Vec);
     }
-
 
 public:
     Ground();

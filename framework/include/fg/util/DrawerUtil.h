@@ -33,6 +33,7 @@ public:
         obj->position(center.x, center.y, center.z);
         obj->normal(nomX, nomY, nomZ);
         obj->colour(color1);
+        
 
         // Corners
         for (int i = 0; i < 6; ++i)

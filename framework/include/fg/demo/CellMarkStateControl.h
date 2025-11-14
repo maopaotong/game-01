@@ -59,9 +59,9 @@ public:
             int cx = key.first;
             int cy = key.second;
             //auto verticesInner = CostMap::calculateVerticesForXZ(cx, cy, CostMap::hexSize, 0.75f);
-            auto verticesInner = Ground::calculateVertices3D(cx, cy, CostMap::hexSize, 0.75f);
+            auto verticesInner = Ground::calculateVertices3D(cx, cy, costMap, CostMap::hexSize, 0.75f);
             //auto verticesOuter = CostMap::calculateVerticesForXZ(cx, cy, CostMap::hexSize, 0.95f);
-            auto verticesOuter = Ground::calculateVertices3D(cx, cy, CostMap::hexSize, 0.95f);
+            auto verticesOuter = Ground::calculateVertices3D(cx, cy, costMap, CostMap::hexSize, 0.95f);
             
             drawHexagonRing(obj, verticesInner, verticesOuter, ColourValue(1.0f, 1.0f, 0.8f, 0.0f), ColourValue(1.0f, 1.0f, 0.8f, 0.6f));
         }

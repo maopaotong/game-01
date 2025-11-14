@@ -8,13 +8,16 @@ CostMapGround::CostMapGround(CostMap *costMap)
 
     int width = costMap->getWidth();
     int height = costMap->getHeight();
+    Vector2 offset = CellUtil::offset(costMap);
+
     float rX = width * CostMap::hexSize * 2;
     float rZ = height * CostMap::hexSize * 2;
 
-    polygon.add(0, 0);
-    polygon.add(0, rZ);
-    polygon.add(rX, rZ);
-    polygon.add(rX, 0);
+    polygon.add(Vector2(0, 0));
+    polygon.add(Vector2(0, rZ));
+    polygon.add(Vector2(rX, rZ));
+    polygon.add(Vector2(rX, 0));
+    polygon += offset;
 }
 CostMap *CostMapGround::getCostMap()
 {

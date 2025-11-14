@@ -121,7 +121,7 @@ public:
         {
             std::vector<Vector2> pathByKey = costMap->findPath(aCellKey, cKey2);
             std::vector<Vector2> pathByPosition(pathByKey.size());
-            CellUtil::translatePathToCellCenter(pathByKey, pathByPosition);
+            CellUtil::translatePathToCellCenter(pathByKey, pathByPosition, CellUtil::offset(costMap));
             float &pathSpeed = this->global->getVarRef(".pathSpeed");
             PathFollow2 *path = new PathFollow2(aPos2, pathByPosition,pathSpeed);
             this->setPath(path);

@@ -7,21 +7,21 @@
 class CellUtil
 {
 public:
-
-    static Ogre::Vector2 calculateCenter(int x, int y, float rad = CostMap::hexSize)
+    static Ogre::Vector2 calculateCenter(int x, int y, Vector2 &offset, float rad = CostMap::hexSize)
     {
-        float centerX = x * 2 * rad + (y % 2 == 0 ? 0 : rad);
-        float centerY = y * rad * std::sqrt(3.0f);
+        float centerX = x * 2 * rad + (y % 2 == 0 ? 0 : rad) + offset.x;
+        float centerY = y * rad * std::sqrt(3.0f) + offset.y;
+
         return Ogre::Vector2(centerX, centerY);
     }
 
-    static void translatePathToCellCenter(std::vector<Vector2> &pathByKey, std::vector<Vector2> &pathByPosition)
+    static void translatePathToCellCenter(std::vector<Vector2> &pathByKey, std::vector<Vector2> &pathByPosition, Vector2 &offset)
     {
         for (int i = 0; i < pathByKey.size(); i++)
         {
             auto p = pathByKey[i];
             // auto center = CostMap::calculateCenterForXZ(static_cast<int>(p.x), static_cast<int>(p.y), CostMap::hexSize);
-            auto center = CellUtil::calculateCenter(static_cast<int>(p.x), static_cast<int>(p.y), CostMap::hexSize);
+            auto center = CellUtil::calculateCenter(static_cast<int>(p.x), static_cast<int>(p.y), offset, CostMap::hexSize);
 
             pathByPosition[i] = Vector2(center.x, center.y);
         }
@@ -38,16 +38,23 @@ public:
         return findCellByPoint(costMap, point.x, point.y, cKey.first, cKey.second);
     }
 
-    static bool findCellByPoint(CostMap *costMap, float px, float py, int &cx, int &cy)
+    static Vector2 offset(CostMap *costMap)
     {
-
         int width = costMap->getWidth();
         int height = costMap->getHeight();
+        return Vector2(-width * CostMap::hexSize / 2.0f, -height * CostMap::hexSize / 2.0f);
+    }
+
+    static bool findCellByPoint(CostMap *costMap, float px, float py, int &cx, int &cy)
+    {
+        int width = costMap->getWidth();
+        int height = costMap->getHeight();
+
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
-                if (isPointInCell(px, py, x, y))
+                if (isPointInCell(px, py, x, y, offset(costMap)))
                 {
                     cx = x;
                     cy = y;
@@ -57,10 +64,10 @@ public:
         }
         return false;
     }
-    static bool isPointInCell(float px, float py, int cx, int cy)
+    static bool isPointInCell(float px, float py, int cx, int cy, Vector2 &offset)
     {
         // auto corners = CostMap::calculateVerticesForXZ(cx, cy, CostMap::hexSize);
-        auto corners = CellUtil::calculateVertices(cx, cy, CostMap::hexSize);
+        auto corners = CellUtil::calculateVertices(cx, cy, offset, CostMap::hexSize);
 
         // 叉积判断是否在所有边的左侧
         for (int i = 0; i < 6; ++i)
@@ -80,19 +87,19 @@ public:
         }
         return true;
     }
-    
+
     // Get hexagon vertices
     // anti-clockwise
-    static std::vector<Ogre::Vector2> calculateVertices(float rad, float scale = 1.0f)
+    static std::vector<Ogre::Vector2> calculateVertices(Vector2 &offset, float rad, float scale = 1.0f)
     {
-        return calculateVertices(0, 0, rad, scale);
+        return calculateVertices(0, 0, offset, rad, scale);
     }
 
-    static std::vector<Ogre::Vector2> calculateVertices(int x, int y, float rad, float scale = 1.0f)
+    static std::vector<Ogre::Vector2> calculateVertices(int x, int y, Vector2 &offset, float rad, float scale = 1.0f)
     {
         std::vector<Ogre::Vector2> vertices(6);
 
-        Ogre::Vector2 center = CellUtil::calculateCenter(x, y, rad);
+        Ogre::Vector2 center = CellUtil::calculateCenter(x, y, offset, rad);
 
         float RAD = scale * 2 * rad / std::sqrt(3.0f);
 
