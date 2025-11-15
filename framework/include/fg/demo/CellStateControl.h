@@ -29,7 +29,7 @@ public:
         obj = sceneMgr->createManualObject();
         node = sceneMgr->getRootSceneNode()->createChildSceneNode();
         node->attachObject(obj);
-        this->highOffset = core->getGlobal()->getVarPtr(".cellHighOffset", DEFAULT_CELL_HIGH_OFFSET, 0.0f, DEFAULT_CELL_HIGH_OFFSET * 100.0f);
+        this->highOffset = core->getGlobal()->VarBag<float>::createBindVptr(".cellHighOffset", DEFAULT_CELL_HIGH_OFFSET, 0.0f, DEFAULT_CELL_HIGH_OFFSET * 100.0f);
         node->setPosition(0, *highOffset, 0);
         //
         buildCellMesh();

@@ -35,8 +35,6 @@ public:
         this->vp = core->getViewport();
         this->sceMgr = core->getSceneManager();
 
-        // active tray
-        this->core->getImGuiApp()->addFrameListener(this);
         //
         this->activeTrayUI = new ActiveTrayUI(core);
         this->mainUI = new MainUI(core);

@@ -21,8 +21,8 @@ class ActorStateControl : public ActorState
 public:
     ActorStateControl(CostMap *costMap, Core *core) : ActorState(costMap, core)
     {
-        this->actorScaleVptr = core->getGlobal()->getVarPtr(".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
-        this->actorHighVptr = core->getGlobal()->getVarPtr(".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
+        this->actorScaleVptr = core->getGlobal()->VarBag<float>::createBindVptr(".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
+        this->actorHighVptr = core->getGlobal()->VarBag<float>::createBindVptr(".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
     }
     void create(SceneManager *sMgr, Entity *&entity, SceneNode *&node) override
     {

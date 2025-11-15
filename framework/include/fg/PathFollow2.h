@@ -10,20 +10,20 @@ class PathFollow2
 {
     std::vector<Ogre::Vector2> path;
     float speedFactor = 30.0f;
-    float &speed;
+    float speed;
     int next = 1; // ignore the first one.
     Vector2 position;
 
 public:
-    PathFollow2(Vector2 position, std::vector<Ogre::Vector2> path, float &speed) : speed(speed)
+    PathFollow2(Vector2 position, std::vector<Ogre::Vector2> path, float speed) : speed(speed)
     {
         this->position = position;
         this->path = path;
     }
 
-    float *getSpeedPtr()
+    float getSpeed()
     {
-        return &speed;
+        return speed;
     }
 
     bool move(float timeEscape, Vector2 &currentPos, Vector2 &direction)

@@ -14,7 +14,7 @@
 #include <OgreRenderWindow.h>
 #include "fg/demo/GameTerrain.h"
 #include "ActiveTrayUI.h"
-class MainUI 
+class MainUI
 {
     Global *global;
     Core *core;
@@ -35,16 +35,19 @@ public:
         this->initGlobalVarPtr(core->getGlobal());
         // active tray
         this->activeTrayUI = new ActiveTrayUI(core);
+
         //
     }
+
+    State *activeState = nullptr;
 
     void Open()
     {
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.7f));
 
         ImGui::Begin("Hello");
-        Actor *actor = global->getActiveActor();
-        if (actor)
+
+        if (activeState)
         {
             ImGui::Button(":Right click a cell as the destination!");
         }
@@ -58,11 +61,12 @@ public:
         ImGui::Text(fmt::format("Viewport.pixel:    {},{},{},{}", vp->getActualLeft(), vp->getActualTop(), vp->getActualWidth(), vp->getActualHeight()).c_str());
         ImGui::Text(fmt::format("Window.pixel:      {},{}", window->getWidth(), window->getHeight()).c_str());
 
-        global->forEachVarPtr([](std::string name, float *vPtr, Global::VarScope<float> *scope)
-                              { 
-                            float min  = scope?scope->min:0;
-                            float max = scope?scope->max:100;
-                            ImGui::SliderFloat(name.c_str(), vPtr, min, max); });
+        this->global->VarBag<float>::forEachVarPtr([](const std::string name, float *vPtr, VarBag<float>::VarRange<float> *range)
+                                                   {
+                float min = range ? range->min : 0;
+                float max = range ? range->max : 100;
+                ImGui::SliderFloat(name.c_str(), vPtr, min, max); });
+
         // stats
 
         const Ogre::RenderTarget::FrameStats &fs = window->getStatistics();
@@ -103,7 +107,7 @@ public:
 
     void initGlobalVarPtr(Global *glb)
     {
-        glb->setVarAndScope(".aniSpeed", 0.55f, 0.0f, 2.0f);
-        glb->setVarAndScope(".pathSpeed", 1.0f, 1.0f, 10.0f);
+        glb->VarBag<float>::createBindVptr(".aniSpeed", 0.55f, 0.0f, 2.0f);
+        glb->VarBag<float>::createBindVptr(".pathSpeed", 1.0f, 1.0f, 10.0f);
     }
 };

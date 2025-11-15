@@ -80,7 +80,10 @@ public:
         void onFrame(const FrameEvent &evt)
         {
             ImGui::Begin("Hello");
-            Actor *actor = global->getActiveActor();
+            
+            State *actor = global->VarBag<std::any>::getVarVal<State *>("<any>.activeState", [](std::any val)
+                                                                        { return std::any_cast<State *>(val); }, nullptr);
+
             if (actor)
             {
                 ImGui::Button(":Right click a cell as the destination!");

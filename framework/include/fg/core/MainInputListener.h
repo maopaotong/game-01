@@ -59,10 +59,10 @@ public:
         this->core = core;
         this->wsc = wsc;
         Global *global = core->getGlobal();
-        this->cameraTopDistanceVptr = global->getVarPtr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
-        this->cameraHighMinVptr = global->getVarPtr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
-        this->cameraHighMaxVptr = global->getVarPtr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
-        this->cameraRollSpeedVptr = global->getVarPtr(".cameraRollSpeed", DEFAULT_CAMERA_ROLL_SPEED, 0.0f, DEFAULT_CAMERA_ROLL_SPEED * 3);           //
+        this->cameraTopDistanceVptr = global->VarBag<float>::createBindVptr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
+        this->cameraHighMinVptr = global->VarBag<float>::createBindVptr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
+        this->cameraHighMaxVptr = global->VarBag<float>::createBindVptr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
+        this->cameraRollSpeedVptr = global->VarBag<float>::createBindVptr(".cameraRollSpeed", DEFAULT_CAMERA_ROLL_SPEED, 0.0f, DEFAULT_CAMERA_ROLL_SPEED * 3);           //
     }
 
     bool mousePressed(const MouseButtonEvent &evt) override

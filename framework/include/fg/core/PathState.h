@@ -36,7 +36,7 @@ public:
         this->sceNode = sceneMgr->getRootSceneNode()->createChildSceneNode();
         this->sceNode->attachObject(pathObject);
 
-        this->pathHighOffset = core->getGlobal()->getVarPtr(".pathHighOffset", DEFAULT_HIGH_OFFSET, 0.0f, DEFAULT_HIGH_OFFSET * 100.0f);
+        this->pathHighOffset = core->getGlobal()->VarBag<float>::createBindVptr(".pathHighOffset", DEFAULT_HIGH_OFFSET, 0.0f, DEFAULT_HIGH_OFFSET * 100.0f);
     }
 
     void clearPath()
