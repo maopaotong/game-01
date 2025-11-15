@@ -14,11 +14,19 @@ public:
         T max;
     };
 
-    template<typename T>
+    template <typename T>
+    struct VarDefine
+    {
+        T defaultValue;
+        T min;
+        T max;
+    };
+
+    template <typename T>
     class VarListener
     {
     public:
-        virtual void onVarChanged(const std::string name, T& ref) = 0;
+        virtual void onVarChanged(const std::string name, T &ref) = 0;
     };
 
 private:
@@ -51,14 +59,13 @@ private:
             listener.erase(l);
         }
 
-        void notify(const std::string& name)
+        void notify(const std::string &name)
         {
             for (auto it : listeners)
             {
                 it->onVarChanged(name, value);
             }
         }
-        
     };
 
 private:
@@ -78,16 +85,7 @@ public:
     void setVarAndScope(const std::string name, float value, float min, float max)
     {
 
-        VarBind<float> *vb = this->getOrCreate(name, value);
-        VarScope<float> *scope = vb->scope;
-        if (!scope)
-        {
-            scope = new VarScope<float>();
-            vb->scope = scope;
-        }
-        scope->min = min;
-        scope->max = max;
-        vb->value = value;
+        VarBind<float> *vb = this->getOrCreate(name, value, min, max);
         vb->notify(name);
     }
     void setVar(const std::string name, float value)
@@ -98,7 +96,7 @@ public:
         vb->notify(name);
     }
 
-    VarBind<float> *getOrCreate(const std::string name, float value)
+    VarBind<float> *getOrCreate(const std::string name, float value = 0.0f, float min = 0.0f, float max = 100.0f)
     {
         std::unordered_map<std::string, VarBind<float> *>::iterator it = this->floatVarMap.find(name);
         VarBind<float> *vp;
@@ -106,6 +104,10 @@ public:
         {
             vp = new VarBind<float>(value);
             this->floatVarMap.emplace(name, vp); //
+            VarScope<float> *scope = new VarScope<float>();
+            vp->scope = scope;
+            scope->min = min;
+            scope->max = max;
         }
         else
         {
@@ -115,13 +117,13 @@ public:
         return vp;
     }
 
-    float *getVarPtr(std::string name)
+    float *getVarPtr(std::string name, float defaultValue = 0.0f, float min = 0.0f, float max = 100.0f)
     {
-        return &this->getOrCreate(name, 0.0f)->value;
+        return &this->getOrCreate(name, defaultValue, min, max)->value;
     }
-    float &getVarRef(std::string name)
+    float &getVarRef(std::string name, float defaultValue = 0.0f, float min = 0.0f, float max = 100.0f)
     {
-        return *this->getVarPtr(name);
+        return *this->getVarPtr(name, defaultValue, min, max);
     }
 
     void forEachVarPtr(std::function<void(const std::string, float *, VarScope<float> *scope)> func)

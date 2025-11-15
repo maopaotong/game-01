@@ -9,6 +9,7 @@
 #include "fg/util/CostMap.h"
 
 using namespace Ogre;
+#define DEFAULT_CELL_HIGH_OFFSET 0.08f
 
 //
 class CellStateControl : public State
@@ -18,6 +19,7 @@ private:
     Ogre::ManualObject *obj;
     Ogre::SceneNode *node;
     CostMap *costMap;
+    float *highOffset;
 
 public:
     CellStateControl(CostMap *costMap, Core *core)
@@ -27,6 +29,8 @@ public:
         obj = sceneMgr->createManualObject();
         node = sceneMgr->getRootSceneNode()->createChildSceneNode();
         node->attachObject(obj);
+        this->highOffset = core->getGlobal()->getVarPtr(".cellHighOffset", DEFAULT_CELL_HIGH_OFFSET, 0.0f, DEFAULT_CELL_HIGH_OFFSET * 100.0f);
+        node->setPosition(0, *highOffset, 0);
         //
         buildCellMesh();
     }
@@ -40,9 +44,9 @@ public:
         obj->begin(MaterialNames::materialNameInUse, Ogre::RenderOperation::OT_TRIANGLE_LIST);
         int width = costMap->getWidth();
         int height = costMap->getHeight();
-        float offsetX = width/2 * CostMap::hexSize;
-        float offsetY = height/2 * CostMap::hexSize;
-        Vector2 offset(offsetX,offsetY);
+        float offsetX = width / 2 * CostMap::hexSize;
+        float offsetY = height / 2 * CostMap::hexSize;
+        Vector2 offset(offsetX, offsetY);
 
         for (int x = 0; x < width; x++)
         {

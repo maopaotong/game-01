@@ -38,10 +38,19 @@ using namespace Ogre;
 // === Input handler for closing application ===
 class MainInputListener : public OgreBites::InputListener
 {
+    static constexpr float DEFAULT_CAMERA_TOP_DISTANCE = 2 * 1000.0f;
+    static constexpr float DEFAULT_CAMERA_HIGH_MIN = 150.0f;
+    static constexpr float DEFAULT_CAMERA_HITH_MAX = DEFAULT_CAMERA_HIGH_MIN * 10.0f;
+    static constexpr float DEFAULT_CAMERA_ROLL_SPEED = (DEFAULT_CAMERA_HITH_MAX - DEFAULT_CAMERA_HIGH_MIN) / 10.0f;
+
 private:
     IWorld *wsc;
 
     Core *core;
+    float *cameraTopDistanceVptr;
+    float *cameraHighMinVptr;
+    float *cameraHighMaxVptr;
+    float *cameraRollSpeedVptr;
 
 public:
     MainInputListener(IWorld *wsc,
@@ -49,6 +58,11 @@ public:
     {
         this->core = core;
         this->wsc = wsc;
+        Global *global = core->getGlobal();
+        this->cameraTopDistanceVptr = global->getVarPtr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
+        this->cameraHighMinVptr = global->getVarPtr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
+        this->cameraHighMaxVptr = global->getVarPtr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
+        this->cameraRollSpeedVptr = global->getVarPtr(".cameraRollSpeed", DEFAULT_CAMERA_ROLL_SPEED, 0.0f, DEFAULT_CAMERA_ROLL_SPEED * 3);           //
     }
 
     bool mousePressed(const MouseButtonEvent &evt) override
@@ -115,10 +129,47 @@ public:
 
     bool mouseWheelRolled(const MouseWheelEvent &evt) override
     {
-        Ogre::SceneNode *node = core->getCamera()->getParentSceneNode();
-        float speed = 20.0f;
-        node->translate(Ogre::Vector3::UNIT_Y * evt.y * speed);
+        Camera *cam = core->getCamera();
+        Ogre::SceneNode *node = cam->getParentSceneNode();
+        Vector3 translate = Ogre::Vector3::NEGATIVE_UNIT_Y * evt.y * *cameraRollSpeedVptr;
+        Vector3 posTarget = node->getPosition() + translate;
+        if (posTarget.y < *this->cameraHighMinVptr)
+        {
+            posTarget.y = *this->cameraHighMinVptr;
+        }
+        if (posTarget.y > *this->cameraHighMaxVptr)
+        {
+            posTarget.y = *this->cameraHighMaxVptr;
+        }
 
+        node->setPosition(posTarget);
+
+        alignHorizonToTop(node, cam, *this->cameraTopDistanceVptr);
         return false;
+    }
+    void alignHorizonToTop(Ogre::SceneNode *camNode, Ogre::Camera *cam, Ogre::Real distance)
+    {
+        Ogre::Radian fovY = cam->getFOVy();
+        Ogre::Real camHeight = camNode->getPosition().y; // 假设地面 Y=0
+
+        // 防止高度 <= 0
+        if (camHeight <= 0.1f)
+            camHeight = 0.1f;
+
+        // 计算相机到目标点的俯角（从水平线向下）
+        Ogre::Radian depressionAngle = Ogre::Math::ATan(camHeight / distance);
+
+        // 目标 pitch：向下转 (depressionAngle + fovY/2)
+        Ogre::Radian targetPitch = -(depressionAngle + fovY / 2);
+
+        // 保持当前 yaw
+        Ogre::Radian currentYaw = camNode->getOrientation().getYaw();
+
+        // 设置新朝向
+        Ogre::Quaternion newOri =
+            Ogre::Quaternion(currentYaw, Ogre::Vector3::UNIT_Y) *
+            Ogre::Quaternion(targetPitch, Ogre::Vector3::UNIT_X);
+
+        camNode->setOrientation(newOri);
     }
 };

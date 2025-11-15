@@ -60,6 +60,8 @@ public:
 
                 // position
                 pNode->translate(currentPos - prevPos); // new position
+                //high
+                
                 // animation
                 AnimationStateIterator it = this->aniSet->getAnimationStateIterator();
                 while (it.hasMoreElements())

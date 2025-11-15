@@ -11,10 +11,11 @@
 
 using namespace Ogre;
 
+#define DEFAULT_HIGH_OFFSET 0.1f
+
 class PathState : public State
 {
     Ogre::ManualObject *pathObject;
-    Ogre::SceneNode *pathNode;
 
     std::vector<Ogre::Vector2> currentPath;
 
@@ -22,17 +23,20 @@ class PathState : public State
     CellKey start = CellKey(-1, -1);
     CellKey end = CellKey(-1, -1);
 
-    Core* core;
+    Core *core;
+    float *pathHighOffset;
+
 public:
-    PathState(CostMap* costMap, Core*core)
+    PathState(CostMap *costMap, Core *core)
     {
         this->costMap = costMap;
 
         Ogre::SceneManager *sceneMgr = core->getSceneManager();
         pathObject = sceneMgr->createManualObject("PathObject");
-        pathNode = sceneMgr->getRootSceneNode()->createChildSceneNode();
-        pathNode->attachObject(pathObject);
-        pathNode->translate(0, 1, 0);
+        this->sceNode = sceneMgr->getRootSceneNode()->createChildSceneNode();
+        this->sceNode->attachObject(pathObject);
+
+        this->pathHighOffset = core->getGlobal()->getVarPtr(".pathHighOffset", DEFAULT_HIGH_OFFSET, 0.0f, DEFAULT_HIGH_OFFSET * 100.0f);
     }
 
     void clearPath()
@@ -55,6 +59,7 @@ public:
         currentPath = path;
         start = ck1;
         end = ck2;
+        this->sceNode->setPosition(0.0f, *pathHighOffset, 0.0f);
         this->rebuild();
     }
 
@@ -80,7 +85,7 @@ public:
         {
             for (int x = 0; x < width; x++)
             {
-                //auto vertices = CostMap::calculateVerticesForXZ(x, y, CostMap::hexSize);
+                // auto vertices = CostMap::calculateVerticesForXZ(x, y, CostMap::hexSize);
                 auto vertices = Ground::calculateVertices3D(x, y, costMap, CostMap::hexSize);
 
                 if (x == start.first && y == start.second)

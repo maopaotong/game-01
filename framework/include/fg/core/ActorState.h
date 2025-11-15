@@ -113,8 +113,8 @@ public:
         }
         // check if this state's position on the target cell
         Vector3 aPos3 = this->sceNode->getPosition();
-        float height = 0.0f;
-        Vector2 aPos2 = Ground::Transfer::to2D(aPos3, height);
+        float actorHeightOffset = 0.0f;
+        Vector2 aPos2 = Ground::Transfer::to2D(aPos3, actorHeightOffset);
         CellKey aCellKey;
         bool hitCell = CellUtil::findCellByPoint(costMap, aPos2, aCellKey);
         if (hitCell)
@@ -129,7 +129,7 @@ public:
             AnimationStateSet *anisSet = entity->getAllAnimationStates();
             float &aniSpeed = this->global->getVarRef(".aniSpeed");
             // new child state.
-            PathFollow2MissionState *missionState = new PathFollow2MissionState(global, path, anisSet, aniNames, aniSpeed, height);
+            PathFollow2MissionState *missionState = new PathFollow2MissionState(global, path, anisSet, aniNames, aniSpeed, actorHeightOffset);//
             // delete missionState;
 
             if (this->mission)

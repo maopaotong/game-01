@@ -25,7 +25,7 @@ using namespace Ogre;
 class GameTerrain : public State
 {
     const String FFP_Transform = "FFP_Transform";
-    const float flatHight = -10;
+    const float flatHight = 0.0f;
 
 private:
     long terrainX = 1;
@@ -40,10 +40,7 @@ private:
 public:
     virtual ~GameTerrain()
     {
-        if (this->defaultTMG)
-        {
-            delete this->defaultTMG;
-        }
+       
         if (terrainGroup)
         {
             delete terrainGroup;
@@ -74,7 +71,9 @@ public:
         options->setCompositeMapDistance(3000);
 
         defaultTMG = new TerrainMaterialGeneratorA();
-        TerrainMaterialGeneratorPtr defaultTMGPtr(defaultTMG, [](TerrainMaterialGenerator *) {});
+        TerrainMaterialGeneratorPtr defaultTMGPtr(defaultTMG, [](TerrainMaterialGenerator *ptr) {
+            delete ptr;
+        });
         options->setDefaultMaterialGenerator(defaultTMGPtr);
 
         TerrainMaterialGeneratorA::SM2Profile *matProfile = static_cast<TerrainMaterialGeneratorA::SM2Profile *>(
