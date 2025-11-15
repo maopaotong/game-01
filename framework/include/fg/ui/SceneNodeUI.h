@@ -18,10 +18,10 @@
 class SceneNodeUI
 {
     template <typename... Args>
-    using NodeVistFunc = void (*)(int depth, Node *cNode, Args... args);
+    using NodeVistFunc = bool (*)(int depth, Node *cNode, Args... args);
 
     template <typename... Args>
-    using SceneNodeVistFunc = void (*)(int depth, SceneNode *cNode, Args... args);
+    using SceneNodeVistFunc = bool (*)(int depth, SceneNode *cNode, Args... args);
 
     Global *global;
     Core *core;
@@ -48,38 +48,61 @@ public:
         ImGui::Begin("SceneNode Explorer");
 
         SceneNode *sNode = sceMgr->getRootSceneNode();
-
-        SceneNodeUI::forEachSceneNode<>(0, sNode, (SceneNodeVistFunc<>)[](int depth, SceneNode *cNode)
-                                        {
-            ImGui::Indent(depth * 10.0f);
+        int id = 0;
+        SceneNodeVistFunc<int &> func = (SceneNodeVistFunc<int &>)[](int depth, SceneNode *cNode, int &id) -> bool
+        {
+            float indent = (depth + 1) * 10.0f;
+            ImGui::Indent(indent);
             ImGui::Text(fmt::format("SceneNode: {}", cNode->getName()).c_str());
-            ImGui::Unindent(depth * 10.0f); });
+            Ogre::Any expand = cNode->getUserObjectBindings().getUserAny(".expanding");            
+            bool isExpand = expand.isEmpty()?false: expand.get<bool>();
+            
+            ImGui::PushID(id++);
+            if(cNode->getChildren().size()>0){
+                ImGui::SameLine();
+                if(ImGui::Checkbox("Exp:", &isExpand)){
+                    cNode->getUserObjectBindings().setUserAny(".expanding", Ogre::Any(isExpand));
+                }
+            }
+
+            ImGui::PopID();
+
+            ImGui::Unindent(indent); 
+            return isExpand; };
+        SceneNodeUI::forEachSceneNode<int &>(0, sNode, func, id);
 
         ImGui::End();
     }
     template <typename... Args>
-    static void forEachSceneNode(int depth, SceneNode *cNode, SceneNodeVistFunc<> func)
+    static void forEachSceneNode(int depth, SceneNode *cNode, SceneNodeVistFunc<Args...> func, Args... args)
     {
 
-        forEachNode<SceneNodeVistFunc<>>( //
-            depth, cNode,                 //
-            (NodeVistFunc<SceneNodeVistFunc<>>)[](int depth, Node *cNode, SceneNodeVistFunc<> func)
+        forEachNode<SceneNodeVistFunc<Args...>, Args...>( //
+            depth, cNode,                                 //
+            (NodeVistFunc<SceneNodeVistFunc<Args...>, Args...>)[](int depth, Node *cNode, SceneNodeVistFunc<Args...> func, Args... args) -> bool
             {
-                SceneNode* sceCNode = dynamic_cast<SceneNode*>(cNode);
-                if(sceCNode){
-                    func(depth, sceCNode);
-               } },
-            func);
+                SceneNode *sceCNode = dynamic_cast<SceneNode *>(cNode);
+                if (sceCNode)
+                {
+                    return func(depth, sceCNode, args...);
+                }
+                return true;
+            },
+            func, args...);
     }
 
     template <typename... Args>
-    static void forEachNode(int depth, Node *cNode, void (*func)(int, Node *, Args...), Args... args)
+    static void forEachNode(int depth, Node *cNode, bool (*func)(int, Node *, Args...), Args... args)
     {
-        func(depth, cNode, args...);
+        bool goOn = func(depth, cNode, args...);
+        if (!goOn)
+        {
+            return;
+        }
         auto &children = cNode->getChildren();
         for (auto &child : children)
         {
-            forEachNode(depth + 1, child, func, args...);
+            forEachNode<Args...>(depth + 1, child, func, args...);
         }
     }
 };
