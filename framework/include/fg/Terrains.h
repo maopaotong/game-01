@@ -1,7 +1,4 @@
 #pragma once
-#include "State.h"
-#include "util/Polygon2.h"
-#include "util/CellUtil.h"
 #include <Ogre.h>
 #include <OgreVector.h>
 using namespace Ogre;

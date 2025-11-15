@@ -1,25 +1,25 @@
 #pragma once
 
-template <typename T>
+template <typename...Args>
 class Listener
 {
 public:
-    virtual bool onEvent(T &evt) = 0;
+    virtual bool onEvent(Args...args) = 0;
 };
 
-template <typename T>
-class FunctionListener : public Listener<T>
+template <typename...Args>
+class FunctionListener : public Listener<Args...>
 {
-    std::function<bool(T)> func;
+    bool (*func)(Args...);
 
 public:
     virtual ~FunctionListener() {}
-    FunctionListener(std::function<bool(T &)> func)
+    FunctionListener(bool(func)(Args... args))
     {
         this->func = func;
     }
-    bool onEvent(T &evt) override
+    bool onEvent(Args...args) override
     {
-        return func(evt);
+        return func(args...);
     }
 };

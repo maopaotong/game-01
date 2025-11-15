@@ -13,7 +13,7 @@
 #include "fg/Actor.h"
 using namespace Ogre;
 
-class ActorState : public State, public Pickable, public Ogre::FrameListener, public Movable, public Actor
+class ActorState : public State, public Pickable, public Ogre::FrameListener, public Movable
 {
 
     constexpr static float ACTOR_SCALE = 5.0f;
@@ -33,7 +33,7 @@ protected:
     float actorHighOffset = 0.0f;
 
 public:
-    ActorState(CostMap *costMap, Core *core) : State(core->getEventCenter())
+    ActorState(CostMap *costMap, Core *core)
     {
         this->global = core->getGlobal();
 

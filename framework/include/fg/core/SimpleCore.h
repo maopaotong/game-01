@@ -26,13 +26,11 @@ private:
     MaterialManager *matMgr;
     Global *global;
     Ogre::Light *light;
-    EventCenter *eventCenter;
 
 public:
     SimpleCore()
     {
         this->global = new Global();
-        this->eventCenter = new EventCenter();
         appCtx = new ImGuiAppContext("HexagonalGridVisualizer");
 
         appCtx->initApp();
@@ -149,8 +147,5 @@ public:
     {
         return State::get(this->sceMgr->getRootSceneNode());
     }
-    EventCenter *getEventCenter() override
-    {
-        return this->eventCenter;
-    }
+   
 };

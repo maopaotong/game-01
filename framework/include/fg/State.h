@@ -11,9 +11,13 @@
 #include "Movable.h"
 #include "fg/EventCenter.h"
 #include "fg/PropertyEvent.h"
+#include "fg/Global.h"
+#include "fg/EventCenter.h"
+#include "fg/PropertyEvent.h"
+
 using namespace Ogre;
 
-class State
+class State : public Actor
 {
 public:
     static State *get(Node *node)
@@ -52,15 +56,10 @@ protected:
     SceneNode *sceNode = nullptr;
     std::vector<State *> *children = nullptr;
     bool active = false;
-    EventCenter *events = nullptr;
-
+    
 public:
-    State() : State(nullptr)
+    State()
     {
-    }
-    State(EventCenter *ec)
-    {
-        this->events = ec;
         this->children = new std::vector<State *>();
         std::cout << "new State()" << this << "" << std::endl;
     }
@@ -144,7 +143,7 @@ public:
         this->active = active;
         if (changed)
         {
-            EventCenter::emit(this->events, PropertyEvent<State>(this, "active"));
+            Global::Context<ECPEActor*>::get()->emit(PropertyEvent<Actor>(this, "active"));
         }
     }
 

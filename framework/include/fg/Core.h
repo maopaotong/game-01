@@ -28,7 +28,6 @@ public:
     virtual State *getRootState() = 0;
     virtual Global * getGlobal() = 0;
     virtual Light* getLight() = 0;
-    virtual EventCenter* getEventCenter() = 0;
 
     template <typename T>
     void setUserObject(const std::string key, T *obj)

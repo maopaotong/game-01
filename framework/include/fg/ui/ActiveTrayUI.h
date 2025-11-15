@@ -5,7 +5,8 @@
 #include "fg/State.h"
 #include "fg/EventCenter.h"
 #include "fg/PropertyEvent.h"
-class ActiveTrayUI
+
+class ActiveTrayUI : public Listener<PropertyEvent<Actor> &>
 {
     Core *core;
     State *state = nullptr;
@@ -15,25 +16,27 @@ public:
     {
         this->core = core;
 
-        std::function<bool(PropertyEvent<State> &)> func = [&](PropertyEvent<State> &evt)
-        {
-            if (evt.getName() == "active")
-            {
-                State *s = evt.getState();
-                if (s->isActive())
-                {
-                    this->state = s;
-                }
-                else
-                {
-                    this->state = nullptr;
-                }
-                // do something with s
-            }
-            return true;
-        };
+        Global::Context<ECPEActor *>::get()->addListener(this);
+    }
 
-        this->core->getEventCenter()->addListener<PropertyEvent<State>>(func);
+    bool onEvent(PropertyEvent<Actor> &evt) override
+    {
+        if (evt.getName() == "active")
+        {
+            Actor *a = evt.getState();
+            State *s = dynamic_cast<State *>(a);
+
+            if (s && s->isActive())
+            {
+                this->state = s;
+            }
+            else
+            {
+                this->state = nullptr;
+            }
+            // do something with s
+        }
+        return true;
     }
 
     bool Open()

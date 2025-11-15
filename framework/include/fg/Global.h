@@ -1,12 +1,13 @@
 
 #pragma once
-#include "Actor.h"
 #include <unordered_map>
 #include <unordered_set>
 #include <functional>
 #include "VarBag.h"
-#include <any>
 #include "fg/Terrains.h"
+#include "fg/Actor.h"
+#include "fg/EventCenter.h"
+#include "fg/PropertyEvent.h"
 
 template <typename T>
 class Context
@@ -56,13 +57,15 @@ public:
     }
 };
 
+typedef EventCenter<PropertyEvent<Actor> &> ECPEActor;
+
 class Global : public VarBag<float>, public VarBag<long>, public VarBag<Vector3>, public VarBag<std::any>, //
-               public Context<Terrains *>
+               public Context<Terrains *>,                                                                 //
+               public Context<ECPEActor *>                                                                 //
 {
     typedef void (*FloatVarVistFunc)(const std::string name, float *vPtr, VarBag<float>::VarRange<float> *range);
 
 public:
-
     static float getTerrainHeightAtPositionWithOffset(float x, float y, float offset = 0.0f)
     {
         return Context<Terrains *>::get()->getHeightAtPosition(x, y) + offset;

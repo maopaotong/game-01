@@ -1,6 +1,8 @@
 #pragma once
 #include <Ogre.h>
 
-class Actor {
-    
+class Actor
+{
+public:
+    virtual ~Actor() = default;
 };
