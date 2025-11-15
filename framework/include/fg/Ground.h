@@ -16,13 +16,18 @@ public:
 
         static Vector3 to3D(Vector2 &vec2, float height = 0.0f)
         {
+            return to3D(vec2.x, vec2.y, height);
+        }
+
+        static Vector3 to3D(float x, float y, float height = 0.0f)
+        {
             if (VERTEX_ORDER_REVERSE)
             {
-                return Vector3(vec2.y, height, -vec2.x);
+                return Vector3(y, height, -x);
             }
             else
             {
-                return Vector3(vec2.x, height, -vec2.y);
+                return Vector3(x, height, -y);
             }
         }
 

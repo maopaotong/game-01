@@ -21,6 +21,8 @@
 #include "fg/WorldState.h"
 #include "fg/core/SimpleInputState.h"
 #include "fg/core/MouseClickPicker.h"
+#include "fg/Terrains.h"
+
 using namespace Ogre;
 // root state & control.
 class WorldStateControl : public WorldState, public IWorld
@@ -52,7 +54,7 @@ public:
         root->addFrameListener(cameraState);
 
         markStateControls[MarkType::ACTIVE] = new CellMarkStateControl(costMap, core, MarkType::ACTIVE);
-        ActorStateControl *actor = new ActorStateControl( costMap, core);
+        ActorStateControl *actor = new ActorStateControl(costMap, core);
         actor->init(core);
         this->addChild(actor);
         root->addFrameListener(actor);

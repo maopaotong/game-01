@@ -7,6 +7,7 @@
 #include "fg/Module.h"
 #include "fg/App.h"
 #include "fg/core/SimpleCore.h"
+#include "fg/Global.h"
 
 using namespace OgreBites;
 using namespace Ogre;
@@ -16,6 +17,7 @@ private:
     Core *core;
     std::vector<Module *> list;
     std::unordered_map<std::string, Module *> map;
+
 
 public:
     SimpleApp()
@@ -48,7 +50,9 @@ public:
     {
 
         Ogre::Root *root = this->core->getRoot();
+
         root->startRendering();
+
     }
 
     void close() override

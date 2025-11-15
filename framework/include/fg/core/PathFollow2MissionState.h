@@ -56,12 +56,15 @@ public:
 
                 //
                 Vector3 prevPos = pNode->getPosition();
-                Vector3 currentPos = Ground::Transfer::to3D(currentPos2D, heightOffset); //
+                
+                float terH = Global::Context<Terrains *>::get()->getHeightAtPosition(currentPos2D); // TODO in a common place to translate all .
+                
+                Vector3 currentPos = Ground::Transfer::to3D(currentPos2D, heightOffset + terH); //
 
                 // position
                 pNode->translate(currentPos - prevPos); // new position
-                //high
-                
+                // high
+
                 // animation
                 AnimationStateIterator it = this->aniSet->getAnimationStateIterator();
                 while (it.hasMoreElements())

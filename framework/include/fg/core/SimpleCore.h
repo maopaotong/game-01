@@ -71,7 +71,7 @@ public:
         // light->setType(Ogre::Light::LT_POINT);
         light->setType(Ogre::Light::LT_DIRECTIONAL);
         light->setDiffuseColour(Ogre::ColourValue(1.0, 1.0, 1.0));  // 白色漫反射
-        light->setSpecularColour(Ogre::ColourValue(1.0, 1.0, 1.0)); // 白色镜面光
+        light->setSpecularColour(Ogre::ColourValue(.0, .0, .0)); // 白色镜面光
         Ogre::SceneNode *lightNode = sceMgr->getRootSceneNode()->createChildSceneNode();
         lightNode->setPosition(0, 500, 0);
         lightNode->setDirection(Ground::DIRECTION_DOWN);

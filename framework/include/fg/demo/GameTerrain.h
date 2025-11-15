@@ -10,7 +10,8 @@
 #include <OgreShaderSubRenderState.h>
 #include <OgreShaderRenderState.h>
 #include <OgreShaderGenerator.h>
-
+#include "fg/Ground.h"
+#include "fg/Terrains.h"
 using namespace Ogre;
 
 //
@@ -22,10 +23,11 @@ using namespace Ogre;
 //- Do not delete the pointer by shared pointer.
 //- We need to detroy it before app closing.
 
-class GameTerrain : public State
+class GameTerrain : public State, public Terrains
 {
     const String FFP_Transform = "FFP_Transform";
     const float flatHight = 0.0f;
+    const float terrainScale = 60.0f;
 
 private:
     long terrainX = 1;
@@ -40,7 +42,7 @@ private:
 public:
     virtual ~GameTerrain()
     {
-       
+
         if (terrainGroup)
         {
             delete terrainGroup;
@@ -49,9 +51,9 @@ public:
         {
             delete options;
         }
-        //Trying to fix the exception when closing the app context.
-        //Ogre::RTShader::SubRenderStateFactory *fac = Ogre::RTShader::ShaderGenerator::getSingleton().getSubRenderStateFactory(FFP_Transform);
-        //fac->destroyAllInstances();
+        // Trying to fix the exception when closing the app context.
+        // Ogre::RTShader::SubRenderStateFactory *fac = Ogre::RTShader::ShaderGenerator::getSingleton().getSubRenderStateFactory(FFP_Transform);
+        // fac->destroyAllInstances();
     }
 
 public:
@@ -71,9 +73,8 @@ public:
         options->setCompositeMapDistance(3000);
 
         defaultTMG = new TerrainMaterialGeneratorA();
-        TerrainMaterialGeneratorPtr defaultTMGPtr(defaultTMG, [](TerrainMaterialGenerator *ptr) {
-            delete ptr;
-        });
+        TerrainMaterialGeneratorPtr defaultTMGPtr(defaultTMG, [](TerrainMaterialGenerator *ptr)
+                                                  { delete ptr; });
         options->setDefaultMaterialGenerator(defaultTMGPtr);
 
         TerrainMaterialGeneratorA::SM2Profile *matProfile = static_cast<TerrainMaterialGeneratorA::SM2Profile *>(
@@ -94,7 +95,7 @@ public:
         options->setCompositeMapDiffuse(light->getDiffuseColour());
 
         Ogre::Terrain::ImportData &defaultimp = terrainGroup->getDefaultImportSettings();
-        defaultimp.inputScale = 600;
+        defaultimp.inputScale = terrainScale;
         defaultimp.minBatchSize = 33;
         defaultimp.maxBatchSize = 65;
 
@@ -118,7 +119,7 @@ public:
         {
             for (long y = 0; y < terrainY; ++y)
             {
-                terrainGroup->defineTerrain(x, y, flatHight);
+                defineTerrain(x, y, false);
             }
         }
         // load
@@ -131,6 +132,34 @@ public:
 
         // free
         terrainGroup->freeTemporaryResources();
+    }
+
+    float getHeightAtPosition(float x, float y) override
+    {
+        return terrainGroup->getHeightAtWorldPosition(Ground::Transfer::to3D(x, y));
+    }
+
+    void defineTerrain(long x, long y, bool flat)
+    {
+        if (flat)
+        {
+            terrainGroup->defineTerrain(x, y, flatHight);
+            return;
+        }
+        Image img;
+        getTerrainImage(x % 2 != 0, y % 2 != 0, img);
+        terrainGroup->defineTerrain(x, y, &img);
+    }
+
+    void getTerrainImage(bool flipX, bool flipY, Image &img)
+    {
+        //! [heightmap]
+        img.load("terrain.png", terrainGroup->getResourceGroup());
+        if (flipX)
+            img.flipAroundY();
+        if (flipY)
+            img.flipAroundX();
+        //! [heightmap]
     }
 
     void genereatePng(const char *filename, int width, int height)

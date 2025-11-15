@@ -23,8 +23,8 @@ class Game01 : public Module
     RenderWindow *window;
     Viewport *vp;
     SceneManager *sceMgr;
-    GameTerrain *terrain = nullptr;
     OnFrameUI *onFrameUI = nullptr;
+
 public:
     Game01()
     {
@@ -38,8 +38,7 @@ public:
     }
     void disactive() override
     {
-        delete this->terrain;
-        this->terrain = nullptr;
+        delete Global::Context<Terrains *>::unset();
     }
 
     void active(Core *core) override
@@ -49,12 +48,23 @@ public:
         this->window = core->getWindow();
         this->vp = core->getViewport();
         this->sceMgr = core->getSceneManager();
+
         this->onFrameUI = new OnFrameUI(core);
         this->core->getImGuiApp()->addFrameListener(this->onFrameUI);
-        
+        //
+        //
+
         CostMap *costMap = createCostMap();
         // Create materials before buding mesh?
         MaterialFactory::createMaterials(core->getMaterialManager());
+        //
+        GameTerrain *terrains = new GameTerrain();
+        RenderSystem *rSys = core->getRoot()->getRenderSystem();
+        Light *light = core->getLight();
+        terrains->load(rSys, sceMgr, light);
+        Global::Context<Terrains *>::set(terrains);
+
+        //
         Ground *ground = new CostMapGround(costMap);
         State *world = new WorldStateControl(costMap, ground, core);
 
@@ -62,13 +72,6 @@ public:
         world->setSceneNode(node);
 
         //
-        terrain = new GameTerrain();
-        RenderSystem *rSys = core->getRoot()->getRenderSystem();
-        Light *light = core->getLight();
-        terrain->load(rSys, sceMgr, light);
-
-        //
-
     }
 
     CostMap *createCostMap()

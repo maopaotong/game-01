@@ -13,11 +13,13 @@
 #include "fg/Actor.h"
 using namespace Ogre;
 
-class ActorState : public State, public Pickable, public Ogre::FrameListener, public Movable,public Actor
+class ActorState : public State, public Pickable, public Ogre::FrameListener, public Movable, public Actor
 {
 
-protected:
+    constexpr static float ACTOR_SCALE = 5.0f;
+    constexpr static float ACTOR_HEIGHT = 10.0f;
 
+protected:
     PathFollow2 *pathFolow = nullptr;
     Ogre::Entity *entity;
     CostMap *costMap;
@@ -25,12 +27,22 @@ protected:
 
     PathFollow2MissionState *mission = nullptr;
     std::vector<std::string> aniNames = {"RunBase", "RunTop"};
-    Global * global;    
+    Global *global;
+    float *actorScaleVptr;
+    float *actorHighVptr;
+    float actorHighOffset = 0.0f;
+
 public:
     ActorState(CostMap *costMap, Core *core) : State(core->getEventCenter())
     {
         this->global = core->getGlobal();
+
         this->costMap = costMap;
+
+        this->actorScaleVptr = core->getGlobal()->VarBag<float>::createBindVptr(".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
+        this->actorHighVptr = core->getGlobal()->VarBag<float>::createBindVptr(".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
+        this->actorHighOffset = *this->actorHighVptr / 2.0f * *actorScaleVptr;
+
         pathState = new PathState(costMap, core);
 
         this->setPickable(this);
@@ -38,7 +50,8 @@ public:
         this->setMovable(this);
     }
 
-    void init(Core* core) {
+    void init(Core *core)
+    {
         SceneManager *sMgr = core->getSceneManager();
         this->create(sMgr, this->entity, this->sceNode);
         this->setSceneNode(sceNode);
@@ -54,7 +67,7 @@ public:
     {
         return this->entity;
     }
-    
+
     PathFollow2 *getPath()
     {
         return this->pathFolow;
@@ -103,8 +116,8 @@ public:
         }
         // check if this state's position on the target cell
         Vector3 aPos3 = this->sceNode->getPosition();
-        float actorHeightOffset = 0.0f;
-        Vector2 aPos2 = Ground::Transfer::to2D(aPos3, actorHeightOffset);
+        float actorCurrentHeightOffset = 0.0f;
+        Vector2 aPos2 = Ground::Transfer::to2D(aPos3, actorCurrentHeightOffset);
         CellKey aCellKey;
         bool hitCell = CellUtil::findCellByPoint(costMap, aPos2, aCellKey);
         if (hitCell)
@@ -113,18 +126,18 @@ public:
             std::vector<Vector2> pathByPosition(pathByKey.size());
             CellUtil::translatePathToCellCenter(pathByKey, pathByPosition, CellUtil::offset(costMap));
             float pathSpeed = this->global->VarBag<float>::getVarVal(".pathSpeed", 1.0f);
-            PathFollow2 *path = new PathFollow2(aPos2, pathByPosition,pathSpeed);
+            PathFollow2 *path = new PathFollow2(aPos2, pathByPosition, pathSpeed);
             this->setPath(path);
             pathState->setPath(pathByKey, aCellKey, cKey2);
             AnimationStateSet *anisSet = entity->getAllAnimationStates();
             float aniSpeed = this->global->VarBag<float>::getVarVal(".aniSpeed", 1.0f);
             // new child state.
-            PathFollow2MissionState *missionState = new PathFollow2MissionState(global, path, anisSet, aniNames, aniSpeed, actorHeightOffset);//
+            PathFollow2MissionState *missionState = new PathFollow2MissionState(global, path, anisSet, aniNames, aniSpeed, this->actorHighOffset); //
             // delete missionState;
 
             if (this->mission)
             {
-                //int size = this->children->size();
+                // int size = this->children->size();
                 this->removeChild(this->mission);
                 // std::cout << "children:size" << size << ",after remove child size:" << this->children->size() << std::endl;
 
