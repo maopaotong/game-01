@@ -11,7 +11,7 @@
 #include <functional>
 
 #include "fg/game/Game01.h"
-#include "fg/game/OnFrameUI.h"
+#include "fg/ui/OnFrameUI.h"
 #include "fg/core/SimpleApp.h"
 
 // === Custom hash function ===
@@ -32,7 +32,6 @@ int main()
         // Initialize Ogre application context
         auto app = std::make_unique<SimpleApp>();
         app->add(new Game01());
-        app->add(new OnFrameUI());
         app->setup();
         app->startRendering();
         app->close();

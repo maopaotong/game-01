@@ -49,9 +49,9 @@ public:
         {
             delete options;
         }
-
-        Ogre::RTShader::SubRenderStateFactory *fac = Ogre::RTShader::ShaderGenerator::getSingleton().getSubRenderStateFactory(FFP_Transform);
-        fac->destroyAllInstances();
+        //Trying to fix the exception when closing the app context.
+        //Ogre::RTShader::SubRenderStateFactory *fac = Ogre::RTShader::ShaderGenerator::getSingleton().getSubRenderStateFactory(FFP_Transform);
+        //fac->destroyAllInstances();
     }
 
 public:

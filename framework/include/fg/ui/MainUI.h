@@ -13,8 +13,8 @@
 #include <random>
 #include <OgreRenderWindow.h>
 #include "fg/demo/GameTerrain.h"
-
-class OnFrameUI : public Module, public ImGuiApp::FrameListener
+#include "ActiveTrayUI.h"
+class MainUI 
 {
     Global *global;
     Core *core;
@@ -22,34 +22,23 @@ class OnFrameUI : public Module, public ImGuiApp::FrameListener
     RenderWindow *window;
     Viewport *vp;
     SceneManager *sceMgr;
+    ActiveTrayUI *activeTrayUI = nullptr;
 
 public:
-    OnFrameUI()
-    {
-    }
-
-    std::string getName() override
-    {
-        return ".onFrameUI";
-    }
-    void disactive() override
-    {
-    
-    }
-
-    void active(Core *core) override
+    MainUI(Core *core)
     {
         this->core = core;
         this->global = core->getGlobal();
         this->window = core->getWindow();
         this->vp = core->getViewport();
         this->sceMgr = core->getSceneManager();
-
         this->initGlobalVarPtr(core->getGlobal());
-        this->core->getImGuiApp()->addFrameListener(this);
+        // active tray
+        this->activeTrayUI = new ActiveTrayUI(core);
+        //
     }
 
-    void onFrame(const FrameEvent &evt)
+    void Open()
     {
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.7f));
 
@@ -112,25 +101,6 @@ public:
         ImGui::PopStyleColor();
     }
 
-    CostMap *createCostMap()
-    {
-        int width = 30;
-        int height = 25;
-        CostMap *cm = new CostMap(60, 50);
-        std::random_device rd;
-        std::mt19937 gen(rd());
-
-        std::uniform_int_distribution<int> rPosX(0, width - 1);  //
-        std::uniform_int_distribution<int> rPosY(0, height - 1); //
-        std::uniform_int_distribution<int> rCost(0, 3);          //
-
-        for (int i = 0; i < (width * height) / 10; i++)
-        {
-            cm->setCost(rPosX(gen), rPosY(gen), rCost(gen));
-        }
-
-        return cm;
-    }
     void initGlobalVarPtr(Global *glb)
     {
         glb->setVarAndScope(".aniSpeed", 0.55f, 0.0f, 2.0f);

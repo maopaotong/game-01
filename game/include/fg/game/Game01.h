@@ -13,6 +13,7 @@
 #include <random>
 #include <OgreRenderWindow.h>
 #include "fg/demo/GameTerrain.h"
+#include "fg/ui/OnFrameUI.h"
 
 class Game01 : public Module
 {
@@ -23,7 +24,7 @@ class Game01 : public Module
     Viewport *vp;
     SceneManager *sceMgr;
     GameTerrain *terrain = nullptr;
-
+    OnFrameUI *onFrameUI = nullptr;
 public:
     Game01()
     {
@@ -48,7 +49,9 @@ public:
         this->window = core->getWindow();
         this->vp = core->getViewport();
         this->sceMgr = core->getSceneManager();
-
+        this->onFrameUI = new OnFrameUI(core);
+        this->core->getImGuiApp()->addFrameListener(this->onFrameUI);
+        
         CostMap *costMap = createCostMap();
         // Create materials before buding mesh?
         MaterialFactory::createMaterials(core->getMaterialManager());
@@ -63,6 +66,9 @@ public:
         RenderSystem *rSys = core->getRoot()->getRenderSystem();
         Light *light = core->getLight();
         terrain->load(rSys, sceMgr, light);
+
+        //
+
     }
 
     CostMap *createCostMap()

@@ -9,6 +9,8 @@
 #include "Pickable.h"
 #include "OgreFrameListener.h"
 #include "Movable.h"
+#include "fg/EventCenter.h"
+#include "fg/PropertyEvent.h"
 using namespace Ogre;
 
 class State
@@ -48,11 +50,17 @@ protected:
     Pickable *pickable = nullptr;
     Movable *movable = nullptr;
     SceneNode *sceNode = nullptr;
-    std::vector<State *> *children;
+    std::vector<State *> *children = nullptr;
+    bool active = false;
+    EventCenter *events = nullptr;
 
 public:
-    State()
+    State() : State(nullptr)
     {
+    }
+    State(EventCenter *ec)
+    {
+        this->events = ec;
         this->children = new std::vector<State *>();
         std::cout << "new State()" << this << "" << std::endl;
     }
@@ -89,7 +97,7 @@ public:
     {
         if (s->parent)
         {
-            throw "Already has a parent state.";
+            throw std::runtime_error("Already has a parent state.");
         }
         this->children->push_back(s);
         s->parent = this;
@@ -128,6 +136,21 @@ public:
     void setMovable(Movable *mvb)
     {
         this->movable = mvb;
+    }
+
+    void setActive(bool active)
+    {
+        bool changed = (this->active != active);
+        this->active = active;
+        if (changed)
+        {
+            EventCenter::emit(this->events, PropertyEvent<State>(this, "active"));
+        }
+    }
+
+    bool isActive()
+    {
+        return this->active;
     }
 
     void forEachChild(std::function<void(State *)> func, bool recusive = true)

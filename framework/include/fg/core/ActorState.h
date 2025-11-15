@@ -17,7 +17,6 @@ class ActorState : public State, public Pickable, public Ogre::FrameListener, pu
 {
 
 protected:
-    bool active = false;
 
     PathFollow2 *pathFolow = nullptr;
     Ogre::Entity *entity;
@@ -26,10 +25,9 @@ protected:
 
     PathFollow2MissionState *mission = nullptr;
     std::vector<std::string> aniNames = {"RunBase", "RunTop"};
-    Global * global;
-
+    Global * global;    
 public:
-    ActorState(CostMap *costMap, Core *core) : State()
+    ActorState(CostMap *costMap, Core *core) : State(core->getEventCenter())
     {
         this->global = core->getGlobal();
         this->costMap = costMap;
@@ -56,15 +54,7 @@ public:
     {
         return this->entity;
     }
-    void setActive(bool active)
-    {
-        this->active = active;
-    }
-
-    bool isActive()
-    {
-        return this->active;
-    }
+    
     PathFollow2 *getPath()
     {
         return this->pathFolow;

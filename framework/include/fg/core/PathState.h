@@ -27,7 +27,7 @@ class PathState : public State
     float *pathHighOffset;
 
 public:
-    PathState(CostMap *costMap, Core *core)
+    PathState(CostMap *costMap, Core *core) : State(core->getEventCenter())
     {
         this->costMap = costMap;
 
