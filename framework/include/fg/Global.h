@@ -56,10 +56,15 @@ public:
     }
 };
 
-class Global : public VarBag<float>, public VarBag<long>, public VarBag<std::any>, //
+class Global : public VarBag<float>, public VarBag<long>, public VarBag<Vector3>, public VarBag<std::any>, //
                public Context<Terrains *>
 {
     typedef void (*FloatVarVistFunc)(const std::string name, float *vPtr, VarBag<float>::VarRange<float> *range);
 
 public:
+
+    static float getTerrainHeightAtPositionWithOffset(float x, float y, float offset = 0.0f)
+    {
+        return Context<Terrains *>::get()->getHeightAtPosition(x, y) + offset;
+    }
 };

@@ -15,6 +15,7 @@
 #include "fg/demo/GameTerrain.h"
 #include "ActiveTrayUI.h"
 #include "MainUI.h"
+#include "SceneNodeUI.h"
 class OnFrameUI : public ImGuiApp::FrameListener
 {
     Global *global;
@@ -25,7 +26,7 @@ class OnFrameUI : public ImGuiApp::FrameListener
     SceneManager *sceMgr;
     ActiveTrayUI *activeTrayUI = nullptr;
     MainUI *mainUI = nullptr;
-
+    SceneNodeUI *sceneNodeUI = nullptr;
 public:
     OnFrameUI(Core *core)
     {
@@ -38,6 +39,7 @@ public:
         //
         this->activeTrayUI = new ActiveTrayUI(core);
         this->mainUI = new MainUI(core);
+        this->sceneNodeUI = new SceneNodeUI(core);
     }
 
     void onFrame(const FrameEvent &evt)
@@ -45,6 +47,7 @@ public:
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.7f));
         this->mainUI->Open();
         this->activeTrayUI->Open();
+        this->sceneNodeUI->Open();
         ImGui::PopStyleColor();
     }
 };

@@ -67,6 +67,9 @@ public:
                 float max = range ? range->max : 100;
                 ImGui::SliderFloat(name.c_str(), vPtr, min, max); });
 
+        this->global->VarBag<Vector3>::forEachVarPtr([](const std::string name, Vector3 *vPtr, VarBag<Vector3>::VarRange<Vector3> *range)
+                                                     { ImGui::Text(fmt::format("{}: {:.2f}, {:.2f}, {:.2f}", name, (*vPtr)[0], (*vPtr)[1], (*vPtr)[2]).c_str()); });
+
         // stats
 
         const Ogre::RenderTarget::FrameStats &fs = window->getStatistics();

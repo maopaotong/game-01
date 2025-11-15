@@ -25,7 +25,7 @@ public:
                          MarkType type) : costMap(costMap), markType(type)
     {
         obj = core->getSceneManager()->createManualObject();
-        node = core->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+        node = core->getSceneManager()->getRootSceneNode()->createChildSceneNode("CellMarkStateNode");
         node->attachObject(obj);
     }
 

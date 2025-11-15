@@ -8,19 +8,23 @@ using namespace Ogre;
 
 class Ground
 {
+    typedef float (*HeightFunction)(float x, float y, float heightOffset);
+
+public:
 public:
     class Transfer
     {
     public:
         static const bool VERTEX_ORDER_REVERSE = false; // is look from back
 
-        static Vector3 to3D(Vector2 &vec2, float height = 0.0f)
+        static Vector3 to3D(Vector2 &vec2, HeightFunction hF = defaultHeightFunction, float heightOffset = 0.0f)
         {
-            return to3D(vec2.x, vec2.y, height);
+            return to3D(vec2.x, vec2.y, hF, heightOffset);
         }
 
-        static Vector3 to3D(float x, float y, float height = 0.0f)
+        static Vector3 to3D(float x, float y, HeightFunction hF = defaultHeightFunction, float heightOffset = 0.0f)
         {
+            float height = hF(x, y, heightOffset);
             if (VERTEX_ORDER_REVERSE)
             {
                 return Vector3(y, height, -x);
@@ -50,18 +54,20 @@ public:
             }
         }
 
-        static void to3D(Vector2 &vec2, Vector3 &vec3, float height = 0.0f)
+        template <typename... Args>
+        static void to3D(Vector2 &vec2, Vector3 &vec3, HeightFunction hF = defaultHeightFunction, float heightOffset = 0.0f)
         {
-            vec3 = Transfer::to3D(vec2, height);
+            vec3 = to3D(vec2, hF, heightOffset);
         }
 
-        static std::vector<Ogre::Vector3> to3D(std::vector<Ogre::Vector2> &vec2Vec, float height = 0.0f)
+        template <typename... Args>
+        static std::vector<Ogre::Vector3> to3D(std::vector<Ogre::Vector2> &vec2Vec, HeightFunction hF = defaultHeightFunction, float heightOffset = 0.0f)
         {
             std::vector<Ogre::Vector3> vertices(vec2Vec.size());
 
             for (int i = 0; i < vec2Vec.size(); i++)
             {
-                to3D(vec2Vec[VERTEX_ORDER_REVERSE ? (6 - i - 1) : i], vertices[i], height);
+                to3D(vec2Vec[VERTEX_ORDER_REVERSE ? (6 - i - 1) : i], vertices[i], hF, heightOffset);
             }
 
             return vertices;
@@ -77,15 +83,23 @@ public:
         return DEFAULT_FORWARD.getRotationTo(d3);
     }
 
-    static std::vector<Ogre::Vector3> calculateVertices3D(int x, int y, CostMap *costMap, float rad, float scale = 1.0f)
+    template <typename... Args>
+    static std::vector<Ogre::Vector3> calculateVertices3D(int x, int y, CostMap *costMap, float rad, float scale = 1.0f, HeightFunction hF = defaultHeightFunction, float heightOffset = 0.0f)
     {
         Vector2 offset = CellUtil::offset(costMap);
-        return calculateVertices3D(x, y, offset, rad, scale);
+        return calculateVertices3D(x, y, offset, rad, scale, hF, heightOffset);
     }
-    static std::vector<Ogre::Vector3> calculateVertices3D(int x, int y, Vector2 &offset, float rad, float scale = 1.0f)
+
+    template <typename... Args>
+    static std::vector<Ogre::Vector3> calculateVertices3D(int x, int y, Vector2 &offset, float rad, float scale = 1.0f, HeightFunction hF = defaultHeightFunction, float heightOffset = 0.0f)
     {
         std::vector<Ogre::Vector2> vec2Vec = CellUtil::calculateVertices(x, y, offset, rad, scale);
-        return Transfer::to3D(vec2Vec);
+        return Transfer::to3D(vec2Vec, hF, heightOffset);
+    }
+
+    static float defaultHeightFunction(float x, float y, float heightOffset)
+    {
+        return heightOffset;
     }
 
 public:

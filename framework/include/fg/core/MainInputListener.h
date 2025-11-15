@@ -39,8 +39,8 @@ using namespace Ogre;
 class MainInputListener : public OgreBites::InputListener
 {
     static constexpr float DEFAULT_CAMERA_TOP_DISTANCE = 2 * 1000.0f;
-    static constexpr float DEFAULT_CAMERA_HIGH_MIN = 150.0f;
-    static constexpr float DEFAULT_CAMERA_HITH_MAX = DEFAULT_CAMERA_HIGH_MIN * 10.0f;
+    static constexpr float DEFAULT_CAMERA_HIGH_MIN = 100.0f;
+    static constexpr float DEFAULT_CAMERA_HITH_MAX = 1000.0f;
     static constexpr float DEFAULT_CAMERA_ROLL_SPEED = (DEFAULT_CAMERA_HITH_MAX - DEFAULT_CAMERA_HIGH_MIN) / 10.0f;
 
 private:
@@ -51,6 +51,7 @@ private:
     float *cameraHighMinVptr;
     float *cameraHighMaxVptr;
     float *cameraRollSpeedVptr;
+    Global *global;
 
 public:
     MainInputListener(IWorld *wsc,
@@ -58,7 +59,7 @@ public:
     {
         this->core = core;
         this->wsc = wsc;
-        Global *global = core->getGlobal();
+        global = core->getGlobal();
         this->cameraTopDistanceVptr = global->VarBag<float>::createBindVptr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
         this->cameraHighMinVptr = global->VarBag<float>::createBindVptr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
         this->cameraHighMaxVptr = global->VarBag<float>::createBindVptr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
@@ -143,6 +144,8 @@ public:
         }
 
         node->setPosition(posTarget);
+
+        global->VarBag<Vector3>::setVar(".camera.position", posTarget);
 
         alignHorizonToTop(node, cam, *this->cameraTopDistanceVptr);
         return false;

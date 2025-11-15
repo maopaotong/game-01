@@ -59,7 +59,9 @@ public:
                 
                 float terH = Global::Context<Terrains *>::get()->getHeightAtPosition(currentPos2D); // TODO in a common place to translate all .
                 
-                Vector3 currentPos = Ground::Transfer::to3D(currentPos2D, heightOffset + terH); //
+                
+
+                Vector3 currentPos = Ground::Transfer::to3D(currentPos2D, Global::getTerrainHeightAtPositionWithOffset, heightOffset); //
 
                 // position
                 pNode->translate(currentPos - prevPos); // new position

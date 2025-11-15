@@ -33,7 +33,7 @@ public:
 
         Ogre::SceneManager *sceneMgr = core->getSceneManager();
         pathObject = sceneMgr->createManualObject("PathObject");
-        this->sceNode = sceneMgr->getRootSceneNode()->createChildSceneNode();
+        this->sceNode = sceneMgr->getRootSceneNode()->createChildSceneNode("PathStateNode");
         this->sceNode->attachObject(pathObject);
 
         this->pathHighOffset = core->getGlobal()->VarBag<float>::createBindVptr(".pathHighOffset", DEFAULT_HIGH_OFFSET, 0.0f, DEFAULT_HIGH_OFFSET * 100.0f);
@@ -86,7 +86,7 @@ public:
             for (int x = 0; x < width; x++)
             {
                 // auto vertices = CostMap::calculateVerticesForXZ(x, y, CostMap::hexSize);
-                auto vertices = Ground::calculateVertices3D(x, y, costMap, CostMap::hexSize);
+                auto vertices = Ground::calculateVertices3D(x, y, costMap, CostMap::hexSize, 1.0f, Global::getTerrainHeightAtPositionWithOffset);
 
                 if (x == start.first && y == start.second)
                 {

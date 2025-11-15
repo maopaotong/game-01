@@ -72,7 +72,7 @@ public:
         light->setType(Ogre::Light::LT_DIRECTIONAL);
         light->setDiffuseColour(Ogre::ColourValue(1.0, 1.0, 1.0));  // 白色漫反射
         light->setSpecularColour(Ogre::ColourValue(.0, .0, .0)); // 白色镜面光
-        Ogre::SceneNode *lightNode = sceMgr->getRootSceneNode()->createChildSceneNode();
+        Ogre::SceneNode *lightNode = sceMgr->getRootSceneNode()->createChildSceneNode("LightNode");
         lightNode->setPosition(0, 500, 0);
         lightNode->setDirection(Ground::DIRECTION_DOWN);
         lightNode->attachObject(light);
@@ -83,7 +83,7 @@ public:
         camera->setAutoAspectRatio(true);
 
         // Create camera node and set position and direction
-        cameraNode = sceMgr->getRootSceneNode()->createChildSceneNode();
+        cameraNode = sceMgr->getRootSceneNode()->createChildSceneNode("CameraNode");
         cameraNode->setPosition(0, 500, 500); //
         cameraNode->attachObject(camera);
         cameraNode->lookAt(Ogre::Vector3(0, 0, 0), Ogre::Node::TS_PARENT);

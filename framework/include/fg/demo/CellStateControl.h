@@ -27,7 +27,7 @@ public:
         Ogre::SceneManager *sceneMgr = core->getSceneManager();
         this->costMap = costMap;
         obj = sceneMgr->createManualObject();
-        node = sceneMgr->getRootSceneNode()->createChildSceneNode();
+        node = sceneMgr->getRootSceneNode()->createChildSceneNode("CellStateNode");
         node->attachObject(obj);
         this->highOffset = core->getGlobal()->VarBag<float>::createBindVptr(".cellHighOffset", DEFAULT_CELL_HIGH_OFFSET, 0.0f, DEFAULT_CELL_HIGH_OFFSET * 100.0f);
         node->setPosition(0, *highOffset, 0);
@@ -44,9 +44,9 @@ public:
         obj->begin(MaterialNames::materialNameInUse, Ogre::RenderOperation::OT_TRIANGLE_LIST);
         int width = costMap->getWidth();
         int height = costMap->getHeight();
-        float offsetX = width / 2 * CostMap::hexSize;
-        float offsetY = height / 2 * CostMap::hexSize;
-        Vector2 offset(offsetX, offsetY);
+        // float offsetX = width / 2 * CostMap::hexSize;
+        // float offsetY = height / 2 * CostMap::hexSize;
+        // Vector2 offset(offsetX, offsetY);
 
         for (int x = 0; x < width; x++)
         {
@@ -60,8 +60,9 @@ public:
 
                 Ogre::ColourValue color = getCostColor(cost);
                 // auto vertices = CostMap::calculateVerticesForXZ(x, y, CostMap::hexSize);
-                auto vertices = Ground::calculateVertices3D(x, y, costMap, CostMap::hexSize);
-
+               
+                std::vector<Vector3> vertices = Ground::calculateVertices3D(x, y, costMap, CostMap::hexSize, 1.0f, Global::getTerrainHeightAtPositionWithOffset, *this->highOffset);
+                
                 DrawerUtil::drawHexagonTo(obj, vertices, color);
             }
         }
