@@ -81,8 +81,7 @@ public:
         {
             ImGui::Begin("Hello");
             
-            State *actor = global->VarBag<std::any>::getVarVal<State *>("<any>.activeState", [](std::any val)
-                                                                        { return std::any_cast<State *>(val); }, nullptr);
+            Actor *actor = global->VarBag<Actor*>::getVarVal(".activeState", nullptr);
 
             if (actor)
             {

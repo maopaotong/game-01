@@ -38,37 +38,38 @@ public:
 
         //
     }
-
-    State *activeState = nullptr;
-
+    static void forEachVarPtr(const std::string name, Actor **vPtr, VarBag<Actor *>::VarRange<Actor *> *range, int &actors)
+    {
+        Actor *a = *vPtr;
+        if (a)
+        {
+            actors++;
+            ImGui::Text(fmt::format("Actor:{}", name).c_str());
+        }
+    };
     void Open()
     {
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.7f));
 
         ImGui::Begin("Hello");
 
-        if (activeState)
-        {
-            ImGui::Button(":Right click a cell as the destination!");
-        }
-        else
-        {
-            ImGui::Button(":Left click to pick an actor!");
-        }
+        ImGui::Text(fmt::format("Actors in global var bag:").c_str());
+        ImGui::Indent(15.0f);
+        int actors = 0;
+
+        this->global->VarBag<Actor *>::forEachVarPtr<int &>(MainUI::forEachVarPtr, actors);
+        ImGui::Unindent(15.0f);
+
         vp = core->getViewport();
 
         ImGui::Text(fmt::format("Viewport.norm:     {},{},{},{}", vp->getLeft(), vp->getTop(), vp->getWidth(), vp->getHeight()).c_str());
         ImGui::Text(fmt::format("Viewport.pixel:    {},{},{},{}", vp->getActualLeft(), vp->getActualTop(), vp->getActualWidth(), vp->getActualHeight()).c_str());
         ImGui::Text(fmt::format("Window.pixel:      {},{}", window->getWidth(), window->getHeight()).c_str());
 
-        this->global->VarBag<float>::forEachVarPtr([](const std::string name, float *vPtr, VarBag<float>::VarRange<float> *range)
-                                                   {
-                float min = range ? range->min : 0;
-                float max = range ? range->max : 100;
-                ImGui::SliderFloat(name.c_str(), vPtr, min, max); });
+        int counter = 0;
+        this->global->VarBag<float>::forEachVarPtr<int &>(MainUI::forEachVarPtr, counter);
 
-        this->global->VarBag<Vector3>::forEachVarPtr([](const std::string name, Vector3 *vPtr, VarBag<Vector3>::VarRange<Vector3> *range)
-                                                     { ImGui::Text(fmt::format("{}: {:.2f}, {:.2f}, {:.2f}", name, (*vPtr)[0], (*vPtr)[1], (*vPtr)[2]).c_str()); });
+        this->global->VarBag<Vector3>::forEachVarPtr<int &>(MainUI::forEachVarPtr, counter);
 
         // stats
 
@@ -106,6 +107,16 @@ public:
         }
         ImGui::End();
         ImGui::PopStyleColor();
+    }
+    static void forEachVarPtr(const std::string name, Vector3 *vPtr, int &counter)
+    {
+        ImGui::Text(fmt::format("{}: {:.2f}, {:.2f}, {:.2f}", name, (*vPtr)[0], (*vPtr)[1], (*vPtr)[2]).c_str());
+    }
+    static void forEachVarPtr(const std::string name, float *vPtr, VarBag<float>::VarRange<float> *range, int &counter)
+    {
+        float min = range ? range->min : 0;
+        float max = range ? range->max : 100;
+        ImGui::SliderFloat(name.c_str(), vPtr, min, max);
     }
 
     void initGlobalVarPtr(Global *glb)

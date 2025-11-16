@@ -10,10 +10,7 @@
 #include "OgreFrameListener.h"
 #include "Movable.h"
 #include "fg/EventCenter.h"
-#include "fg/PropertyEvent.h"
 #include "fg/Global.h"
-#include "fg/EventCenter.h"
-#include "fg/PropertyEvent.h"
 
 using namespace Ogre;
 

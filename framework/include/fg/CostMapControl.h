@@ -6,7 +6,6 @@
 #include <OgreColourValue.h>
 #include "fg/defines.h"
 #include "fg/util/CostMap.h"
-#include "fg/util/Component.h"
 #include "fg/State.h"
 #include "fg/MaterialNames.h"
 #include "fg/util/DrawerUtil.h"

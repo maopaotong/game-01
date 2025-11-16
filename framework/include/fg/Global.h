@@ -7,7 +7,6 @@
 #include "fg/Terrains.h"
 #include "fg/Actor.h"
 #include "fg/EventCenter.h"
-#include "fg/PropertyEvent.h"
 #include <string>
 
 template <typename T>
@@ -60,7 +59,7 @@ public:
 
 typedef EventCenter<Actor*, std::string &> ECActorProperty;
 
-class Global : public VarBag<float>, public VarBag<long>, public VarBag<Vector3>, public VarBag<std::any>, //
+class Global : public VarBag<float>, public VarBag<long>, public VarBag<Vector3>, public VarBag<Actor*>, //
                public Context<Terrains *>,                                                                 //
                public Context<ECActorProperty *>                                                                 //
 {

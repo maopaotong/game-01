@@ -165,12 +165,23 @@ public:
     }
 
     template <typename... Args>
-    void forEachVarPtr(void (*func)(const std::string, T *, VarRange<T> *scope), Args... args)
+    void forEachVarPtr(void (*func)(const std::string, T *, VarRange<T> *scope, Args... args), Args... args)
     {
         for (auto pair : varMap)
         {
             VarBind<T> *bind = pair.second;
             func(pair.first, &bind->value, bind->scope, args...);
+        }
+    }
+
+    
+    template <typename... Args>
+    void forEachVarPtr(void (*func)(const std::string, T *, Args... args), Args... args)
+    {
+        for (auto pair : varMap)
+        {
+            VarBind<T> *bind = pair.second;
+            func(pair.first, &bind->value, args...);
         }
     }
 };

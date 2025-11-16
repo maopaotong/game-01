@@ -65,12 +65,12 @@ public:
         float ndcY = evt.y / (float)viewport->getActualHeight();
         Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
         Pickable *picked = pick(ray);
-        State *actor = nullptr;
+        Actor *actor = nullptr;
         if (picked)
         {
             actor = dynamic_cast<State *>(picked);
         }
-        global->VarBag<std::any>::setVar("<any>.activeState", std::any(actor));
+        global->VarBag<Actor*>::setVar(".activeActor", actor);
         return actor;
     }
 

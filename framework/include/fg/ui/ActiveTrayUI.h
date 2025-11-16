@@ -4,7 +4,6 @@
 #include "fg/Core.h"
 #include "fg/State.h"
 #include "fg/EventCenter.h"
-#include "fg/PropertyEvent.h"
 
 class ActiveTrayUI : public Listener<Actor *, std::string &>
 {

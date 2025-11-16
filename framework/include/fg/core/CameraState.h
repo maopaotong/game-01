@@ -28,7 +28,6 @@
 #include "fg/util/Polygon2.h"
 #include "fg/State.h"
 #include "fg/Ground.h"
-#include "fg/util/BoolFunctionList.h"
 using namespace Ogre;
 
 // === Frame Listener class for main loop ===
