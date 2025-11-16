@@ -2,7 +2,7 @@
 #pragma once
 #include <vector>
 #include <Ogre.h>
-
+namespace fog{
 class CameraUtil
 {
 public:
@@ -12,3 +12,4 @@ public:
 
     }
 };
+};//end of namespace

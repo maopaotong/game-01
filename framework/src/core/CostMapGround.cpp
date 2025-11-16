@@ -1,7 +1,8 @@
 #pragma once
 
 #include "fg/core/CostMapGround.h"
-
+namespace fog
+{
 CostMapGround::CostMapGround(CostMap *costMap)
 {
     this->costMap = costMap;
@@ -31,3 +32,4 @@ bool CostMapGround::isPointInside(Vector2 &p)
 {
     return polygon.isPointInPolygon(p.x, p.y);
 }
+};

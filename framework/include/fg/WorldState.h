@@ -2,6 +2,9 @@
 #include "State.h"
 #include "util/Polygon2.h"
 #include "Ground.h"
+
+namespace fog
+{
 class WorldState : public State
 {
 protected:
@@ -16,4 +19,5 @@ public:
     {
         return ground;
     }
+};
 };

@@ -5,6 +5,8 @@
 #include <unordered_set>
 #include <functional>
 
+namespace fog
+{
 template <typename T>
 class Var
 {
@@ -183,4 +185,5 @@ public:
             }
         }
     };
+};
 };

@@ -31,6 +31,7 @@
 #include "fg/Ground.h"
 #include "fg/Core.h"
 
+namespace fog{
 using namespace OgreBites;
 using namespace Ogre;
 // === Custom hash function ===
@@ -179,3 +180,5 @@ public:
         camNode->setOrientation(newOri);
     }
 };
+
+};//end of namespace

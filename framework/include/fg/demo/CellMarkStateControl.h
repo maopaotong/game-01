@@ -7,6 +7,8 @@
 #include "fg/util/CellMark.h"
 #include "fg/MaterialNames.h"
 #include "fg/Core.h"
+
+namespace fog{
 using namespace Ogre;
 
 //
@@ -104,3 +106,5 @@ public:
         }
     }
 };
+
+};//end of namespace

@@ -7,7 +7,7 @@
 #include "fg/State.h"
 #include "fg/Core.h"
 #include "fg/util/CostMap.h"
-
+namespace fog{
 using namespace Ogre;
 #define DEFAULT_CELL_HIGH_OFFSET 0.08f
 
@@ -124,3 +124,5 @@ public:
         }
     }
 };
+
+};//end of namespace

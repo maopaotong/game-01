@@ -9,9 +9,11 @@
 #include "Pickable.h"
 #include "OgreFrameListener.h"
 #include "Movable.h"
-#include "fg/EventCenter.h"
+#include "fg/Event.h"
 #include "fg/Global.h"
 
+namespace fog
+{
 using namespace Ogre;
 
 class State : public Actor
@@ -140,7 +142,7 @@ public:
         this->active = active;
         if (changed)
         {
-            Global::Context<ECActorProperty *>::get()->emit(this, std::string("active"));
+            Global::Context<ActorPropEC *>::get()->emit(this, std::string("active"));
         }
     }
 
@@ -171,4 +173,5 @@ public:
     }
 
 public:
+};
 };

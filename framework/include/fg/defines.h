@@ -2,7 +2,8 @@
 #include <functional>
 #include <Ogre.h>
 
-
+namespace fog
+{};
 
 
  

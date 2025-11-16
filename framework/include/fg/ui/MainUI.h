@@ -14,6 +14,8 @@
 #include <OgreRenderWindow.h>
 #include "fg/demo/GameTerrain.h"
 #include "ActiveTrayUI.h"
+
+namespace fog{
 class MainUI
 {
     Global *global;
@@ -125,3 +127,4 @@ public:
         glb->Var<float>::Bag::createBindVptr(".pathSpeed", 1.0f, 1.0f, 10.0f);
     }
 };
+};//end of namespace

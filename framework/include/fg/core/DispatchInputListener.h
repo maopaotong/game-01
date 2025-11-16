@@ -1,6 +1,7 @@
 #pragma once
 #include <OgreInput.h>
 
+namespace fog{
 using namespace Ogre;
 using namespace OgreBites;
 class DispatchInputListener : public InputListener
@@ -167,3 +168,5 @@ public:
         return false;
     }
 };
+
+};//end of namespace

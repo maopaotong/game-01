@@ -1,6 +1,7 @@
 #include <iostream>
 #include "fg/util/HexGridPrinter.h"
-
+namespace fog
+{
 void HexGridPrinter::printCostGrid(CostMap &grid)
 {
     std::cout << "Original Cost Grid (0=obstacle, 1=normal, 2=costly, 3=very costly):\n";
@@ -80,3 +81,4 @@ void HexGridPrinter::printPathGrid(CostMap *grid, int startx , int starty , int 
         std::cout << "\n";
     }
 }
+};

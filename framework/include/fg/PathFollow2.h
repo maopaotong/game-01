@@ -4,6 +4,8 @@
 #include <Ogre.h>
 #include "util/Polyline2.h"
 
+namespace fog
+{
 using namespace Ogre;
 
 class PathFollow2
@@ -55,4 +57,5 @@ public:
         }
         return rt;
     }
+};
 };

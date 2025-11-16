@@ -6,6 +6,7 @@
 #include "fg/State.h"
 #include "fg/PathFollow2.h"
 
+namespace fog{
 class MissionState : public State
 {
 public:
@@ -45,3 +46,5 @@ public:
         }
     }
 };
+
+};//end of namespace

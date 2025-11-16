@@ -3,6 +3,7 @@
 #include <vector>
 #include <Ogre.h>
 
+namespace fog{
 using namespace Ogre;
 
 class Polygon2
@@ -89,3 +90,4 @@ public:
         return true;
     }
 };
+};//end of namespace

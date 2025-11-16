@@ -28,6 +28,9 @@
 #include "fg/util/Polygon2.h"
 #include "fg/State.h"
 #include "fg/Ground.h"
+
+namespace fog{
+
 using namespace Ogre;
 
 // === Frame Listener class for main loop ===
@@ -127,3 +130,4 @@ public:
         return true; // Continue rendering
     }
 };
+};//end of namespace

@@ -14,6 +14,7 @@
 #define MAO_IMGUI_BUTTON_RIGHT 1
 #define MAO_IMGUI_BUTTON_OTHER 2
 
+namespace fog{
 using namespace Ogre;
 using namespace OgreBites;
 
@@ -76,3 +77,5 @@ public:
         return ret;
     }
 };
+
+};//end of namespace

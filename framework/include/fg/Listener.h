@@ -1,5 +1,6 @@
 #pragma once
-
+namespace fog
+{
 template <typename...Args>
 class Listener
 {
@@ -22,4 +23,5 @@ public:
     {
         return func(args...);
     }
+};
 };

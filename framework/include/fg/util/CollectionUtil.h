@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+
+namespace fog{
 class CollectionUtil
 {
 
@@ -22,3 +24,5 @@ public:
         return false;
     }
 };
+
+};//end of namespace

@@ -3,6 +3,8 @@
 
 #include <Ogre.h>
 #include <OgreColourValue.h>
+
+namespace fog{
 using namespace Ogre;
 class DrawerUtil
 {
@@ -52,3 +54,4 @@ public:
         }
     } //
 };
+};//end of namespace

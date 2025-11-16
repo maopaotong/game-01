@@ -1,6 +1,7 @@
 #pragma once
 #include "Module.h"
-
+namespace fog
+{
 class App
 {
 public:
@@ -8,4 +9,5 @@ public:
     virtual void setup() = 0;
     virtual void startRendering() = 0;
     virtual void close() = 0;
+};
 };

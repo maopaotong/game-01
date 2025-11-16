@@ -4,6 +4,8 @@
 #include "util/CellUtil.h"
 #include <Ogre.h>
 #include <OgreVector.h>
+namespace fog
+{
 using namespace Ogre;
 
 class Ground
@@ -106,4 +108,5 @@ public:
     Ground();
     virtual bool isPointInside(float x, float z) = 0;
     virtual bool isPointInside(Vector2 &p) = 0;
+};
 };

@@ -23,6 +23,7 @@
 #include "fg/core/MouseClickPicker.h"
 #include "fg/Terrains.h"
 
+namespace fog{
 using namespace Ogre;
 // root state & control.
 class WorldStateControl : public WorldState, public IWorld
@@ -69,3 +70,4 @@ public:
         return costMap;
     }
 };
+};//end of namespace

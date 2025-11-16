@@ -10,11 +10,13 @@
 #include "ImGuiFPSCounter.h"
 #include "fg/ImGuiApp.h"
 #include "ImGuiAppImpl.h"
+#include "fg/Video.h"
 
 #define MAO_IMGUI_BUTTON_LEFT 0
 #define MAO_IMGUI_BUTTON_RIGHT 1
 #define MAO_IMGUI_BUTTON_OTHER 2
 
+namespace fog{
 using namespace Ogre;
 using namespace OgreBites;
 
@@ -23,17 +25,22 @@ class ImGuiAppContext : public ApplicationContextSDL
 protected:
     ImGuiAppImpl *imGuiApp = nullptr;
 
+    Video::Mode videoMode{1920, 1080, 32};
+
 public:
     ImGuiAppContext(std::string name) : ApplicationContextSDL(name)
     {
-
         //
     }
-    // ========== 清理 ==========
     virtual ~ImGuiAppContext() override
     {
         if (this->imGuiApp)
             delete this->imGuiApp;
+    }
+
+    void createRoot() override
+    {
+        ApplicationContextSDL::createRoot();
     }
 
     void initApp()
@@ -73,8 +80,11 @@ public:
         // only the dispatcher listener can be there.
         this->imGuiApp->addInputListener(listener);
     }
-    void windowResized(Ogre::RenderWindow* rw) {
+    void windowResized(Ogre::RenderWindow *rw)
+    {
         ApplicationContextSDL::windowResized(rw);
         this->imGuiApp->windowResized(rw);
     }
 };
+
+};//end of namespace

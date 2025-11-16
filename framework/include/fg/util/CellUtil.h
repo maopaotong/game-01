@@ -3,7 +3,7 @@
 #include <vector>
 #include <Ogre.h>
 #include "CostMap.h"
-
+namespace fog{
 class CellUtil
 {
 public:
@@ -115,3 +115,4 @@ public:
         return vertices;
     }
 };
+};//end of namespace

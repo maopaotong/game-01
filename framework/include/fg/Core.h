@@ -5,10 +5,11 @@
 #include "ImGuiApp.h"
 #include "Global.h"
 #include "State.h"
-#include "EventCenter.h"
+#include "fg/Event.h"
 using namespace Ogre;
 using namespace OgreBites;
-
+namespace fog
+{
 class Core
 {
 public:
@@ -62,4 +63,5 @@ public:
         }
         return rt;
     }
+};
 };

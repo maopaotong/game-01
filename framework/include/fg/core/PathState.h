@@ -9,6 +9,7 @@
 #include "fg/util/CellMark.h"
 #include "fg/util/DrawerUtil.h"
 
+namespace fog{
 using namespace Ogre;
 
 #define DEFAULT_HIGH_OFFSET 0.1f
@@ -110,3 +111,5 @@ public:
         pathObject->end();
     }
 };
+
+};//end of namespace

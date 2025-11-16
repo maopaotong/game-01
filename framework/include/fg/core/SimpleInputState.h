@@ -30,6 +30,7 @@
 #include "fg/IWorld.h"
 #include "fg/InputState.h"
 
+namespace fog{
 using namespace OgreBites;
 using namespace Ogre;
 // === Custom hash function ===
@@ -140,3 +141,5 @@ public:
         return this->back;
     }
 };
+
+};//end of namespace

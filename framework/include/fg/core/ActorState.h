@@ -11,6 +11,8 @@
 #include "fg/util/CollectionUtil.h"
 #include "fg/Movable.h"
 #include "fg/Actor.h"
+
+namespace fog{
 using namespace Ogre;
 
 class ActorState : public State, public Pickable, public Ogre::FrameListener, public Movable
@@ -164,3 +166,4 @@ public:
         return true;
     }
 };
+};//end of namespace

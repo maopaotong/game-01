@@ -1,7 +1,8 @@
 #pragma once
 #include "fg/Ground.h"
 #include "fg/util/Polygon2.h"
-
+namespace fog
+{
 class GroundImpl :public Ground
 {
 protected:
@@ -20,3 +21,4 @@ public:
 Ground::Ground(){
 
 }
+};

@@ -15,6 +15,7 @@
 #include "fg/demo/GameTerrain.h"
 #include "ActiveTrayUI.h"
 
+namespace fog{
 class SceneNodeUI
 {
     template <typename... Args>
@@ -106,3 +107,4 @@ public:
         }
     }
 };
+};//end of namespace

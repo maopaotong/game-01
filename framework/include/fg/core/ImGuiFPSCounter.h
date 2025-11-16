@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <vector>
 
+namespace fog{
 class ImGuiFPSCounter
 {
 public:
@@ -64,3 +65,4 @@ private:
     size_t mFrameIndex = 0;
     float rate = 1.0;
 };
+};//end of namespace

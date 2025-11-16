@@ -24,7 +24,7 @@
 #include <OgreRTShaderSystem.h>
 #include <OgreTechnique.h>
 #include "CellMark.h"
-
+namespace fog{
 struct PairHash
 {
     template <typename T, typename U>
@@ -226,3 +226,4 @@ public:
 private:
    
 };
+};//end of namespace

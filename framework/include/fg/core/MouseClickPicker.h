@@ -31,6 +31,7 @@
 #include "fg/Pickable.h"
 #include "fg/Global.h"
 
+namespace fog{
 using namespace OgreBites;
 using namespace Ogre;
 // === Custom hash function ===
@@ -118,3 +119,5 @@ public:
         // high light the cell in which the actor stand.
     }
 };
+
+};//end of namespace

@@ -4,6 +4,9 @@
 #include "fg/core/CostMapGround.h"
 #include "imgui.h"
 #include "fg/core/MaterialFactory.h"
+namespace fog{
+
+
 class Demo
 {
 public:
@@ -95,4 +98,5 @@ public:
             ImGui::End();
         }
     };
+};
 };

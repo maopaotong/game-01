@@ -1,5 +1,6 @@
 #pragma once
-
+namespace fog
+{
 class InputState
 {
 public:
@@ -14,4 +15,5 @@ public:
     {
         return isLeft() || isRight() || isFront() || isBack();
     }
+};
 };

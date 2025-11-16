@@ -16,7 +16,7 @@
 
 // === Custom hash function ===
 //
-
+using namespace fog;
 // === Main function ===
 int main()
 {

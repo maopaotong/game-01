@@ -6,6 +6,7 @@
 #include "fg/core/MissionState.h"
 #include "fg/PathFollow2.h"
 
+namespace fog{
 /**
  * Move a node to a destination.
  */
@@ -97,3 +98,4 @@ public:
         return true;
     }
 };
+};//end of namespace

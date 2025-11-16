@@ -6,6 +6,8 @@
 #include "fg/core/ActorState.h"
 #include "fg/Core.h"
 #include "fg/Terrains.h"
+
+namespace fog{
 using namespace Ogre;
 
 class ActorStateControl : public ActorState
@@ -32,3 +34,4 @@ public:
         // todo collect auto
     }
 };
+};//end of namespace

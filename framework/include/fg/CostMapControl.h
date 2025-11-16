@@ -9,7 +9,8 @@
 #include "fg/State.h"
 #include "fg/MaterialNames.h"
 #include "fg/util/DrawerUtil.h"
-
+namespace fog
+{
 using namespace Ogre;
 class CostMapControl : public CostMap
 {
@@ -38,4 +39,5 @@ public:
         this->setCost(4, 3, CostMap::OBSTACLE);
         this->setCost(7, 5, CostMap::OBSTACLE);
     }
+};
 };

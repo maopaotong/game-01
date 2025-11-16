@@ -10,6 +10,8 @@
 #include "fg/CostMapControl.h"
 #include "fg/Module.h"
 #include <unordered_map>
+
+namespace fog{
 using namespace OgreBites;
 using namespace Ogre;
 
@@ -42,10 +44,7 @@ public:
         Log *log = lm->getDefaultLog();
         log->setDebugOutputEnabled(false);
         log->setLogDetail(Ogre::LL_LOW);
-        //
-        InputListener *ls = appCtx->getImGuiInputListener();
-        std::cout << "appCtx.imGuiInputListener:" << ls << std::endl;
-
+        //     
         RenderWindow *window = appCtx->getRenderWindow();
 
         sceMgr = appCtx->getRoot()->createSceneManager();
@@ -149,3 +148,4 @@ public:
     }
    
 };
+};//end of namespace

@@ -12,6 +12,9 @@
 #include <OgreShaderGenerator.h>
 #include "fg/Ground.h"
 #include "fg/Terrains.h"
+
+
+namespace fog{
 using namespace Ogre;
 
 //
@@ -27,7 +30,12 @@ class GameTerrain : public State, public Terrains
 {
     const String FFP_Transform = "FFP_Transform";
     const float flatHight = 0.0f;
-    const float terrainScale = 60.0f;
+    const float terrainScale = 100.0f;
+
+    float minHeight0 = 40;
+    float fadeDist0 = 30;
+    float minHeight1 = 70;
+    float fadeDist1 = 30;
 
 private:
     long terrainX = 1;
@@ -110,7 +118,7 @@ public:
         defaultimp.layerList[1].worldSize = 200;
         defaultimp.layerList[1].textureNames.push_back("Ground23_diffspec"); // loaded from memory
         defaultimp.layerList[1].textureNames.push_back("Ground23_normheight.dds");
-        defaultimp.layerList[2].worldSize = 400;
+        defaultimp.layerList[2].worldSize = 200;
         defaultimp.layerList[2].textureNames.push_back("Rock20_diffspec.dds");
         defaultimp.layerList[2].textureNames.push_back("Rock20_normheight.dds");
 
@@ -129,9 +137,48 @@ public:
         terrainGroup->getDefaultImportSettings();
 
         // blend
-
+        for (const auto &ti : terrainGroup->getTerrainSlots())
+        {
+            initBlendMaps(ti.second->instance);
+        }
         // free
         terrainGroup->freeTemporaryResources();
+    }
+    void initBlendMaps(Ogre::Terrain *terrain)
+    {
+        Ogre::TerrainLayerBlendMap *blendMap0 = terrain->getLayerBlendMap(1);
+        Ogre::TerrainLayerBlendMap *blendMap1 = terrain->getLayerBlendMap(2);
+
+        float *pBlend0 = blendMap0->getBlendPointer();
+        float *pBlend1 = blendMap1->getBlendPointer();
+
+        for (Ogre::uint16 y = 0; y < terrain->getLayerBlendMapSize(); ++y)
+        {
+            for (Ogre::uint16 x = 0; x < terrain->getLayerBlendMapSize(); ++x)
+            {
+                float height = terrain->getHeightAtTerrainPosition(
+                    static_cast<float>(x) / (terrain->getLayerBlendMapSize() - 1),
+                    static_cast<float>(y) / (terrain->getLayerBlendMapSize() - 1));
+
+                // Layer 0
+                float val = (height - minHeight0) / fadeDist0;
+                val = Ogre::Math::Clamp(val, 0.0f, 1.0f);
+                *pBlend0 = val;
+
+                // Layer 1
+                val = (height - minHeight1) / fadeDist1;
+                val = Ogre::Math::Clamp(val, 0.0f, 1.0f);
+                *pBlend1 = val;
+
+                pBlend0++;
+                pBlend1++;
+            }
+        }
+
+        blendMap0->dirty();
+        blendMap1->dirty();
+        blendMap0->update();
+        blendMap1->update();
     }
 
     float getHeightAtPosition(float x, float y) override
@@ -181,3 +228,4 @@ public:
         stbi_write_png(filename, width, height, 1, image.data(), width); // 最后一个参数是每行字节数
     }
 };
+};//end of namespace

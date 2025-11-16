@@ -25,7 +25,7 @@
 #include <OgreTechnique.h>
 #include "fg/MaterialNames.h"
 
-
+namespace fog{
 // === Custom hash function ===
 //
 // === Hexagonal Map Visualizer class ===
@@ -99,3 +99,5 @@ public:
         createVertexColourMaterialForSelected(matMgr); // for selected
     }
 };
+
+};//end of namespace

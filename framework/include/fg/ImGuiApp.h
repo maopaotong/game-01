@@ -1,5 +1,8 @@
 #pragma once
 #include <OgreFrameListener.h>
+
+namespace fog
+{
 using namespace Ogre;
 using namespace OgreBites;
 class ImGuiApp
@@ -16,4 +19,5 @@ public:
     virtual void addFrameListener(FrameListener *l) = 0;
 
     virtual void breakRender() = 0;
+};
 };

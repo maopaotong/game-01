@@ -3,8 +3,9 @@
 #include <string>
 #include "fg/Core.h"
 #include "fg/State.h"
-#include "fg/EventCenter.h"
+#include "fg/Event.h"
 
+namespace fog{
 class ActiveTrayUI : public Listener<Actor *, std::string &>
 {
     Core *core;
@@ -15,7 +16,7 @@ public:
     {
         this->core = core;
 
-        Global::Context<ECActorProperty *>::get()->addListener(this);
+        Global::Context<ActorPropEC *>::get()->addListener(this);
     }
 
     bool onEvent(Actor *a, std::string &pName) override
@@ -33,7 +34,7 @@ public:
                 this->state = nullptr;
             }
             // do something with s
-        }
+        }        
         return true;
     }
 
@@ -43,11 +44,11 @@ public:
         {
             return false;
         }
-
-        State *state = this->state;
+        
         if (state)
         {
             ImGui::Text(("Active State: " + std::to_string((uintptr_t)state)).c_str());
+
         }
         else
         {
@@ -58,3 +59,5 @@ public:
         return true;
     }
 };
+
+};//end of namespace

@@ -14,7 +14,7 @@
 #include "fg/core/SimpleApp.h"
 // === Custom hash function ===
 //
-
+using namespace fog;
 // === Main function ===
 int main()
 {
@@ -37,7 +37,8 @@ int main()
         app->startRendering();
         app->close();
     }
-    catch(Ogre::Exception& e){
+    catch (Ogre::Exception &e)
+    {
         std::cerr << "Error: " << e.what() << "\n";
         return 1;
     }
@@ -46,7 +47,7 @@ int main()
         std::cerr << "Error: " << e.what() << "\n";
         return 1;
     }
-    catch (const char* &e)
+    catch (const char *&e)
     {
         std::cerr << "Error: " << e << "\n";
         return 1;

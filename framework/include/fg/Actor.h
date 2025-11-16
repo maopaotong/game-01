@@ -1,8 +1,11 @@
 #pragma once
 #include <Ogre.h>
-
-class Actor
+namespace fog
 {
-public:
-    virtual ~Actor() = default;
+
+    class Actor
+    {
+    public:
+        virtual ~Actor() = default;
+    };
 };

@@ -3,6 +3,7 @@
 #include <vector>
 #include <Ogre.h>
 
+namespace fog{
 using namespace Ogre;
 
 class Polyline2
@@ -57,3 +58,4 @@ public:
     }
 
 };
+};//end of namespace

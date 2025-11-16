@@ -16,6 +16,7 @@
 #include "ActiveTrayUI.h"
 #include "MainUI.h"
 #include "SceneNodeUI.h"
+namespace fog{
 class OnFrameUI : public ImGuiApp::FrameListener
 {
     Global *global;
@@ -51,3 +52,4 @@ public:
         ImGui::PopStyleColor();
     }
 };
+};//end of namespace

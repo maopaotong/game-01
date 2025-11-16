@@ -9,6 +9,8 @@
 #include "fg/core/SimpleCore.h"
 #include "fg/Global.h"
 
+namespace fog{
+
 using namespace OgreBites;
 using namespace Ogre;
 class SimpleApp : public App
@@ -88,3 +90,4 @@ public:
     
     }
 };
+};//end of namespace
