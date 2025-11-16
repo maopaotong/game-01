@@ -14,42 +14,48 @@
 #include <OgreRenderWindow.h>
 #include "fg/demo/GameTerrain.h"
 #include "ActiveTrayUI.h"
+#include "CommandUI.h"
 #include "MainUI.h"
 #include "SceneNodeUI.h"
-namespace fog{
-class OnFrameUI : public ImGuiApp::FrameListener
+namespace fog
 {
-    Global *global;
-    Core *core;
-    bool breakRenderRequested = false;
-    RenderWindow *window;
-    Viewport *vp;
-    SceneManager *sceMgr;
-    ActiveTrayUI *activeTrayUI = nullptr;
-    MainUI *mainUI = nullptr;
-    SceneNodeUI *sceneNodeUI = nullptr;
-public:
-    OnFrameUI(Core *core)
+    class OnFrameUI : public ImGuiApp::FrameListener
     {
-        this->core = core;
-        this->global = core->getGlobal();
-        this->window = core->getWindow();
-        this->vp = core->getViewport();
-        this->sceMgr = core->getSceneManager();
+        Global *global;
+        Core *core;
+        bool breakRenderRequested = false;
+        RenderWindow *window;
+        Viewport *vp;
+        SceneManager *sceMgr;
+        ActiveTrayUI *activeTrayUI = nullptr;
+        MainUI *mainUI = nullptr;
+        SceneNodeUI *sceneNodeUI = nullptr;
+        CommandUI * cmdUI;
+    public:
+        OnFrameUI(Core *core, CostMap *costMap)
+        {
+            this->core = core;
+            this->global = core->getGlobal();
+            this->window = core->getWindow();
+            this->vp = core->getViewport();
+            this->sceMgr = core->getSceneManager();
 
-        //
-        this->activeTrayUI = new ActiveTrayUI(core);
-        this->mainUI = new MainUI(core);
-        this->sceneNodeUI = new SceneNodeUI(core);
-    }
+            //
+            this->activeTrayUI = new ActiveTrayUI(core, costMap);
+            this->mainUI = new MainUI(core, costMap);
+            this->sceneNodeUI = new SceneNodeUI(core);
+            this->cmdUI = new CommandUI(core,costMap);
+            
+        }
 
-    void onFrame(const FrameEvent &evt)
-    {
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.7f));
-        this->mainUI->Open();
-        this->activeTrayUI->Open();
-        this->sceneNodeUI->Open();
-        ImGui::PopStyleColor();
-    }
-};
-};//end of namespace
+        void onFrame(const FrameEvent &evt)
+        {
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.7f));
+            this->mainUI->Open();
+            this->activeTrayUI->Open();
+            this->sceneNodeUI->Open();
+            this->cmdUI->Open();
+            ImGui::PopStyleColor();
+        }
+    };
+}; // end of namespace

@@ -64,6 +64,10 @@ public:
         this->rebuild();
     }
 
+    virtual CellKey getDestinationCell(){
+        return this->end;
+    }
+
     void rebuild()
     {
 

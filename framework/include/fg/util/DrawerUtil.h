@@ -21,6 +21,7 @@ namespace fog
                                   const std::vector<Ogre::Vector3> &vertices,
                                   const Ogre::ColourValue &color1, ColourValue color2)
         {
+            float offsetY = 100.0f;
             const float nomX = 0;
             const float nomY = 1;
             const float nomZ = 0;
@@ -61,6 +62,54 @@ namespace fog
         static void drawHexagonTo(Ogre::ManualObject *obj,
                                   const TerrainedVertices3 &vertices,
                                   const Ogre::ColourValue &color1)
+        {
+            const float nomX = 0;
+            const float nomY = 1;
+            const float nomZ = 0;
+
+            int rows = vertices.size();
+
+            for (int i = 0; i < rows; i++)
+            {
+                const std::vector<Vector3> &row = vertices[i];
+                int cols = row.size();
+
+                for (int j = 0; j < cols; j++)
+                {
+                    Vector3 pos = row[j];
+                    obj->position(pos.x, pos.y, pos.z);
+                    obj->normal(nomX, nomY, nomZ);
+                    obj->colour(color1);
+
+                    obj->position(pos.x, pos.y, pos.z + 3.0f); // density
+                    obj->normal(nomX, nomY, nomZ);
+                    obj->colour(color1);
+
+                    obj->position(pos.x + 3.0f, pos.y, pos.z);
+                    obj->normal(nomX, nomY, nomZ);
+                    obj->colour(color1);
+                }
+            }
+
+            int idx = 0;
+
+            for (int i = 0; i < rows; i++)
+            {
+                const std::vector<Vector3> &row = vertices[i];
+                int cols = row.size();
+
+                for (int j = 0; j < cols; j++)
+                {
+                    obj->triangle(idx * 3, idx * 3 + 1, idx * 3 + 2);
+                    idx++; // total index.
+                }
+            }
+
+        } //
+
+        static void drawHexagonTo_DEL(Ogre::ManualObject *obj,
+                                      const TerrainedVertices3 &vertices,
+                                      const Ogre::ColourValue &color1)
         {
             const float nomX = 0;
             const float nomY = 1;

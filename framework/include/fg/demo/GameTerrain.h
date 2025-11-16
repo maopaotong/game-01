@@ -12,7 +12,6 @@
 #include <OgreShaderGenerator.h>
 #include "fg/Ground.h"
 #include "fg/Terrains.h"
-
 namespace fog
 {
     using namespace Ogre;
@@ -30,13 +29,13 @@ namespace fog
     {
         const String FFP_Transform = "FFP_Transform";
         const float flatHight = 0.0f;
-        const float terrainScale = 100.0f;
+        const float terrainScale = 100.0f; // height
 
         float minHeight0 = 40;
         float fadeDist0 = 30;
         float minHeight1 = 70;
         float fadeDist1 = 30;
-
+        bool flat = true; // for test.
     private:
         long terrainX = 1;
         long terrainY = 1;
@@ -127,7 +126,7 @@ namespace fog
             {
                 for (long y = 0; y < terrainY; ++y)
                 {
-                    defineTerrain(x, y, false);
+                    defineTerrain(x, y, flat);
                 }
             }
             // load
@@ -186,12 +185,12 @@ namespace fog
             return terrainGroup->getHeightAtWorldPosition(Ground::Transfer::to3D(x, y));
         }
 
-        Vector3 getOrigin()override
+        Vector3 getOrigin() override
         {
             return terrainGroup->getOrigin();
         }
 
-        float getDensity()override
+        float getDensity() override
         {
             return this->worldSize / (this->terrainSize - 1);
         }

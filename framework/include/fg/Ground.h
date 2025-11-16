@@ -118,17 +118,17 @@ namespace fog
         static TerrainedVertices3 calculateVertices3D(int cellX, int cellY, CostMap *costMap, float rad, float heightOffset = 0.0f)
         {
             // center in world 2D
-            Vector2 center = CellUtil::calculateCenter(cellX, cellY, costMap, rad); //
+            Vector2 cellCenterIn2DWld = CellUtil::calculateCenter(cellX, cellY, costMap, rad); //
 
             // center
             float cellWidth = rad * 2.0f;
             float cellHeight = rad / std::sqrt(3);
 
             // calculate the rectangle scope.
-            float minX = center.x - cellWidth / 2.0f;
-            float minY = center.y - cellHeight / 2.0f;
-            float maxX = center.x + cellWidth / 2.0f;
-            float maxY = center.y + cellHeight / 2.0f;
+            float cllMinXIn2DWld = cellCenterIn2DWld.x - cellWidth / 2.0f;
+            float cllMinYIn2DWld = cellCenterIn2DWld.y - cellHeight / 2.0f;
+            float cllMaxXIn2DWld = cellCenterIn2DWld.x + cellWidth / 2.0f;
+            float cllMaxYIn2DWld = cellCenterIn2DWld.y + cellHeight / 2.0f;
 
             Terrains *terrains = Global::Context<Terrains *>::get();
             // dencity of terrain
@@ -136,12 +136,13 @@ namespace fog
             // scope of index of the height map
             Vector3 terOrigin = terrains->getOrigin();
             // transfer terrain origin position to world 2D
-            Vector2 terOrigin2D = Ground::Transfer::to2D(terOrigin);
+            Vector2 terOriginIn2DWld = Ground::Transfer::to2D(terOrigin);
 
-            int tMinX = (int)((minX - terOrigin2D.x) / density);
-            int tMinY = (int)((minY - terOrigin2D.y) / density);
-            int tMaxX = (int)((maxX - terOrigin2D.x) / density);
-            int tMaxY = (int)((maxY - terOrigin2D.y) / density);
+            //scaler 
+            int tMinX = (int)((cllMinXIn2DWld - terOriginIn2DWld.x) / density);
+            int tMinY = (int)((cllMinYIn2DWld - terOriginIn2DWld.y) / density);
+            int tMaxX = (int)((cllMaxXIn2DWld - terOriginIn2DWld.x) / density);
+            int tMaxY = (int)((cllMaxYIn2DWld - terOriginIn2DWld.y) / density);
 
             // make the result
             TerrainedVertices3 ret;
@@ -151,13 +152,16 @@ namespace fog
                 std::vector<Vector3> row;
                 for (int x = tMinX; x < tMaxX; x++)
                 {
+                    bool addAllCell = true;
 
-                    Vector2 point2D(x * density, y * density);
-                    point2D += terOrigin2D;
-                    if (CellUtil::isPointInCell(point2D.x, point2D.y, cellX, cellY, costMap))
+                    ;
+                    Vector2 pointIn2DWld = cellCenterIn2DWld + Vector2 (x * density, y * density); 
+
+                    if (addAllCell || CellUtil::isPointInCell(pointIn2DWld.x, pointIn2DWld.y, cellX, cellY, costMap))
                     {
-                        Vector3 pos = Ground::Transfer::to3D(point2D, Global::getTerrainHeightAtPositionWithOffset, heightOffset);
+                        Vector3 pos = Ground::Transfer::to3D(pointIn2DWld, Global::getTerrainHeightAtPositionWithOffset, heightOffset);
                         row.push_back(pos);
+                        std::cout << "push cell(x:" << cellX << ",y:" << cellY << "),pos:" << pos << std::endl;
                     }
                 }
 

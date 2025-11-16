@@ -14,164 +14,169 @@
 
 namespace fog
 {
-using namespace Ogre;
+    using namespace Ogre;
 
-class State : public Actor
-{
-public:
-    static State *get(Node *node)
+    class State : public Actor
     {
-        const Any &any = node->getUserAny();
-        if (any.isEmpty())
+    public:
+        static State *get(Node *node)
         {
+            const Any &any = node->getUserAny();
+            if (any.isEmpty())
+            {
+                return nullptr;
+            }
+
+            State *state = Ogre::any_cast<State *>(any);
+            return state;
+        }
+        static void set(SceneNode *node, State *state)
+        {
+            node->setUserAny(state);
+        }
+
+        static State *getState(MovableObject *mo)
+        {
+            const Any &any = mo->getUserAny();
+            if (any.isEmpty())
+            {
+                return nullptr;
+            }
+
+            State *state = Ogre::any_cast<State *>(any);
+            return state;
+        }
+
+    protected:
+        State *parent = nullptr;
+        FrameListener *frameListener = nullptr;
+        Pickable *pickable = nullptr;
+        Movable *movable = nullptr;
+        SceneNode *sceNode = nullptr;
+        std::vector<State *> *children = nullptr;
+        bool active = false;
+
+    public:
+        State()
+        {
+            this->children = new std::vector<State *>();
+            std::cout << "new State()" << this << "" << std::endl;
+        }
+        virtual ~State()
+        {
+            std::cout << "~State()" << this << "" << std::endl;
+        }
+
+        virtual CellKey getDestinationCell() override
+        {
+            return CellKey(0, 0);
+        }
+
+        SceneNode *getSceneNode()
+        {
+            return this->sceNode;
+        }
+
+        SceneNode *findSceneNode()
+        {
+            State *s = this;
+            while (s)
+            {
+                if (s->sceNode)
+                {
+                    return s->sceNode;
+                }
+                s = s->parent;
+            }
             return nullptr;
         }
-
-        State *state = Ogre::any_cast<State *>(any);
-        return state;
-    }
-    static void set(SceneNode *node, State *state)
-    {
-        node->setUserAny(state);
-    }
-
-    static State *getState(MovableObject *mo)
-    {
-        const Any &any = mo->getUserAny();
-        if (any.isEmpty())
+        void setSceneNode(SceneNode *sNode)
         {
-            return nullptr;
+            State::set(sNode, this);
+            this->sceNode = sNode;
         }
 
-        State *state = Ogre::any_cast<State *>(any);
-        return state;
-    }
-
-protected:
-    State *parent = nullptr;
-    FrameListener *frameListener = nullptr;
-    Pickable *pickable = nullptr;
-    Movable *movable = nullptr;
-    SceneNode *sceNode = nullptr;
-    std::vector<State *> *children = nullptr;
-    bool active = false;
-
-public:
-    State()
-    {
-        this->children = new std::vector<State *>();
-        std::cout << "new State()" << this << "" << std::endl;
-    }
-    virtual ~State()
-    {
-        std::cout << "~State()" << this << "" << std::endl;
-    }
-
-    SceneNode *getSceneNode()
-    {
-        return this->sceNode;
-    }
-
-    SceneNode *findSceneNode()
-    {
-        State *s = this;
-        while (s)
+        void addChild(State *s)
         {
-            if (s->sceNode)
+            if (s->parent)
             {
-                return s->sceNode;
+                throw std::runtime_error("Already has a parent state.");
             }
-            s = s->parent;
+            this->children->push_back(s);
+            s->parent = this;
         }
-        return nullptr;
-    }
-    void setSceneNode(SceneNode *sNode)
-    {
-        State::set(sNode, this);
-        this->sceNode = sNode;
-    }
 
-    void addChild(State *s)
-    {
-        if (s->parent)
+        void removeChild(State *cs)
         {
-            throw std::runtime_error("Already has a parent state.");
+            this->children->erase(std::remove(this->children->begin(), this->children->end(), cs), this->children->end());
         }
-        this->children->push_back(s);
-        s->parent = this;
-    }
 
-    void removeChild(State *cs)
-    {
-        this->children->erase(std::remove(this->children->begin(), this->children->end(), cs), this->children->end());
-    }
-
-    Pickable *getPickable()
-    {
-        return this->pickable;
-    }
-
-    void setPickable(Pickable *pick)
-    {
-        this->pickable = pick;
-    }
-
-    FrameListener *getFrameListener()
-    {
-        return this->frameListener;
-    }
-
-    void setFrameListener(FrameListener *listener)
-    {
-        this->frameListener = listener;
-    }
-
-    Movable *getMovable()
-    {
-        return this->movable;
-    }
-
-    void setMovable(Movable *mvb)
-    {
-        this->movable = mvb;
-    }
-
-    void setActive(bool active)
-    {
-        bool changed = (this->active != active);
-        this->active = active;
-        if (changed)
+        Pickable *getPickable()
         {
-            Global::Context<ActorPropEC *>::get()->emit(this, std::string("active"));
+            return this->pickable;
         }
-    }
 
-    bool isActive()
-    {
-        return this->active;
-    }
-
-    template <typename... Args>
-    void forEachChild(void (*func)(State *, Args...), Args... args)
-    {
-        forEachChild<Args...>(true, func, args...);
-    }
-
-    template <typename... Args>
-    void forEachChild(bool recursive, void (*func)(State *, Args...), Args... args)
-    {
-        std::vector<State *> *tmp = this->children;
-        for (auto it = tmp->begin(); it != tmp->end(); ++it)
+        void setPickable(Pickable *pick)
         {
-            State *s = *it;
-            func(s, args...);
-            if (recursive)
+            this->pickable = pick;
+        }
+
+        FrameListener *getFrameListener()
+        {
+            return this->frameListener;
+        }
+
+        void setFrameListener(FrameListener *listener)
+        {
+            this->frameListener = listener;
+        }
+
+        Movable *getMovable()
+        {
+            return this->movable;
+        }
+
+        void setMovable(Movable *mvb)
+        {
+            this->movable = mvb;
+        }
+
+        void setActive(bool active)
+        {
+            bool changed = (this->active != active);
+            this->active = active;
+            if (changed)
             {
-                s->forEachChild<Args...>(true, func, args...);
+                Global::Context<ActorPropEC *>::get()->emit(this, std::string("active"));
             }
         }
-    }
 
-public:
-};
+        bool isActive()
+        {
+            return this->active;
+        }
+
+        template <typename... Args>
+        void forEachChild(void (*func)(State *, Args...), Args... args)
+        {
+            forEachChild<Args...>(true, func, args...);
+        }
+
+        template <typename... Args>
+        void forEachChild(bool recursive, void (*func)(State *, Args...), Args... args)
+        {
+            std::vector<State *> *tmp = this->children;
+            for (auto it = tmp->begin(); it != tmp->end(); ++it)
+            {
+                State *s = *it;
+                func(s, args...);
+                if (recursive)
+                {
+                    s->forEachChild<Args...>(true, func, args...);
+                }
+            }
+        }
+
+    public:
+    };
 };

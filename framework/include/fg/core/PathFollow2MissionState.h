@@ -41,7 +41,7 @@ public:
     {
         return this->path;
     }
-
+    
     bool frameStarted(const Ogre::FrameEvent &evt) override
     {
         SceneNode *pNode = this->findSceneNode(); // the parent node to operate

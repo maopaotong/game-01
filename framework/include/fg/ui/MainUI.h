@@ -27,7 +27,7 @@ class MainUI
     ActiveTrayUI *activeTrayUI = nullptr;
 
 public:
-    MainUI(Core *core)
+    MainUI(Core *core,CostMap* costMap)
     {
         this->core = core;
         this->global = core->getGlobal();
@@ -36,7 +36,6 @@ public:
         this->sceMgr = core->getSceneManager();
         this->initGlobalVarPtr(core->getGlobal());
         // active tray
-        this->activeTrayUI = new ActiveTrayUI(core);
 
         //
     }

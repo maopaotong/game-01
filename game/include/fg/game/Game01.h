@@ -50,13 +50,13 @@ namespace fog
             this->window = core->getWindow();
             this->vp = core->getViewport();
             this->sceMgr = core->getSceneManager();
+            CostMap *costMap = createCostMap();
 
-            this->onFrameUI = new OnFrameUI(core);
+            this->onFrameUI = new OnFrameUI(core, costMap);
             this->core->getImGuiApp()->addFrameListener(this->onFrameUI);
             //
             //
 
-            CostMap *costMap = createCostMap();
             // Create materials before buding mesh?
             MaterialFactory::createMaterials(core->getMaterialManager());
             //
