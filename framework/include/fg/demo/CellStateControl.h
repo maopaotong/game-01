@@ -60,10 +60,17 @@ public:
 
                 Ogre::ColourValue color = getCostColor(cost);
                 // auto vertices = CostMap::calculateVerticesForXZ(x, y, CostMap::hexSize);
-               
-                std::vector<Vector3> vertices = Ground::calculateVertices3D(x, y, costMap, CostMap::hexSize, 1.0f, Global::getTerrainHeightAtPositionWithOffset, *this->highOffset);
-                
-                DrawerUtil::drawHexagonTo(obj, vertices, color);
+                if(true){
+
+                    std::vector<Vector3> vertices = Ground::calculateVertices3D(x, y, costMap, CostMap::hexSize, 1.0f, Global::getTerrainHeightAtPositionWithOffset, *this->highOffset);                
+                    DrawerUtil::drawHexagonTo(obj, vertices, color);
+                }else{
+                    TerrainedVertices3 vertices = TerrainedGround::calculateVertices3D(x, y, costMap, CostMap::hexSize, *this->highOffset); 
+                    TerrainedDrawerUtil::drawHexagonTo(obj, vertices, color);
+
+
+                }
+
             }
         }
 
