@@ -4,11 +4,12 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <functional>
+
+
 template <typename T>
 class VarBag
 {
 public:
-    template <typename T>
     struct VarRange
     {
         T min;
@@ -24,11 +25,10 @@ public:
     };
 
 private:
-    template <typename T>
     struct VarBind
     {
         T value;
-        VarRange<T> *scope = nullptr;
+        VarRange *scope = nullptr;
         std::unordered_set<VarListener<T> *> listeners;
         VarBind(VarBind &vp)
         {
@@ -63,13 +63,13 @@ private:
     };
 
 private:
-    std::unordered_map<std::string, VarBind<T> *> varMap;
+    std::unordered_map<std::string, VarBind *> varMap;
 
 public:
     void setVar(const std::string name, T value)
     {
 
-        VarBind<T> *vbp = this->getBind(name);
+        VarBind *vbp = this->getBind(name);
 
         if (vbp)
         {
@@ -77,7 +77,7 @@ public:
         }
         else
         {
-            void (*func)(VarBind<T> *) = [](VarBind<T> *) {};
+            void (*func)(VarBind *) = [](VarBind *) {};
 
             vbp = this->createBind(name, value, func);
         }
@@ -86,35 +86,35 @@ public:
 
     T *createBindVptr(const std::string name, T value, T min, T max)
     {
-        void (*func)(VarBind<T> *, T, T) = [](VarBind<T> *bind, T min, T max)
+        void (*func)(VarBind *, T, T) = [](VarBind *bind, T min, T max)
         { bind->scope = new VarRange(min, max); };
 
         return createBindVptr<T, T>(name, value, func, min, max);
     }
 
     template <typename... Args>
-    T *createBindVptr(const std::string name, T defVal, void (*initFunc)(VarBind<T> *, Args...), Args... args)
+    T *createBindVptr(const std::string name, T defVal, void (*initFunc)(VarBind *, Args...), Args... args)
     {
-        VarBind<T> *vbp = this->createBind<Args...>(name, defVal, initFunc, args...);
+        VarBind *vbp = this->createBind<Args...>(name, defVal, initFunc, args...);
         return &vbp->value;
     }
 
     template <typename... Args>
-    VarBind<T> *createBind(const std::string name, T defVal, void (*initFunc)(VarBind<T> *, Args...), Args... args)
+    VarBind *createBind(const std::string name, T defVal, void (*initFunc)(VarBind *, Args...), Args... args)
     {
-        VarBind<T> *vbp = this->getBind(name);
+        VarBind *vbp = this->getBind(name);
         if (vbp)
         {
             return vbp;
         }
-        vbp = new VarBind<T>(defVal);
+        vbp = new VarBind(defVal);
         this->varMap.emplace(name, vbp); //
         initFunc(vbp, args...);
         return vbp;
     }
-    VarBind<T> *getBind(const std::string name)
+    VarBind *getBind(const std::string name)
     {
-        std::unordered_map<std::string, VarBind<T> *>::iterator it = this->varMap.find(name);
+        std::unordered_map<std::string, VarBind *>::iterator it = this->varMap.find(name);
         if (it == this->varMap.end())
         {
             return nullptr;
@@ -124,7 +124,7 @@ public:
 
     T *getVarPtr(std::string name)
     {
-        VarBind<T> *vb = this->getBind(name);
+        VarBind *vb = this->getBind(name);
         if (vb)
         {
             return &vb->value;
@@ -165,11 +165,11 @@ public:
     }
 
     template <typename... Args>
-    void forEachVarPtr(void (*func)(const std::string, T *, VarRange<T> *scope, Args... args), Args... args)
+    void forEachVarPtr(void (*func)(const std::string, T *, VarRange *scope, Args... args), Args... args)
     {
         for (auto pair : varMap)
         {
-            VarBind<T> *bind = pair.second;
+            VarBind *bind = pair.second;
             func(pair.first, &bind->value, bind->scope, args...);
         }
     }
@@ -180,7 +180,7 @@ public:
     {
         for (auto pair : varMap)
         {
-            VarBind<T> *bind = pair.second;
+            VarBind *bind = pair.second;
             func(pair.first, &bind->value, args...);
         }
     }

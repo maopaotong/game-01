@@ -63,7 +63,7 @@ class Global : public VarBag<float>, public VarBag<long>, public VarBag<Vector3>
                public Context<Terrains *>,                                                                 //
                public Context<ECActorProperty *>                                                                 //
 {
-    typedef void (*FloatVarVistFunc)(const std::string name, float *vPtr, VarBag<float>::VarRange<float> *range);
+    typedef void (*FloatVarVistFunc)(const std::string name, float *vPtr, VarBag<float>::VarRange *range);
 
 public:
     static float getTerrainHeightAtPositionWithOffset(float x, float y, float offset = 0.0f)

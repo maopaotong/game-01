@@ -38,7 +38,7 @@ public:
 
         //
     }
-    static void forEachVarPtr(const std::string name, Actor **vPtr, VarBag<Actor *>::VarRange<Actor *> *range, int &actors)
+    static void forEachVarPtr(const std::string name, Actor **vPtr, VarBag<Actor *>::VarRange *range, int &actors)
     {
         Actor *a = *vPtr;
         if (a)
@@ -112,7 +112,7 @@ public:
     {
         ImGui::Text(fmt::format("{}: {:.2f}, {:.2f}, {:.2f}", name, (*vPtr)[0], (*vPtr)[1], (*vPtr)[2]).c_str());
     }
-    static void forEachVarPtr(const std::string name, float *vPtr, VarBag<float>::VarRange<float> *range, int &counter)
+    static void forEachVarPtr(const std::string name, float *vPtr, VarBag<float>::VarRange *range, int &counter)
     {
         float min = range ? range->min : 0;
         float max = range ? range->max : 100;
