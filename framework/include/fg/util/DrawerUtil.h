@@ -3,7 +3,7 @@
 
 #include <Ogre.h>
 #include <OgreColourValue.h>
-
+#include <fmt/format.h>
 namespace fog
 {
     using namespace Ogre;
@@ -63,6 +63,8 @@ namespace fog
                                   const TerrainedVertices3 &vertices,
                                   const Ogre::ColourValue &color1)
         {
+            int baseIndex = obj->getCurrentVertexCount();
+
             const float nomX = 0;
             const float nomY = 1;
             const float nomZ = 0;
@@ -73,6 +75,11 @@ namespace fog
             {
                 const std::vector<Vector3> &row = vertices[i];
                 int cols = row.size();
+                if (i == 0 && cols > 0)
+                {
+                    Vector3 vec3 = row[0];
+                    // std::cout << fmt::format("center:{},{},{}", vec3.x, vec3.y, vec3.z).c_str() << std::endl;
+                }
 
                 for (int j = 0; j < cols; j++)
                 {
@@ -81,11 +88,11 @@ namespace fog
                     obj->normal(nomX, nomY, nomZ);
                     obj->colour(color1);
 
-                    obj->position(pos.x, pos.y, pos.z + 3.0f); // density
+                    obj->position(pos.x, pos.y, pos.z + 10.0f); // density
                     obj->normal(nomX, nomY, nomZ);
                     obj->colour(color1);
 
-                    obj->position(pos.x + 3.0f, pos.y, pos.z);
+                    obj->position(pos.x + 10.0f, pos.y, pos.z);
                     obj->normal(nomX, nomY, nomZ);
                     obj->colour(color1);
                 }
@@ -100,7 +107,9 @@ namespace fog
 
                 for (int j = 0; j < cols; j++)
                 {
-                    obj->triangle(idx * 3, idx * 3 + 1, idx * 3 + 2);
+                    int p1 = baseIndex + idx * 3;
+
+                    obj->triangle(p1, p1 + 1, p1 + 2);
                     idx++; // total index.
                 }
             }

@@ -10,7 +10,7 @@
 namespace fog
 {
     using namespace Ogre;
-#define DEFAULT_CELL_HIGH_OFFSET 100.08f
+#define DEFAULT_CELL_HIGH_OFFSET .08f
 
     //
     class CellStateControl : public State
@@ -48,7 +48,7 @@ namespace fog
             // float offsetY = height / 2 * CostMap::hexSize;
             // Vector2 offset(offsetX, offsetY);
             bool ignoreDefaultCost = false;
-            int cellLimit = 1;
+            int cellLimit = 10000;
             int cellCounter = 0;
 
             int xStart = 0;
@@ -56,8 +56,8 @@ namespace fog
             int yStart = 0;
             int yEnd = height;
 
-            xStart = width / 2;
-            yStart = height / 2;
+            //xStart = width / 2;
+            //yStart = height / 2;
 
             for (int x = xStart; x < xEnd; x++)
             {
@@ -79,7 +79,7 @@ namespace fog
                     }
                     else
                     {
-                        TerrainedVertices3 vertices = TerrainedGround::calculateVertices3D(x, y, costMap, CostMap::hexSize, this->highOffset);
+                        TerrainedVertices3 vertices = TerrainedGround::calculateVertices3D(x, y, costMap, CostMap::hexSize);
                         TerrainedDrawerUtil::drawHexagonTo(obj, vertices, color);
                     }
                     if (cellCounter >= cellLimit)
@@ -87,11 +87,7 @@ namespace fog
                         break;
                     }
                 }
-                if (cellCounter >= cellLimit)
-                {
-                    break;
-                }
-                cellCounter++;
+                
             }
 
             // End the manual object

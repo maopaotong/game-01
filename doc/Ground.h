@@ -4,9 +4,6 @@
 #include "util/CellUtil.h"
 #include <Ogre.h>
 #include <OgreVector.h>
-
-#define DEFAULT_LAYERS 5
-
 namespace fog
 {
     using namespace Ogre;
@@ -68,13 +65,11 @@ namespace fog
             template <typename... Args>
             static std::vector<Ogre::Vector3> to3D(std::vector<Ogre::Vector2> &vec2Vec, HeightFunction hF = defaultHeightFunction, float heightOffset = 0.0f)
             {
-                std::vector<Ogre::Vector3> vertices;
+                std::vector<Ogre::Vector3> vertices(vec2Vec.size());
 
                 for (int i = 0; i < vec2Vec.size(); i++)
                 {
-                    Vector3 pos;
-                    to3D(vec2Vec[VERTEX_ORDER_REVERSE ? (6 - i - 1) : i], pos, hF, heightOffset);
-                    vertices.push_back(pos);
+                    to3D(vec2Vec[VERTEX_ORDER_REVERSE ? (6 - i - 1) : i], vertices[i], hF, heightOffset);
                 }
 
                 return vertices;
@@ -120,55 +115,103 @@ namespace fog
     class TerrainedGround
     {
     public:
-        // net of spider.
         static TerrainedVertices3 calculateVertices3D(int cellX, int cellY, CostMap *costMap, float rad, float heightOffset = 0.0f)
         {
-            Vector2 offset = CellUtil::offset(costMap);
-            Vector2 cellCenterIn2DWld = CellUtil::calculateCenter(cellX, cellY, offset, rad);
+            Vector2 cellCenterIn2DWld = CellUtil::calculateCenter(cellX, cellY, costMap, rad);
+            
+            float cellWidth = rad / std::sqrt(3);
+            float cellHeight = rad * 2.0f;
 
-            std::vector<std::vector<Vector2>> vertices2;
-
-            std::vector<Vector2> row2;
-            row2.push_back(cellCenterIn2DWld);
-            vertices2.push_back(row2);
-            int layers = DEFAULT_LAYERS;
-
-            for (int i = 0; i < layers; i++)
-            {
-                int sizeI = std::powf(2, i) * 6;
-                float radI = rad * (i + 1) / layers;
-                row2 = calculateCirclePoints(cellCenterIn2DWld, radI, sizeI);
-                vertices2.push_back(row2);
-            }
-
-            TerrainedVertices3 ret;
-            for (int i = 0; i < vertices2.size(); i++)
-            {
-                std::vector<Vector3> row3I = Ground::Transfer::to3D(vertices2[i], Global::getTerrainHeightAtPositionWithOffset, heightOffset);
-                ret.push_back(row3I);
-            }
-
-            return ret;
-        }
-
-        static std::vector<Vector2> calculateCirclePoints(Vector2 center, float rad, float size, float offsetAngle = 0.0f)
-        {
-
-            std::vector<Vector2> ret(size);
-            float angle = 360.0f / size;
-
-            for (int i = 0; i < size; i++)
-            {
-
-                float angle_rad = (angle * i + offsetAngle) * Ogre::Math::PI / 180.0f;
-
-                float dx = rad * std::cos(angle_rad);
-                float dy = rad * std::sin(angle_rad);
-
-                ret[i] = Ogre::Vector2(center.x + dx, center.y + dy);
-            }
-            return ret;
+            // calculate the rectangle scope.
+            float cllMinXIn2DWld = cellCenterIn2DWld.x - cellWidth / 2.0f;
+            float cllMinYIn2DWld = cellCenterIn2DWld.y - cellHeight / 2.0f;
+            float cllMaxXIn2DWld = cellCenterIn2DWld.x + cellWidth / 2.0f;
+            float cllMaxYIn2DWld = cellCenterIn2DWld.y + cellHeight / 2.0f;
+            
+            //
+            
         }
     };
 
+    class TerrainedGround_TODO
+    {
+    public:
+        static TerrainedVertices3 calculateVertices3D(int cellX, int cellY, CostMap *costMap, float rad, float heightOffset = 0.0f)
+        {
+            // center in world 2D
+            Vector2 cellCenterIn2DWld = CellUtil::calculateCenter(cellX, cellY, costMap, rad); //
+
+            // center
+            float cellWidth = rad * 2.0f;
+            float cellHeight = rad / std::sqrt(3);
+
+            // calculate the rectangle scope.
+            float cllMinXIn2DWld = cellCenterIn2DWld.x - cellWidth / 2.0f;
+            float cllMinYIn2DWld = cellCenterIn2DWld.y - cellHeight / 2.0f;
+            float cllMaxXIn2DWld = cellCenterIn2DWld.x + cellWidth / 2.0f;
+            float cllMaxYIn2DWld = cellCenterIn2DWld.y + cellHeight / 2.0f;
+
+            Terrains *terrains = Global::Context<Terrains *>::get();
+            // dencity of terrain
+            float density = terrains->getDensity(); //
+            // scope of index of the height map
+            Vector3 terOrigin = terrains->getOrigin();
+            // transfer terrain origin position to world 2D
+            Vector2 terOriginIn2DWld = Ground::Transfer::to2D(terOrigin);
+
+            // scaler
+            int tMinX = (int)((cllMinXIn2DWld - terOriginIn2DWld.x) / density);
+            int tMinY = (int)((cllMinYIn2DWld - terOriginIn2DWld.y) / density);
+            int tMaxX = (int)((cllMaxXIn2DWld - terOriginIn2DWld.x) / density);
+            int tMaxY = (int)((cllMaxYIn2DWld - terOriginIn2DWld.y) / density);
+
+            // make the result
+            TerrainedVertices3 ret;
+            for (int y = tMinY; y < tMaxY; y++)
+            {
+
+                std::vector<Vector3> row;
+                for (int x = tMinX; x < tMaxX; x++)
+                {
+                    bool addAllCell = true;
+
+                    ;
+                    Vector2 pointIn2DWld = cellCenterIn2DWld + Vector2(x * density, y * density);
+
+                    if (addAllCell || CellUtil::isPointInCell(pointIn2DWld.x, pointIn2DWld.y, cellX, cellY, costMap))
+                    {
+                        Vector3 pos = Ground::Transfer::to3D(pointIn2DWld, Global::getTerrainHeightAtPositionWithOffset, heightOffset);
+                        row.push_back(pos);
+                        std::cout << "push cell(x:" << cellX << ",y:" << cellY << "),pos:" << pos << std::endl;
+                    }
+                }
+
+                if (!row.empty())
+                {
+                    ret.push_back(row);
+                }
+            }
+
+            return ret;
+        }
+
+        static bool isInsideOfCell_TODO(Vector2 center, Vector2 point, float rad)
+        {
+            const float SQRT3 = 1.73205080757f;
+
+            Vector2 pointNom = point - center; //
+            float dx = pointNom.x;
+            float dy = pointNom.y;
+            float R = rad * SQRT3;
+            // Pointy-top hexagon (vertices at top/bottom)
+            // 条件：|dx| <= √3 * R / 2 且 |dz| <= R 且 |√3*dx ± dz| <= √3 * R
+            float a = SQRT3 * dx + dy;
+            float b = SQRT3 * dx - dy;
+            return (std::fabs(dx) <= SQRT3 * R / 2.0f) &&
+                   (std::fabs(dy) <= R) &&
+                   (std::fabs(a) <= SQRT3 * R) &&
+                   (std::fabs(b) <= SQRT3 * R);
+        }
+
+    }; // end of class
 }; // end of namespace

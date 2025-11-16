@@ -35,7 +35,7 @@ namespace fog
         float fadeDist0 = 30;
         float minHeight1 = 70;
         float fadeDist1 = 30;
-        bool flat = true; // for test.
+        bool flat = false; // for test.
     private:
         long terrainX = 1;
         long terrainY = 1;

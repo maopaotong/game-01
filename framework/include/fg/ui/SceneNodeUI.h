@@ -55,6 +55,8 @@ public:
             float indent = (depth + 1) * 10.0f;
             ImGui::Indent(indent);
             ImGui::Text(fmt::format("SceneNode: {}", cNode->getName()).c_str());
+            ImGui::SameLine();
+            ImGuiUtil::Text(cNode->getPosition());
             Ogre::Any expand = cNode->getUserObjectBindings().getUserAny(".expanding");            
             bool isExpand = expand.isEmpty()?false: expand.get<bool>();
             
