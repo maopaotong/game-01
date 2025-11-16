@@ -8,6 +8,7 @@
 #include "fg/Actor.h"
 #include "fg/EventCenter.h"
 #include "fg/PropertyEvent.h"
+#include <string>
 
 template <typename T>
 class Context
@@ -57,11 +58,11 @@ public:
     }
 };
 
-typedef EventCenter<PropertyEvent<Actor> &> ECPEActor;
+typedef EventCenter<Actor*, std::string &> ECActorProperty;
 
 class Global : public VarBag<float>, public VarBag<long>, public VarBag<Vector3>, public VarBag<std::any>, //
                public Context<Terrains *>,                                                                 //
-               public Context<ECPEActor *>                                                                 //
+               public Context<ECActorProperty *>                                                                 //
 {
     typedef void (*FloatVarVistFunc)(const std::string name, float *vPtr, VarBag<float>::VarRange<float> *range);
 

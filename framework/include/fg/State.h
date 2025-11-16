@@ -56,7 +56,7 @@ protected:
     SceneNode *sceNode = nullptr;
     std::vector<State *> *children = nullptr;
     bool active = false;
-    
+
 public:
     State()
     {
@@ -143,7 +143,7 @@ public:
         this->active = active;
         if (changed)
         {
-            Global::Context<ECPEActor*>::get()->emit(PropertyEvent<Actor>(this, "active"));
+            Global::Context<ECActorProperty *>::get()->emit(this, std::string("active"));
         }
     }
 
@@ -152,16 +152,23 @@ public:
         return this->active;
     }
 
-    void forEachChild(std::function<void(State *)> func, bool recusive = true)
+    template <typename... Args>
+    void forEachChild(void (*func)(State *, Args...), Args... args)
+    {
+        forEachChild<Args...>(true, func, args...);
+    }
+
+    template <typename... Args>
+    void forEachChild(bool recursive, void (*func)(State *, Args...), Args... args)
     {
         std::vector<State *> *tmp = this->children;
         for (auto it = tmp->begin(); it != tmp->end(); ++it)
         {
             State *s = *it;
-            func(s);
-            if (recusive)
+            func(s, args...);
+            if (recursive)
             {
-                s->forEachChild(func, recusive);
+                s->forEachChild<Args...>(true, func, args...);
             }
         }
     }

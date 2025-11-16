@@ -8,28 +8,27 @@
 
 #include "fg/Listener.h"
 
-template <typename T>
+template <typename... Args>
 class EventCenter
 {
-    std::vector<Listener<T> *> listeners;
+    std::vector<Listener<Args...> *> listeners;
 
 public:
-    void addListener(Listener<T> *listener)
+    void addListener(Listener<Args...> *listener)
     {
         listeners.push_back(listener);
     }
 
-    void emit(T &evt)
+    void emit(Args...evt)
     {
         for (auto listener : listeners)
         {
-            listener->onEvent(evt);
+            listener->onEvent(evt...);
         }
     }
 
-    template <typename T>
-    void addListener(bool (*func)(T &))
+    void addListener(bool (*func)(Args... args))
     {
-        addListener(new FunctionListener<T&>(func));
+        addListener(new FunctionListener<Args...>(func));
     }
 };

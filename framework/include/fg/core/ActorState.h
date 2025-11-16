@@ -152,7 +152,7 @@ public:
 
     bool frameStarted(const FrameEvent &evt) override
     {
-        std::function<void(State *)> func = [&evt](State *cState)
+        void (*func)(State *, const FrameEvent &evt) = [](State *cState, const FrameEvent &evt)
         {
             FrameListener *fl = cState->getFrameListener();
             if (fl)
@@ -160,7 +160,7 @@ public:
                 fl->frameStarted(evt);
             }
         };
-        this->forEachChild(func);
+        this->forEachChild<const FrameEvent &>(func, evt);
         return true;
     }
 };

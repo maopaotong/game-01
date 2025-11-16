@@ -104,16 +104,19 @@ public:
 
             if (hitCell)
             {
-
-                core->getRootState()->forEachChild(
-                    [&cKey](State *s)
+                void (*func)(State *, CellKey &) =
+                    [](State *s, CellKey &cKey)
+                {
+                    Movable *mvb = s->getMovable();
+                    if (mvb)
                     {
-                        Movable *mvb = s->getMovable();
-                        if (mvb)
-                        {
-                            mvb->setTargetCell(cKey);
-                        }
-                    });
+                        mvb->setTargetCell(cKey);
+                    }
+                };
+
+                core->getRootState()->forEachChild<CellKey &>(
+                    func,
+                    cKey);
                 //
             }
             // cout << "worldPoint(" << pickX << ",0," << pickZ << "),cellIdx:[" << cx << "," << cy << "]" << endl;

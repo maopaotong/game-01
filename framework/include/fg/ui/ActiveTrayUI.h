@@ -6,7 +6,7 @@
 #include "fg/EventCenter.h"
 #include "fg/PropertyEvent.h"
 
-class ActiveTrayUI : public Listener<PropertyEvent<Actor> &>
+class ActiveTrayUI : public Listener<Actor *, std::string &>
 {
     Core *core;
     State *state = nullptr;
@@ -16,14 +16,13 @@ public:
     {
         this->core = core;
 
-        Global::Context<ECPEActor *>::get()->addListener(this);
+        Global::Context<ECActorProperty *>::get()->addListener(this);
     }
 
-    bool onEvent(PropertyEvent<Actor> &evt) override
+    bool onEvent(Actor *a, std::string &pName) override
     {
-        if (evt.getName() == "active")
+        if (pName == "active")
         {
-            Actor *a = evt.getState();
             State *s = dynamic_cast<State *>(a);
 
             if (s && s->isActive())
