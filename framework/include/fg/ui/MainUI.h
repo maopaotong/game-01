@@ -38,7 +38,7 @@ public:
 
         //
     }
-    static void forEachVarPtr(const std::string name, Actor **vPtr, VarBag<Actor *>::VarRange *range, int &actors)
+    static void forEachVarPtr(const std::string name, Actor **vPtr, Var<Actor*>::Range *range, int &actors)
     {
         Actor *a = *vPtr;
         if (a)
@@ -57,7 +57,7 @@ public:
         ImGui::Indent(15.0f);
         int actors = 0;
 
-        this->global->VarBag<Actor *>::forEachVarPtr<int &>(MainUI::forEachVarPtr, actors);
+        this->global->Var<Actor*>::Bag::forEachVarPtr<int &>(MainUI::forEachVarPtr, actors);
         ImGui::Unindent(15.0f);
 
         vp = core->getViewport();
@@ -67,9 +67,9 @@ public:
         ImGui::Text(fmt::format("Window.pixel:      {},{}", window->getWidth(), window->getHeight()).c_str());
 
         int counter = 0;
-        this->global->VarBag<float>::forEachVarPtr<int &>(MainUI::forEachVarPtr, counter);
+        this->global->Var<float>::Bag::forEachVarPtr<int &>(MainUI::forEachVarPtr, counter);
 
-        this->global->VarBag<Vector3>::forEachVarPtr<int &>(MainUI::forEachVarPtr, counter);
+        this->global->Var<Vector3>::Bag::forEachVarPtr<int &>(MainUI::forEachVarPtr, counter);
 
         // stats
 
@@ -112,7 +112,7 @@ public:
     {
         ImGui::Text(fmt::format("{}: {:.2f}, {:.2f}, {:.2f}", name, (*vPtr)[0], (*vPtr)[1], (*vPtr)[2]).c_str());
     }
-    static void forEachVarPtr(const std::string name, float *vPtr, VarBag<float>::VarRange *range, int &counter)
+    static void forEachVarPtr(const std::string name, float *vPtr, Var<float>::Range *range, int &counter)
     {
         float min = range ? range->min : 0;
         float max = range ? range->max : 100;
@@ -121,7 +121,7 @@ public:
 
     void initGlobalVarPtr(Global *glb)
     {
-        glb->VarBag<float>::createBindVptr(".aniSpeed", 0.55f, 0.0f, 2.0f);
-        glb->VarBag<float>::createBindVptr(".pathSpeed", 1.0f, 1.0f, 10.0f);
+        glb->Var<float>::Bag::createBindVptr(".aniSpeed", 0.55f, 0.0f, 2.0f);
+        glb->Var<float>::Bag::createBindVptr(".pathSpeed", 1.0f, 1.0f, 10.0f);
     }
 };

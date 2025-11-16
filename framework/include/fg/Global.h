@@ -59,11 +59,11 @@ public:
 
 typedef EventCenter<Actor*, std::string &> ECActorProperty;
 
-class Global : public VarBag<float>, public VarBag<long>, public VarBag<Vector3>, public VarBag<Actor*>, //
+class Global : public Var<float>::Bag, public Var<long>::Bag, public Var<Vector3>::Bag, public Var<Actor*>::Bag, //
                public Context<Terrains *>,                                                                 //
                public Context<ECActorProperty *>                                                                 //
 {
-    typedef void (*FloatVarVistFunc)(const std::string name, float *vPtr, VarBag<float>::VarRange *range);
+    typedef void (*FloatVarVistFunc)(const std::string name, float *vPtr, Var<float>::Range *range);
 
 public:
     static float getTerrainHeightAtPositionWithOffset(float x, float y, float offset = 0.0f)

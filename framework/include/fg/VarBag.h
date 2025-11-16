@@ -5,50 +5,45 @@
 #include <unordered_set>
 #include <functional>
 
-
 template <typename T>
-class VarBag
+class Var
 {
 public:
-    struct VarRange
+    struct Range
     {
         T min;
         T max;
-        VarRange(T min, T max) : min(min), max(max) {}
+        Range(T min, T max) : min(min), max(max) {}
     };
-
-    template <typename T>
-    class VarListener
+    class Listener
     {
     public:
         virtual void onVarChanged(const std::string name, T &ref) = 0;
     };
-
-private:
-    struct VarBind
+    struct Bind
     {
         T value;
-        VarRange *scope = nullptr;
-        std::unordered_set<VarListener<T> *> listeners;
-        VarBind(VarBind &vp)
+        Range *scope = nullptr;
+        std::unordered_set<Listener *> listeners;
+        Bind(Bind &vp)
         {
             VarPtr(vp.ptr);
         }
-        VarBind(T value) : value(value)
+        Bind(T value) : value(value)
         {
         }
-        ~VarBind()
+        ~Bind()
         {
             if (this->scope)
             {
                 delete this->scope;
             }
         }
-        void addListener(VarListener<T> *l)
+        void addListener(Listener *l)
         {
             listeners.insert(l);
         }
-        void removeListener(VarListener<T> *l)
+        void removeListener(Listener *l)
         {
             listener.erase(l);
         }
@@ -62,126 +57,130 @@ private:
         }
     };
 
-private:
-    std::unordered_map<std::string, VarBind *> varMap;
-
-public:
-    void setVar(const std::string name, T value)
+    class Bag
     {
+    public:
+    private:
+    private:
+        std::unordered_map<std::string, Bind *> varMap;
 
-        VarBind *vbp = this->getBind(name);
-
-        if (vbp)
+    public:
+        void setVar(const std::string name, T value)
         {
-            vbp->value = value;
+
+            Bind *vbp = this->getBind(name);
+
+            if (vbp)
+            {
+                vbp->value = value;
+            }
+            else
+            {
+                void (*func)(Bind *) = [](Bind *) {};
+
+                vbp = this->createBind(name, value, func);
+            }
+            vbp->notify(name);
         }
-        else
-        {
-            void (*func)(VarBind *) = [](VarBind *) {};
 
-            vbp = this->createBind(name, value, func);
+        T *createBindVptr(const std::string name, T value, T min, T max)
+        {
+            void (*func)(Bind *, T, T) = [](Bind *bind, T min, T max)
+            { bind->scope = new Range(min, max); };
+
+            return createBindVptr<T, T>(name, value, func, min, max);
         }
-        vbp->notify(name);
-    }
 
-    T *createBindVptr(const std::string name, T value, T min, T max)
-    {
-        void (*func)(VarBind *, T, T) = [](VarBind *bind, T min, T max)
-        { bind->scope = new VarRange(min, max); };
-
-        return createBindVptr<T, T>(name, value, func, min, max);
-    }
-
-    template <typename... Args>
-    T *createBindVptr(const std::string name, T defVal, void (*initFunc)(VarBind *, Args...), Args... args)
-    {
-        VarBind *vbp = this->createBind<Args...>(name, defVal, initFunc, args...);
-        return &vbp->value;
-    }
-
-    template <typename... Args>
-    VarBind *createBind(const std::string name, T defVal, void (*initFunc)(VarBind *, Args...), Args... args)
-    {
-        VarBind *vbp = this->getBind(name);
-        if (vbp)
+        template <typename... Args>
+        T *createBindVptr(const std::string name, T defVal, void (*initFunc)(Bind *, Args...), Args... args)
         {
+            Bind *vbp = this->createBind<Args...>(name, defVal, initFunc, args...);
+            return &vbp->value;
+        }
+
+        template <typename... Args>
+        Bind *createBind(const std::string name, T defVal, void (*initFunc)(Bind *, Args...), Args... args)
+        {
+            Bind *vbp = this->getBind(name);
+            if (vbp)
+            {
+                return vbp;
+            }
+            vbp = new Bind(defVal);
+            this->varMap.emplace(name, vbp); //
+            initFunc(vbp, args...);
             return vbp;
         }
-        vbp = new VarBind(defVal);
-        this->varMap.emplace(name, vbp); //
-        initFunc(vbp, args...);
-        return vbp;
-    }
-    VarBind *getBind(const std::string name)
-    {
-        std::unordered_map<std::string, VarBind *>::iterator it = this->varMap.find(name);
-        if (it == this->varMap.end())
+        Bind *getBind(const std::string name)
         {
+            std::unordered_map<std::string, Bind *>::iterator it = this->varMap.find(name);
+            if (it == this->varMap.end())
+            {
+                return nullptr;
+            }
+            return it->second;
+        }
+
+        T *getVarPtr(std::string name)
+        {
+            Bind *vb = this->getBind(name);
+            if (vb)
+            {
+                return &vb->value;
+            }
             return nullptr;
         }
-        return it->second;
-    }
 
-    T *getVarPtr(std::string name)
-    {
-        VarBind *vb = this->getBind(name);
-        if (vb)
+        bool getVarVal(std::string name, T &ret)
         {
-            return &vb->value;
+            T *ptr = this->getVarPtr(name);
+            if (ptr)
+            {
+                ret = *ptr;
+                return true;
+            }
+            return false;
         }
-        return nullptr;
-    }
 
-    bool getVarVal(std::string name, T &ret)
-    {
-        T *ptr = this->getVarPtr(name);
-        if (ptr)
+        template <typename T2>
+        T2 getVarVal(std::string name, T2 (*cvtFunc)(T from), T2 def)
         {
-            ret = *ptr;
-            return true;
+            T *ptr = this->getVarPtr(name);
+            if (ptr)
+            {
+                return def;
+            }
+            return cvtFunc(*ptr);
         }
-        return false;
-    }
 
-    template <typename T2>
-    T2 getVarVal(std::string name, T2 (*cvtFunc)(T from), T2 def)
-    {
-        T *ptr = this->getVarPtr(name);
-        if (ptr)
+        T getVarVal(std::string name, T def)
         {
+            T *ptr = this->getVarPtr(name);
+            if (ptr)
+            {
+                return *ptr;
+            }
             return def;
         }
-        return cvtFunc(*ptr);
-    }
 
-    T getVarVal(std::string name, T def)
-    {
-        T *ptr = this->getVarPtr(name);
-        if (ptr)
+        template <typename... Args>
+        void forEachVarPtr(void (*func)(const std::string, T *, Range *scope, Args... args), Args... args)
         {
-            return *ptr;
+            for (auto pair : varMap)
+            {
+                Bind *bind = pair.second;
+                func(pair.first, &bind->value, bind->scope, args...);
+            }
         }
-        return def;
-    }
 
-    template <typename... Args>
-    void forEachVarPtr(void (*func)(const std::string, T *, VarRange *scope, Args... args), Args... args)
-    {
-        for (auto pair : varMap)
+        template <typename... Args>
+        void forEachVarPtr(void (*func)(const std::string, T *, Args... args), Args... args)
         {
-            VarBind *bind = pair.second;
-            func(pair.first, &bind->value, bind->scope, args...);
+            for (auto pair : varMap)
+            {
+                Bind *bind = pair.second;
+                func(pair.first, &bind->value, args...);
+            }
         }
-    }
-
-    
-    template <typename... Args>
-    void forEachVarPtr(void (*func)(const std::string, T *, Args... args), Args... args)
-    {
-        for (auto pair : varMap)
-        {
-            VarBind *bind = pair.second;
-            func(pair.first, &bind->value, args...);
-        }
-    }
+    };
 };

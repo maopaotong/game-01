@@ -39,8 +39,8 @@ public:
 
         this->costMap = costMap;
 
-        this->actorScaleVptr = core->getGlobal()->VarBag<float>::createBindVptr(".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
-        this->actorHighVptr = core->getGlobal()->VarBag<float>::createBindVptr(".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
+        this->actorScaleVptr = core->getGlobal()->Var<float>::Bag::createBindVptr(".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
+        this->actorHighVptr = core->getGlobal()->Var<float>::Bag::createBindVptr(".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
         this->actorHighOffset = *this->actorHighVptr / 2.0f * *actorScaleVptr;
 
         pathState = new PathState(costMap, core);
@@ -125,12 +125,12 @@ public:
             std::vector<Vector2> pathByKey = costMap->findPath(aCellKey, cKey2);
             std::vector<Vector2> pathByPosition(pathByKey.size());
             CellUtil::translatePathToCellCenter(pathByKey, pathByPosition, CellUtil::offset(costMap));
-            float pathSpeed = this->global->VarBag<float>::getVarVal(".pathSpeed", 1.0f);
+            float pathSpeed = this->global->Var<float>::Bag::getVarVal(".pathSpeed", 1.0f);
             PathFollow2 *path = new PathFollow2(aPos2, pathByPosition, pathSpeed);
             this->setPath(path);
             pathState->setPath(pathByKey, aCellKey, cKey2);
             AnimationStateSet *anisSet = entity->getAllAnimationStates();
-            float aniSpeed = this->global->VarBag<float>::getVarVal(".aniSpeed", 1.0f);
+            float aniSpeed = this->global->Var<float>::Bag::getVarVal(".aniSpeed", 1.0f);
             // new child state.
             PathFollow2MissionState *missionState = new PathFollow2MissionState(global, path, anisSet, aniNames, aniSpeed, this->actorHighOffset); //
             // delete missionState;

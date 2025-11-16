@@ -70,7 +70,7 @@ public:
         {
             actor = dynamic_cast<State *>(picked);
         }
-        global->VarBag<Actor*>::setVar(".activeActor", actor);
+        global->Var<Actor*>::Bag::setVar(".activeActor", actor);
         return actor;
     }
 

@@ -60,10 +60,10 @@ public:
         this->core = core;
         this->wsc = wsc;
         global = core->getGlobal();
-        this->cameraTopDistanceVptr = global->VarBag<float>::createBindVptr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
-        this->cameraHighMinVptr = global->VarBag<float>::createBindVptr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
-        this->cameraHighMaxVptr = global->VarBag<float>::createBindVptr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
-        this->cameraRollSpeedVptr = global->VarBag<float>::createBindVptr(".cameraRollSpeed", DEFAULT_CAMERA_ROLL_SPEED, 0.0f, DEFAULT_CAMERA_ROLL_SPEED * 3);           //
+        this->cameraTopDistanceVptr = global->Var<float>::Bag::createBindVptr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
+        this->cameraHighMinVptr = global->Var<float>::Bag::createBindVptr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
+        this->cameraHighMaxVptr = global->Var<float>::Bag::createBindVptr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
+        this->cameraRollSpeedVptr = global->Var<float>::Bag::createBindVptr(".cameraRollSpeed", DEFAULT_CAMERA_ROLL_SPEED, 0.0f, DEFAULT_CAMERA_ROLL_SPEED * 3);           //
     }
 
     bool mousePressed(const MouseButtonEvent &evt) override
@@ -148,7 +148,7 @@ public:
 
         node->setPosition(posTarget);
 
-        global->VarBag<Vector3>::setVar(".camera.position", posTarget);
+        global->Var<Vector3>::Bag::setVar(".camera.position", posTarget);
 
         alignHorizonToTop(node, cam, *this->cameraTopDistanceVptr);
         return false;
