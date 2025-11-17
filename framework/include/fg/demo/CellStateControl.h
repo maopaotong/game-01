@@ -9,122 +9,33 @@
 #include "fg/util/CostMap.h"
 #include "fg/Cell.h"
 #include "fg/Global.h"
-
+#include "fg/core/CellStateBase.h"
+#include "fg/util/CostMap.h"
 namespace fog
 {
     using namespace Ogre;
-#define DEFAULT_CELL_HIGH_OFFSET .08f
 
     //
-    class CellStateControl : public State
+    class CellStateControl : public CellStateBase
     {
     public:
-    private:
-        Ogre::ManualObject *obj;
-        Ogre::SceneNode *node;
         CostMap *costMap;
-        float highOffset = DEFAULT_CELL_HIGH_OFFSET;
 
     public:
-        CellStateControl(CostMap *costMap, Core *core)
+        CellStateControl(CostMap *costMap, Core *core) : CellStateBase(core), costMap(costMap)
         {
-            Ogre::SceneManager *sceneMgr = core->getSceneManager();
-            this->costMap = costMap;
-            obj = sceneMgr->createManualObject();
-            node = sceneMgr->getRootSceneNode()->createChildSceneNode("CellStateNode");
-            node->attachObject(obj);
-            node->setPosition(0, highOffset, 0);
-            //
-            buildCellMesh();
         }
 
-        void buildCellMesh()
+        virtual void buildInstanceMesh(ManualObject *obj, Cell::Instance &cell)
         {
-            obj->clear();
-
-            // Begin the manual object
-            obj->begin(MaterialNames::materialNameInUse, Ogre::RenderOperation::OT_TRIANGLE_LIST);
-            Cell::Center *cc = Global::Context<Cell::Center *>::get();
-
-            void (*visit)(Cell::Instance &cell, CellStateControl *) = [](Cell::Instance &cell, CellStateControl *this_)
-            {
-                this_->buildMesh(cell);
-            };
-
-            cc->forEachCell<CellStateControl *>(visit, this);
-
-            // End the manual object
-            obj->end();
-        }
-
-        void buildMesh(Cell::Instance &cell)
-        {
-            int cost = costMap->getCost(cell.cKey.first, cell.cKey.second);
-            Ogre::ColourValue color = getCostColor(cost);
+            ColourValue color = getCostColor(cell);
             cell.buildMesh(obj, color);
         }
 
-        void buildCellMesh_DEL()
-        {
-
-            obj->clear();
-
-            // Begin the manual object
-            obj->begin(MaterialNames::materialNameInUse, Ogre::RenderOperation::OT_TRIANGLE_LIST);
-            int width = costMap->getWidth();
-            int height = costMap->getHeight();
-            // float offsetX = width / 2 * CostMap::hexSize;
-            // float offsetY = height / 2 * CostMap::hexSize;
-            // Vector2 offset(offsetX, offsetY);
-            bool ignoreDefaultCost = false;
-            int cellLimit = 10000;
-            int cellCounter = 0;
-
-            int xStart = 0;
-            int xEnd = width;
-            int yStart = 0;
-            int yEnd = height;
-
-            // xStart = width / 2;
-            // yStart = height / 2;
-
-            for (int x = xStart; x < xEnd; x++)
-            {
-                for (int y = yStart; y < yEnd; y++)
-                {
-                    int cost = costMap->getCost(x, y);
-                    if (ignoreDefaultCost && cost == CostMap::DEFAULT_COST)
-                    {
-                        continue; // ignore this cell.
-                    }
-
-                    Ogre::ColourValue color = getCostColor(cost);
-                    // auto vertices = CostMap::calculateVerticesForXZ(x, y, CostMap::hexSize);
-                    if (false)
-                    {
-
-                        std::vector<Vector3> vertices = Ground::calculateVertices3D(x, y, costMap, CostMap::hexSize, 1.0f, Global::getTerrainHeightAtPositionWithOffset, this->highOffset);
-                        DrawerUtil::drawHexagonTo(obj, vertices, color);
-                    }
-                    else
-                    {
-                        TerrainedVertices3 vertices = TerrainedGround::calculateVertices3D(x, y, costMap, CostMap::hexSize);
-                        TerrainedDrawerUtil::drawHexagonTo(obj, vertices, color);
-                    }
-                    if (cellCounter >= cellLimit)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            // End the manual object
-            obj->end();
-        }
-
         // Get color based on cost
-        Ogre::ColourValue getCostColor(int cost) const
+        Ogre::ColourValue getCostColor(Cell::Instance &cell) const
         {
+            const int cost = costMap->getCost(cell.cKey.first, cell.cKey.second);
             switch (cost)
             {
             case CostMap::OBSTACLE:
@@ -137,41 +48,6 @@ namespace fog
                 return Ogre::ColourValue(0.2f, 0.4f, 0.8f); // Water color
             default:
                 return Ogre::ColourValue(0.7f, 0.7f, 0.7f); // light gray
-            }
-        }
-
-        void drawHexagonRing(Ogre::ManualObject *obj,
-                             const std::vector<Ogre::Vector3> &verticesInner,
-                             const std::vector<Ogre::Vector3> &verticesOuter,
-                             const Ogre::ColourValue &colorInner,
-                             Ogre::ColourValue &colorOuter)
-        {
-            const float nomX = 0;
-            const float nomY = 1;
-            const float nomZ = 0;
-            int baseIndex = obj->getCurrentVertexCount();
-            for (int i = 0; i < 6; i++)
-            {
-
-                obj->position(verticesInner[i]);
-                obj->normal(nomX, nomY, nomZ);
-                obj->colour(colorInner);
-
-                obj->position(verticesOuter[i]);
-                obj->normal(nomX, nomY, nomZ);
-                obj->colour(colorOuter);
-            }
-
-            // Triangles
-            for (int i = 0; i < 6; ++i)
-            {
-                int p1 = baseIndex + i * 2;
-                int p2 = p1 + 1;
-                int p3 = baseIndex + ((i + 1) % 6) * 2 + 1;
-                int p4 = p3 - 1;
-
-                obj->triangle(p1, p2, p3);
-                obj->triangle(p1, p3, p4);
             }
         }
     };

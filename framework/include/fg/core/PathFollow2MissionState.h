@@ -58,7 +58,7 @@ public:
                 //
                 Vector3 prevPos = pNode->getPosition();
                 
-                float terH = Global::Context<Terrains *>::get()->getHeightAtPosition(currentPos2D); // TODO in a common place to translate all .
+                float terH = 0.0f;//Global::Context<Terrains *>::get()->getHeightAtPosition(currentPos2D); // TODO in a common place to translate all .
                 
                 
 

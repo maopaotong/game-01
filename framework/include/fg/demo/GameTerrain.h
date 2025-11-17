@@ -180,9 +180,9 @@ namespace fog
             blendMap1->update();
         }
 
-        float getHeightAtPosition(float x, float y) override
+        float getHeightAtPosition(Vector3&pos) override
         {
-            return terrainGroup->getHeightAtWorldPosition(Ground::Transfer::to3D(x, y));
+            return terrainGroup->getHeightAtWorldPosition(pos);
         }
 
         Vector3 getOrigin() override

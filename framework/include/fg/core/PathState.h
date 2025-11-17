@@ -8,6 +8,7 @@
 #include "fg/util/HexGridPrinter.h"
 #include "fg/util/CellMark.h"
 #include "fg/util/DrawerUtil.h"
+#include "fg/core/CellStateBase.h"
 
 namespace fog
 {
@@ -15,29 +16,17 @@ namespace fog
 
 #define DEFAULT_HIGH_OFFSET 1.1f
 
-    class PathState : public State
+    class PathState : public CellStateBase
     {
-        Ogre::ManualObject *pathObject;
-
         std::vector<Ogre::Vector2> currentPath;
-
         CostMap *costMap;
         CellKey start = CellKey(-1, -1);
         CellKey end = CellKey(-1, -1);
-
-        Core *core;
-        float pathHighOffset = DEFAULT_HIGH_OFFSET;
+        std::unordered_set<std::pair<int, int>, PairHash> pathSet;
 
     public:
-        PathState(CostMap *costMap, Core *core)
+        PathState(CostMap *costMap, Core *core) : CellStateBase(core), costMap(costMap)
         {
-            this->costMap = costMap;
-
-            Ogre::SceneManager *sceneMgr = core->getSceneManager();
-            pathObject = sceneMgr->createManualObject("PathObject");
-            this->sceNode = sceneMgr->getRootSceneNode()->createChildSceneNode("PathStateNode");
-            this->sceNode->attachObject(pathObject);
-            sceNode->setPosition(0, pathHighOffset, 0);
         }
 
         void clearPath()
@@ -60,8 +49,12 @@ namespace fog
             currentPath = path;
             start = ck1;
             end = ck2;
-            this->sceNode->setPosition(0.0f, pathHighOffset, 0.0f);
-            this->rebuild();
+            pathSet.clear();
+            for (const auto &p : currentPath)
+            {
+                pathSet.insert({static_cast<int>(p.x), static_cast<int>(p.y)});
+            }
+            this->rebuildMesh();
         }
 
         virtual CellKey getDestinationCell()
@@ -69,62 +62,40 @@ namespace fog
             return this->end;
         }
 
-        void rebuild()
+        virtual void buildInstanceMesh(ManualObject *obj, Cell::Instance &cell)
+        {
+            ColourValue color;
+            if (resolveColor(cell, color))
+            {
+                cell.buildMesh(obj, color);
+            }
+        }
+
+        bool resolveColor(Cell::Instance &cell, ColourValue &color)
         {
 
-            pathObject->clear();
-
-            // Create path points set for quick lookup
-            std::unordered_set<std::pair<int, int>, PairHash> pathSet;
-            for (const auto &p : currentPath)
+            bool draw = false;
+            int x = cell.cKey.first;
+            int y = cell.cKey.second;
+            if (x == start.first && y == start.second)
             {
-                pathSet.insert({static_cast<int>(p.x), static_cast<int>(p.y)});
+                // Start point in green
+                color = Ogre::ColourValue::Green;
+                draw = true;
             }
-
-            // Begin the manual object
-            pathObject->begin(MaterialNames::materialNameInUse, Ogre::RenderOperation::OT_TRIANGLE_LIST);
-
-            int width = costMap->getWidth();
-            int height = costMap->getHeight();
-
-            for (int y = 0; y < height; y++)
+            else if (x == end.first && y == end.second)
             {
-                for (int x = 0; x < width; x++)
-                {
-                    // auto vertices = CostMap::calculateVerticesForXZ(x, y, CostMap::hexSize);
-                    // auto vertices = Ground::calculateVertices3D(x, y, costMap, CostMap::hexSize, 1.0f, Global::getTerrainHeightAtPositionWithOffset);
-
-                    ColourValue color(1.0f, 1.0f, 0.0f);
-                    bool draw = false;
-
-                    if (x == start.first && y == start.second)
-                    {
-                        // Start point in green
-                        color = Ogre::ColourValue::Green;
-                        draw = true;
-                    }
-                    else if (x == end.first && y == end.second)
-                    {
-                        // End point in blue
-                        color = Ogre::ColourValue::Blue;
-                        draw = true;
-                    }
-                    else if (pathSet.find({x, y}) != pathSet.end())
-                    {
-                        // Path in yellow
-                        draw = true;
-                    }
-                    if (draw)
-                    {
-
-                        TerrainedVertices3 vertices3 = TerrainedGround::calculateVertices3D(x, y, costMap, CostMap::hexSize);
-                        TerrainedDrawerUtil::drawHexagonTo(pathObject, vertices3, color);
-                    }
-                }
+                // End point in blue
+                color = Ogre::ColourValue::Blue;
+                draw = true;
             }
-
-            // End the manual object
-            pathObject->end();
+            else if (pathSet.find({x, y}) != pathSet.end())
+            {
+                color = ColourValue(1.0f, 1.0f, 0.0f);
+                // Path in yellow
+                draw = true;
+            }
+            return draw;
         }
     };
 

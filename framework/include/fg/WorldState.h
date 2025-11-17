@@ -5,19 +5,22 @@
 
 namespace fog
 {
-class WorldState : public State
-{
-protected:
-    Ground *ground;
-public:
-    WorldState(Ground * shape)
+    class WorldState : public State
     {
-        this->ground = shape;
-    }
+    protected:
+        Ground *ground;
 
-    Ground *getGround()
-    {
-        return ground;
-    }
-};
+    public:
+        WorldState(Ground *shape)
+        {
+            this->ground = shape;
+        }
+
+        virtual void init() override = 0;
+
+        Ground *getGround()
+        {
+            return ground;
+        }
+    };
 };

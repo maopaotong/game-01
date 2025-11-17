@@ -47,6 +47,7 @@ namespace fog
             this->actorHighOffset = *this->actorHighVptr / 2.0f * *actorScaleVptr;
 
             pathState = new PathState(costMap, core);
+            pathState->init();
 
             this->setPickable(this);
             this->setFrameListener(this);
@@ -117,21 +118,34 @@ namespace fog
             {
                 return false;
             }
+            
+            Cell::Center* cells = Global::Context<Cell::Center*>::get() ;
+
             // check if this state's position on the target cell
             Vector3 aPos3 = this->sceNode->getPosition();
-            float actorCurrentHeightOffset = 0.0f;
-            Vector2 aPos2 = Ground::Transfer::to2D(aPos3, actorCurrentHeightOffset);
-            CellKey aCellKey;
-            bool hitCell = CellUtil::findCellByPoint(costMap, aPos2, aCellKey);
+            Node2D * root2D = cells->getRoot2D();
+            Vector2 actorPosIn2D = root2D->to2D(aPos3);
+            Cell::Instance cell;
+            //bool hitCell = CellUtil::findCellByPoint(costMap, aPos2, aCellKey);
+            bool hitCell = Global::Context<Cell::Center*>::get()->findCellByPoint(aPos3, cell);
             if (hitCell)
             {
-                std::vector<Vector2> pathByKey = costMap->findPath(aCellKey, cKey2);
-                std::vector<Vector2> pathByPosition(pathByKey.size());
-                CellUtil::translatePathToCellCenter(pathByKey, pathByPosition, CellUtil::offset(costMap));
+                CellKey aCellKey = cell.cKey;
+                std::vector<Vector2> pathByPoint2DNom = costMap->findPath(cell.cKey, cKey2);
+
+
+                std::vector<Vector2> pathByCellCenterIn2D;
+
+                //CellUtil::translatePathToCellCenter(pathByKey, pathByPosition, CellUtil::offset(costMap));
+
+                //Global::Context<Node2D*>::get()->
+
+                std::vector<Vector2> pathByPointIn2D = Global::Context<Cell::Center*>::get()->getCellPointListByNomPoints(pathByPoint2DNom);
                 float pathSpeed = this->global->Var<float>::Bag::getVarVal(".pathSpeed", 1.0f);
-                PathFollow2 *path = new PathFollow2(aPos2, pathByPosition, pathSpeed);
+
+                PathFollow2 *path = new PathFollow2(actorPosIn2D, pathByPointIn2D, pathSpeed);
                 this->setPath(path);
-                pathState->setPath(pathByKey, aCellKey, cKey2);
+                pathState->setPath(pathByPoint2DNom, aCellKey, cKey2);
                 AnimationStateSet *anisSet = entity->getAllAnimationStates();
                 float aniSpeed = this->global->Var<float>::Bag::getVarVal(".aniSpeed", 1.0f);
                 // new child state.

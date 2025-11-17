@@ -31,93 +31,94 @@
 #include "fg/Pickable.h"
 #include "fg/Global.h"
 
-namespace fog{
-using namespace OgreBites;
-using namespace Ogre;
-// === Custom hash function ===
-//
-// === Input handler for closing application ===
-class MouseClickPicker : public OgreBites::InputListener
+namespace fog
 {
-private:
-    Viewport *viewport;
-    Camera *camera;
-    SceneManager *sMgr;
-    Global *global;
-
-public:
-    MouseClickPicker(Global *global, Camera *cam, SceneManager *sMgr, Viewport *vp)
+    using namespace OgreBites;
+    using namespace Ogre;
+    // === Custom hash function ===
+    //
+    // === Input handler for closing application ===
+    class MouseClickPicker : public OgreBites::InputListener
     {
-        this->global = global;
-        this->camera = cam;
-        this->sMgr = sMgr;
-        this->viewport = vp;
-    }
+    private:
+        Viewport *viewport;
+        Camera *camera;
+        SceneManager *sMgr;
+        Global *global;
 
-    bool mousePressed(const MouseButtonEvent &evt) override
-    {
-        if (evt.button != ButtonType::BUTTON_LEFT)
+    public:
+        MouseClickPicker(Global *global, Camera *cam, SceneManager *sMgr, Viewport *vp)
         {
-            return false;
+            this->global = global;
+            this->camera = cam;
+            this->sMgr = sMgr;
+            this->viewport = vp;
         }
-        // normalized (0,1)
 
-        float ndcX = evt.x / (float)viewport->getActualWidth();
-        float ndcY = evt.y / (float)viewport->getActualHeight();
-        Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
-        Pickable *picked = pick(ray);
-        Actor *actor = nullptr;
-        if (picked)
+        bool mousePressed(const MouseButtonEvent &evt) override
         {
-            actor = dynamic_cast<State *>(picked);
-        }
-        global->Var<Actor*>::Bag::setVar(".activeActor", actor);
-        return actor;
-    }
-
-    Pickable *pick(Ray &ray)
-    {
-        // 创建射线查询对象
-        Ogre::RaySceneQuery *rayQuery = sMgr->createRayQuery(ray);
-        rayQuery->setSortByDistance(true);  // 按距离排序（最近的优先）
-        rayQuery->setQueryMask(0x00000001); // 与 Entity 的查询掩码匹配
-
-        // 执行查询
-        Ogre::RaySceneQueryResult &result = rayQuery->execute();
-
-        Pickable *picked = nullptr;
-        MovableObject *actorMo = nullptr;
-        // 遍历结果
-        for (auto &it : result)
-        {
-            Node *node = it.movable->getParentNode();
-            State *s = State::get(node);
-            if (s)
+            if (evt.button != ButtonType::BUTTON_LEFT)
             {
+                return false;
+            }
+            // normalized (0,1)
 
-                Pickable *p = s->getPickable();
+            float ndcX = evt.x / (float)viewport->getActualWidth();
+            float ndcY = evt.y / (float)viewport->getActualHeight();
+            Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
+            Pickable *picked = pick(ray);
+            Actor *actor = nullptr;
+            if (picked)
+            {
+                actor = dynamic_cast<State *>(picked);
+            }
+            global->Var<Actor *>::Bag::setVar(".activeActor", actor);
+            return actor;
+        }
 
-                if (p)
+        Pickable *pick(Ray &ray)
+        {
+            // 创建射线查询对象
+            Ogre::RaySceneQuery *rayQuery = sMgr->createRayQuery(ray);
+            rayQuery->setSortByDistance(true);  // 按距离排序（最近的优先）
+            rayQuery->setQueryMask(0x00000001); // 与 Entity 的查询掩码匹配
+
+            // 执行查询
+            Ogre::RaySceneQueryResult &result = rayQuery->execute();
+
+            Pickable *picked = nullptr;
+            MovableObject *actorMo = nullptr;
+            // 遍历结果
+            for (auto &it : result)
+            {
+                Node *node = it.movable->getParentNode();
+                State *s = State::get(node);
+                if (s)
                 {
-                    picked = p;
-                    actorMo = it.movable;
-                    break;
+
+                    Pickable *p = s->getPickable();
+
+                    if (p)
+                    {
+                        picked = p;
+                        actorMo = it.movable;
+                        break;
+                    }
                 }
             }
-        }
-        sMgr->destroyQuery(rayQuery);
-        if (!picked)
-        {
+            sMgr->destroyQuery(rayQuery);
+            if (!picked)
+            {
+                return nullptr;
+            }
+            //
+            if (picked->pickUp(actorMo))
+            {
+                return picked;
+            }
             return nullptr;
+            // high light the cell in which the actor stand.
         }
-        //
-        if (picked->pickUp(actorMo))
-        {
-            return picked;
-        }
-        return nullptr;
-        // high light the cell in which the actor stand.
-    }
-};
+    };
 
-};//end of namespace
+}; // end of namespace

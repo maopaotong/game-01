@@ -68,6 +68,8 @@ namespace fog
             std::cout << "~State()" << this << "" << std::endl;
         }
 
+        virtual void init() {};
+
         virtual CellKey getDestinationCell() override
         {
             return CellKey(0, 0);

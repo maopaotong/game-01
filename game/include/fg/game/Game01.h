@@ -65,13 +65,20 @@ namespace fog
             Light *light = core->getLight();
             terrains->load(rSys, sceMgr, light);
             Global::Context<Terrains *>::set(terrains);
+            //
+            fog::Plane *p = new fog::Plane(terrains);
+            Node2D *root2D = new Node2D(p, 30.0f);
+            
+
+            Global::Context<Cell::Center *>::set(new Cell::Center(root2D, costMap));
 
             //
             Ground *ground = new CostMapGround(costMap);
-            State *world = new WorldStateControl(costMap, ground, core);
-
+            State *world = new WorldStateControl(costMap, ground, core);            
             SceneNode *node = sceMgr->getRootSceneNode();
             world->setSceneNode(node);
+
+            world->init();
 
             //
         }

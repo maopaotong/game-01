@@ -6,12 +6,13 @@
 #include "fg/util/CostMap.h"
 #include <OgreManualObject.h>
 #include <OgreColourValue.h>
+#include "fg/Terrains.h"
 using namespace Ogre;
 
 namespace fog
 {
-    template <typename... Args>
-    static void forEachPointOnCircle(float size, float offsetAngle, void (*visit)(Vector2, Args...), Args... args)
+    template <typename F>
+    static void forEachPointOnCircle(float size, float offsetAngle, F &&visit)
     {
 
         float angle = 360.0f / size;
@@ -24,7 +25,7 @@ namespace fog
             float dx = std::cos(angle_rad);
             float dy = std::sin(angle_rad);
 
-            visit(Ogre::Vector2(dx, dy), args...);
+            visit(Ogre::Vector2(dx, dy));
         }
     };
 
@@ -32,14 +33,16 @@ namespace fog
     {
 
     public:
-        struct Instance
+        struct Instance : public Object2D
         {
             CellKey cKey;
-            Node2D *node;
+            Instance()
+            {
+            }
             Instance(int x, int y, Node2D *node) : Instance(CellKey(x, y), node)
             {
             }
-            Instance(CellKey cKey, Node2D *node) : cKey(cKey), node(node)
+            Instance(CellKey cKey, Node2D *node) : cKey(cKey), Object2D(node)
             {
             }
 
@@ -55,9 +58,9 @@ namespace fog
 
             void set(ManualObject *obj, Vector2 pointInCell2D, Vector2 origin, Vector3 nom, ColourValue color)
             {
-                float height = 0.0f;
+
                 Vector2 pointIn2D = pointInCell2D * this->node->scale + origin + this->node->position;
-                Vector3 positionIn3D = node->plane->to3D(pointIn2D, height);
+                Vector3 positionIn3D = node->plane->to3D(pointIn2D);
                 obj->position(positionIn3D);
                 obj->normal(nom);
                 obj->colour(color);
@@ -66,18 +69,34 @@ namespace fog
             void buildMesh(ManualObject *obj, ColourValue color)
             {
                 Vector2 origin = this->getOrigin2D();
+                Vector3 nom(0, 1, 0);
+
+                struct Visit
+                {
+                    ManualObject *obj;
+                    ColourValue color;
+                    Cell::Instance *this_;
+                    Vector2 origin;
+                    Vector3 nom;
+
+                    void operator()(Vector2 &point)
+                    {
+                        this_->set(obj, point, origin, nom, color);
+                    }
+                } visit{
+                    obj,
+                    color,
+                    this,
+                    origin,
+                    nom,
+                };
+
                 int LAYERS = 3;
                 for (int i = 0; i < LAYERS; i++)
                 {
-                    int sizeI = std::powf(2, i) * 6;
-                    Vector3 nom(0, 1, 0);
-                    void (*visit)(Vector2, Cell::Instance *, ManualObject *, Vector2 &origin, Vector3 &, ColourValue &) =
-                        [](Vector2 point, Cell::Instance *this_, ManualObject *obj, Vector2 &origin, Vector3 &nom, ColourValue &color)
-                    {
-                        this_->set(obj, point, origin, nom, color);
-                    };
+                    float sizeI = std::powf(2, i) * 6;
 
-                    forEachPointOnCircle<Cell::Instance *, ManualObject *, Vector2 &, Vector3 &, ColourValue &>(sizeI, 0.0f, visit, this, obj, origin, nom, color);
+                    forEachPointOnCircle(sizeI, 0.0f, visit);
                 }
             }
         };
@@ -91,15 +110,74 @@ namespace fog
             Center(Node2D *root, CostMap *costMap) : root(root), costMap(costMap)
             {
             }
-            template <typename... Args>
-            void forEachCell(void (*visit)(Cell::Instance &cell, Args... args), Args... args)
+            Node2D *getRoot2D(){
+                return root;
+            }
+            std::vector<Vector2> getCellPointListByNomPoints(std::vector<Vector2> pointIn2DNom){
+                std::vector<Vector2> ret;
+                ret.reserve(pointIn2DNom.size());
+                for (auto pNom : pointIn2DNom)
+                {
+                    Cell::Instance cell = getCellByNom(pNom);
+
+                    ret.push_back(cell.getOrigin2D());
+                }
+                return ret;
+            }
+
+            std::vector<Cell::Instance> getInstanceListByNomPoints(std::vector<Vector2> pointIn2DNom)
+            {
+                std::vector<Cell::Instance> ret;
+                ret.reserve(pointIn2DNom.size());
+                for (auto pNom : pointIn2DNom)
+                {
+                    Cell::Instance cell = getCellByNom(pNom);
+                    ret.push_back(cell);
+                }
+                return ret;
+            }
+
+            Cell::Instance getCellByNom(Vector2 nom)
+            {
+                return Cell::Instance(CellKey(static_cast<int>(nom.x), static_cast<int>(nom.y)), root);
+            }
+
+            bool findCellByPoint(Vector3 positionIn3D, Cell::Instance &cell)
+            {
+                return forCellByPoint(positionIn3D, [&cell](Cell::Instance &cell2)
+                                      { cell = cell2; });
+            }
+            template <typename F>
+            bool forCellByPoint(Vector3 positionIn3D, F &&visit)
+            {
+
+                // Vector2 pointIn2D = pointInCell2D * this->node->scale + origin + this->node->position;
+                // Vector3 positionIn3D = node->plane->to3D(pointIn2D);
+                Vector2 pointIn2D = root->plane->to2D(positionIn3D);
+
+                Vector2 pointIn2DNom = (pointIn2D - root->position) / root->scale;
+
+                int x = pointIn2DNom.x;
+                int y = pointIn2DNom.y;
+
+                if (x < 0 || x >= costMap->getWidth() || y < 0 || y >= costMap->getHeight())
+                {
+                    return false;
+                }
+
+                visit(Cell::Instance(x, y, root));
+                return true;
+            }
+
+            template <typename F>
+            void forEachCell(F &&visit)
             {
                 for (int x = 0; x < costMap->getWidth(); x++)
                 {
                     for (int y = 0; y < costMap->getHeight(); y++)
                     {
                         Cell::Instance cell(x, y, root);
-                        visit(cell, args...);
+                        visit(cell);
                     }
                 }
             }

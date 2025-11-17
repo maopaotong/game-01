@@ -11,12 +11,7 @@ namespace fog
     public:
         virtual ~Terrains() {};
 
-        float getHeightAtPosition(Vector2 &pos)
-        {
-            return getHeightAtPosition(pos.x, pos.y);
-        }
-
-        virtual float getHeightAtPosition(float x, float y) = 0;
+        virtual float getHeightAtPosition(Vector3 &pos) = 0;
 
         virtual Vector3 getOrigin() = 0;
 
