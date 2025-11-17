@@ -11,6 +11,7 @@
 #include "fg/Global.h"
 #include "fg/core/CellStateBase.h"
 #include "fg/util/CostMap.h"
+#include "fg/MeshBuild.h"
 namespace fog
 {
     using namespace Ogre;
@@ -26,10 +27,21 @@ namespace fog
         {
         }
 
-        virtual void buildInstanceMesh(ManualObject *obj, Cell::Instance &cell)
+        void rebuildMesh() override
         {
-            ColourValue color = getCostColor(cell);
-            cell.buildMesh(obj, color);
+            obj->clear();
+            // Begin the manual object
+            obj->begin(this->material, Ogre::RenderOperation::OT_TRIANGLE_LIST);
+            Cell::Center *cc = Global::Context<Cell::Center *>::get();
+
+            MeshBuild::PointOnCircle buildMesh;
+            cc->forEachCell([this, &buildMesh](Cell::Instance &cell)
+                            {
+                ColourValue color = this->getCostColor(cell);
+                buildMesh(this->obj,cell,color); });
+
+            // End the manual object
+            obj->end();
         }
 
         // Get color based on cost

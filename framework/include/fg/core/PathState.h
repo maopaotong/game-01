@@ -62,13 +62,26 @@ namespace fog
             return this->end;
         }
 
-        virtual void buildInstanceMesh(ManualObject *obj, Cell::Instance &cell)
+        void rebuildMesh() override
         {
-            ColourValue color;
-            if (resolveColor(cell, color))
-            {
-                cell.buildMesh(obj, color);
-            }
+            obj->clear();
+            // Begin the manual object
+            obj->begin(this->material, Ogre::RenderOperation::OT_TRIANGLE_LIST);
+            Cell::Center *cc = Global::Context<Cell::Center *>::get();
+
+            MeshBuild::PointOnCircle buildMesh;
+            cc->forEachCell([this, &buildMesh](Cell::Instance &cell)
+                            {
+                                ColourValue color;
+                                bool ok = this->resolveColor(cell, color);
+                                if (ok)
+                                {
+                                    buildMesh(this->obj, cell, color);
+                                } //
+                            });
+
+            // End the manual object
+            obj->end();
         }
 
         bool resolveColor(Cell::Instance &cell, ColourValue &color)

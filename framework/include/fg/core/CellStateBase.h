@@ -10,6 +10,7 @@
 #include "fg/Cell.h"
 #include "fg/Global.h"
 #include "fg/MaterialNames.h"
+#include "fg/MeshBuild.h"
 #define DEFAULT_CELL_HIGH_OFFSET .08f
 
 namespace fog
@@ -19,8 +20,8 @@ namespace fog
     //
     class CellStateBase : public State
     {
-    public:
-    private:
+        
+    protected:
         Ogre::ManualObject *obj;
         Ogre::SceneNode *node;
         std::string material = MaterialNames::materialNameInUse;
@@ -34,31 +35,13 @@ namespace fog
             node->attachObject(obj);
             //
         }
-        void init() override
-        {
-            this->rebuildMesh();
+
+        void init() {
+            rebuildMesh();
         }
+        
+        virtual void rebuildMesh() = 0;
 
-        void rebuildMesh()
-        {
-            obj->clear();
-
-            // Begin the manual object
-            obj->begin(this->material, Ogre::RenderOperation::OT_TRIANGLE_LIST);
-            Cell::Center *cc = Global::Context<Cell::Center *>::get();
-
-            cc->forEachCell([this](Cell::Instance &cell)
-                            { this->buildInstanceMesh(obj, cell); });
-
-            // End the manual object
-            obj->end();
-        }
-
-        virtual void buildInstanceMesh(ManualObject *obj, Cell::Instance &cell)
-        {
-            Ogre::ColourValue color = ColourValue::White;
-            cell.buildMesh(obj, color);
-        }
     };
 
 }; // end of namespace

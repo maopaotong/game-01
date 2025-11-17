@@ -33,7 +33,7 @@ namespace fog
         }
         void setOrigin(Vector3 origin)
         {
-            //this->origin = origin;
+            this->origin = origin;
         }
 
         Vector3 to3D(Vector2 point, float heightOffset = 0.0f)
@@ -53,7 +53,7 @@ namespace fog
 
         Vector2 to2D(Vector3 position)
         {
-
+            
             Vector2 ret = Vector2(position.x - origin.x, -(position.z - origin.z));
             return ret;
         };
