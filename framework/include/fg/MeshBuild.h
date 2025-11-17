@@ -95,14 +95,16 @@ namespace fog
                 int layer;
                 int layerSize;
                 int preLayerSize;
-                int topLayer = 5;
+                int totalLayer = 6;//settings global
+                int topLayer = 6;
+                int botLayer = 0;
                 // to build the mesh, this context alive on the whole building operation.
                 // so it visits each cell and each points of cells.
                 int idx; // point index
 
                 void operator()(int pIdx, Vector2 &pointOnCircle)
                 {
-                    Vector2 pointOnLayer = pointOnCircle * (layer / topLayer);
+                    Vector2 pointOnLayer = pointOnCircle * ((float)layer / (float)totalLayer);
                     Vector3 pos = cell->node->to3D(origin, pointOnLayer);
                     obj->position(pos);
                     obj->normal(nom3);
@@ -113,24 +115,30 @@ namespace fog
                     int size2 = layerSize;
                     int i = layer;
                     int j = pIdx; //
+                    // skip i==0
 
-                    if (i > 0) // skip first layer, process from second ... layer
+                    if (i > botLayer) //
                     {
-                        // (j-1-size1)    .   .   .   .   .   .
-                        //         |   \   | \ | \ | \ | \ | \ |
-                        //      (j-1)__(j)___*__*   .   .   .
+                        // (j-1-size1)        .       .     .   .   .   .
+                        //         |   \     | \      | \   | \ | \ | \ |
+                        //      (j-1)__(j)   .___*    __    .   .   .
+                        //        0     1    2   3    4  5
 
-                        if (j > 0 && j < size1 - 1)
+                        if (j % 2 == 1) // 1,3,5
                         {
-                            obj->triangle(idx, idx - 1 - size1, idx - 1);
+                            obj->triangle(idx, idx - 1 - size1 - j / 2, idx - 1);
                         }
-
-                        //         . __* __ .__. __. __ .__ .
-                        //           \ | \ | \ | \ | \ | \ |
-                        //         .   .   .   .   .   .   .
-                        if (j > 0 && j < size2)
+                        //
+                        if (j % 2 == 0 && j > 1) // 2,4,6
                         {
-                            obj->triangle(idx, idx - size1, idx - 1);
+                            obj->triangle(idx, idx - size1 - j / 2, idx - 1);
+                            obj->triangle(idx - 1, idx - size1 - j / 2, idx - size1 - j / 2 - 1);
+                        }
+                        if (j == size2 - 1) // 0=idx-j
+                        {                   // last one, then find the first one.
+                            int j0 = idx - j;
+                            obj->triangle(idx - j, (idx - j) - size1, idx);
+                            obj->triangle(idx, (idx - j) - size1, idx - j - 1);
                         }
                     }
                     idx++;
@@ -160,18 +168,13 @@ namespace fog
                 visitPoint.cell = &cell;
                 visitPoint.color = color;
                 visitPoint.origin = cell.getOrigin2D();
-
+                visitPoint.layerSize = 0;
                 //
-                for (int i = 0; i < visitPoint.topLayer + 1; i++)
+                for (int i = visitPoint.botLayer; i < visitPoint.topLayer + 1; i++)
                 {
                     visitPoint.layer = i;
                     visitPoint.preLayerSize = visitPoint.layerSize;
                     visitPoint.layerSize = layerSize(i);
-                    if (i == 0)
-                    {
-                        visitPoint(0, Vector2(0, 0));
-                        continue;
-                    }
 
                     Cell::forEachPointOnCircle(visitPoint.layerSize, 0.0f, visitPoint);
                 }
@@ -179,7 +182,7 @@ namespace fog
 
             int layerSize(int layer)
             {
-                return layer == 0 ? 1 : std::powf(2, layer) * 6;
+                return layer = std::powf(2, layer) * 6;
             }
 
             void end()
