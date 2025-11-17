@@ -29,19 +29,17 @@ namespace fog
 
         void rebuildMesh() override
         {
-            obj->clear();
-            // Begin the manual object
-            obj->begin(this->material, Ogre::RenderOperation::OT_TRIANGLE_LIST);
-            Cell::Center *cc = Global::Context<Cell::Center *>::get();
 
-            MeshBuild::PointOnCircle buildMesh;
+            Cell::Center *cc = Global::Context<Cell::Center *>::get();
+            //MeshBuild::PointOnCircle buildMesh(obj);
+            MeshBuild::SpiderNet buildMesh(obj);
+            buildMesh.begin(this->material);
             cc->forEachCell([this, &buildMesh](Cell::Instance &cell)
                             {
                 ColourValue color = this->getCostColor(cell);
-                buildMesh(this->obj,cell,color); });
+                buildMesh(cell,color); });
+            buildMesh.end();
 
-            // End the manual object
-            obj->end();
         }
 
         // Get color based on cost

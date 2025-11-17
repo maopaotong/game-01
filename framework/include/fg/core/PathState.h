@@ -64,24 +64,20 @@ namespace fog
 
         void rebuildMesh() override
         {
-            obj->clear();
-            // Begin the manual object
-            obj->begin(this->material, Ogre::RenderOperation::OT_TRIANGLE_LIST);
-            Cell::Center *cc = Global::Context<Cell::Center *>::get();
 
-            MeshBuild::PointOnCircle buildMesh;
+            Cell::Center *cc = Global::Context<Cell::Center *>::get();
+            MeshBuild::PointOnCircle buildMesh(obj);
+            buildMesh.begin(this->material);
             cc->forEachCell([this, &buildMesh](Cell::Instance &cell)
                             {
                                 ColourValue color;
                                 bool ok = this->resolveColor(cell, color);
                                 if (ok)
                                 {
-                                    buildMesh(this->obj, cell, color);
+                                    buildMesh(cell, color);
                                 } //
                             });
-
-            // End the manual object
-            obj->end();
+            buildMesh.end();
         }
 
         bool resolveColor(Cell::Instance &cell, ColourValue &color)

@@ -74,6 +74,12 @@ namespace fog
             return ret;
         }
 
+        Vector3 to3D(Vector2 cellOrigin, Vector2 pointInCell, float heightOffset = 0.0f){
+            Vector2 pointIn2D = pointInCell * this->scale + cellOrigin;
+            Vector3 positionIn3D = this->plane->to3D(pointIn2D);
+            return positionIn3D;
+        }
+
         Vector3 to3D(Vector2 p2D, float heightOffset = 0.0f)
         {
             return this->plane->to3D(p2D, heightOffset);
