@@ -15,6 +15,7 @@ namespace fog
         {
             ImGui::Text(fmt::format("({:.1f},{:.1f},{:.1f})", pos.x, pos.y, pos.z).c_str());
         };
+        
 
         template <typename... Args>
         static void TextFormat(const std::string str, Args... args)

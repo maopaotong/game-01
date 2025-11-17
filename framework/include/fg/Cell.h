@@ -15,6 +15,7 @@ namespace fog
     static void forEachPointOnCircle(float size, float offsetAngle, F &&visit)
     {
 
+        // rad=1, RAD=2
         float angle = 360.0f / size;
 
         for (int i = 0; i < size; i++)
@@ -46,6 +47,7 @@ namespace fog
             {
             }
 
+            // center of the cell.
             Ogre::Vector2 getOrigin2D()
             {
                 float rad = node->scale;
@@ -59,7 +61,7 @@ namespace fog
             void set(ManualObject *obj, Vector2 pointInCell2D, Vector2 origin, Vector3 nom, ColourValue color)
             {
 
-                Vector2 pointIn2D = pointInCell2D * this->node->scale + origin + this->node->position;
+                Vector2 pointIn2D = pointInCell2D * this->node->scale + origin;
                 Vector3 positionIn3D = node->plane->to3D(pointIn2D);
                 obj->position(positionIn3D);
                 obj->normal(nom);
@@ -110,10 +112,20 @@ namespace fog
             Center(Node2D *root, CostMap *costMap) : root(root), costMap(costMap)
             {
             }
-            Node2D *getRoot2D(){
+
+            void translateToCenter()
+            {
+                Vector2 pos2D = this->getCenterIn2D();
+                Vector3 pos3D = root->to3D(pos2D);
+                root->plane->setOrigin(Vector3(-pos3D.x, 0.0f, -pos3D.z));
+            }
+
+            Node2D *getRoot2D()
+            {
                 return root;
             }
-            std::vector<Vector2> getCellPointListByNomPoints(std::vector<Vector2> pointIn2DNom){
+            std::vector<Vector2> getCellPointListByNomPoints(std::vector<Vector2> pointIn2DNom)
+            {
                 std::vector<Vector2> ret;
                 ret.reserve(pointIn2DNom.size());
                 for (auto pNom : pointIn2DNom)
@@ -137,6 +149,13 @@ namespace fog
                 return ret;
             }
 
+            Vector2 getCenterIn2D()
+            {
+                float cX = this->costMap->getWidth();
+                float cY = this->costMap->getHeight();
+                return Vector2(cX, cY) * root->scale;
+            }
+
             Cell::Instance getCellByNom(Vector2 nom)
             {
                 return Cell::Instance(CellKey(static_cast<int>(nom.x), static_cast<int>(nom.y)), root);
@@ -153,9 +172,9 @@ namespace fog
 
                 // Vector2 pointIn2D = pointInCell2D * this->node->scale + origin + this->node->position;
                 // Vector3 positionIn3D = node->plane->to3D(pointIn2D);
-                Vector2 pointIn2D = root->plane->to2D(positionIn3D);
+                Vector2 pointIn2D = root->to2D(positionIn3D);
 
-                Vector2 pointIn2DNom = (pointIn2D - root->position) / root->scale;
+                Vector2 pointIn2DNom = pointIn2D / (root->scale * 2);
 
                 int x = pointIn2DNom.x;
                 int y = pointIn2DNom.y;

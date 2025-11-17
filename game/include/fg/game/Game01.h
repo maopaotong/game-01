@@ -67,14 +67,21 @@ namespace fog
             Global::Context<Terrains *>::set(terrains);
             //
             fog::Plane *p = new fog::Plane(terrains);
-            Node2D *root2D = new Node2D(p, 30.0f);
             
+            float scale = 30.0f;
+            Node2D *root2D = new Node2D(p, scale); //
 
-            Global::Context<Cell::Center *>::set(new Cell::Center(root2D, costMap));
+            Global::Context<Node2D *>::set(root2D);
+
+            Cell::Center *cells = new Cell::Center(root2D, costMap);
+            cells->translateToCenter();
+
+            //root2D->position = -cells->getCenterIn2D(); // move center to (0,0)
+            Global::Context<Cell::Center *>::set(cells);
 
             //
             Ground *ground = new CostMapGround(costMap);
-            State *world = new WorldStateControl(costMap, ground, core);            
+            State *world = new WorldStateControl(costMap, ground, core);
             SceneNode *node = sceMgr->getRootSceneNode();
             world->setSceneNode(node);
 

@@ -23,7 +23,6 @@ namespace fog
     private:
         Ogre::ManualObject *obj;
         Ogre::SceneNode *node;
-        float highOffset = DEFAULT_CELL_HIGH_OFFSET;
         std::string material = MaterialNames::materialNameInUse;
 
     public:
@@ -33,7 +32,6 @@ namespace fog
             obj = sceneMgr->createManualObject();
             node = sceneMgr->getRootSceneNode()->createChildSceneNode();
             node->attachObject(obj);
-            node->setPosition(0, highOffset, 0);
             //
         }
         void init() override

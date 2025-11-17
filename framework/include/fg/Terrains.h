@@ -15,6 +15,5 @@ namespace fog
 
         virtual Vector3 getOrigin() = 0;
 
-        virtual float getDensity() = 0;
     };
 };

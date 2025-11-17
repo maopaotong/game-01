@@ -30,7 +30,7 @@ public:
         sceNode = sMgr->getRootSceneNode()->createChildSceneNode("SinbadNode");
         sceNode->setScale(*actorScaleVptr, *actorScaleVptr, *actorScaleVptr);
         sceNode->attachObject(entity);
-        sceNode->translate(0, actorHighOffset, 0);
+       
         // todo collect auto
     }
 };

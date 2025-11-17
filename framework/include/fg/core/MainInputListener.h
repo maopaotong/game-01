@@ -31,154 +31,159 @@
 #include "fg/Ground.h"
 #include "fg/Core.h"
 
-namespace fog{
-using namespace OgreBites;
-using namespace Ogre;
-// === Custom hash function ===
-//
-// === Input handler for closing application ===
-class MainInputListener : public OgreBites::InputListener
+namespace fog
 {
-    static constexpr float DEFAULT_CAMERA_TOP_DISTANCE = 2 * 1000.0f;
-    static constexpr float DEFAULT_CAMERA_HIGH_MIN = 100.0f;
-    static constexpr float DEFAULT_CAMERA_HITH_MAX = 1000.0f;
-    static constexpr float DEFAULT_CAMERA_ROLL_SPEED = (DEFAULT_CAMERA_HITH_MAX - DEFAULT_CAMERA_HIGH_MIN) / 10.0f;
-
-private:
-    IWorld *wsc;
-
-    Core *core;
-    float *cameraTopDistanceVptr;
-    float *cameraHighMinVptr;
-    float *cameraHighMaxVptr;
-    float *cameraRollSpeedVptr;
-    Global *global;
-
-public:
-    MainInputListener(IWorld *wsc,
-                      Core *core)
+    using namespace OgreBites;
+    using namespace Ogre;
+    // === Custom hash function ===
+    //
+    // === Input handler for closing application ===
+    class MainInputListener : public OgreBites::InputListener
     {
-        this->core = core;
-        this->wsc = wsc;
-        global = core->getGlobal();
-        this->cameraTopDistanceVptr = global->Var<float>::Bag::createBindVptr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
-        this->cameraHighMinVptr = global->Var<float>::Bag::createBindVptr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
-        this->cameraHighMaxVptr = global->Var<float>::Bag::createBindVptr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
-        this->cameraRollSpeedVptr = global->Var<float>::Bag::createBindVptr(".cameraRollSpeed", DEFAULT_CAMERA_ROLL_SPEED, 0.0f, DEFAULT_CAMERA_ROLL_SPEED * 3);           //
-    }
+        static constexpr float DEFAULT_CAMERA_TOP_DISTANCE = 2 * 1000.0f;
+        static constexpr float DEFAULT_CAMERA_HIGH_MIN = 100.0f;
+        static constexpr float DEFAULT_CAMERA_HITH_MAX = 1000.0f;
+        static constexpr float DEFAULT_CAMERA_ROLL_SPEED = (DEFAULT_CAMERA_HITH_MAX - DEFAULT_CAMERA_HIGH_MIN) / 10.0f;
 
-    bool mousePressed(const MouseButtonEvent &evt) override
-    {
+    private:
+        IWorld *wsc;
 
-        if (evt.button == ButtonType::BUTTON_RIGHT)
+        Core *core;
+        float *cameraTopDistanceVptr;
+        float *cameraHighMinVptr;
+        float *cameraHighMaxVptr;
+        float *cameraRollSpeedVptr;
+        Global *global;
+
+    public:
+        MainInputListener(IWorld *wsc,
+                          Core *core)
         {
-
-            setTargetByMouse(evt.x, evt.y);
+            this->core = core;
+            this->wsc = wsc;
+            global = core->getGlobal();
+            this->cameraTopDistanceVptr = global->Var<float>::Bag::createBindVptr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
+            this->cameraHighMinVptr = global->Var<float>::Bag::createBindVptr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
+            this->cameraHighMaxVptr = global->Var<float>::Bag::createBindVptr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
+            this->cameraRollSpeedVptr = global->Var<float>::Bag::createBindVptr(".cameraRollSpeed", DEFAULT_CAMERA_ROLL_SPEED, 0.0f, DEFAULT_CAMERA_ROLL_SPEED * 3);           //
         }
 
-        return false;
-    }
-
-    void setTargetByMouse(int mx, int my)
-    {
-        // normalized (0,1)
-        Viewport *viewport = core->getViewport();
-        Camera *camera = core->getCamera();
-
-        float ndcX = mx / (float)viewport->getActualWidth();
-        float ndcY = my / (float)viewport->getActualHeight();
-
-        Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
-
-        Ogre::Plane ground(Ogre::Vector3::UNIT_Y, 0); // Y = 0
-        auto hitGrd = ray.intersects(ground);
-        std::cout << "ndc:(" << ndcX << "," << ndcY << ")" << "hit:" << hitGrd.first << std::endl;
-        if (hitGrd.first)
+        bool mousePressed(const MouseButtonEvent &evt) override
         {
-            Ogre::Vector3 pos = ray.getPoint(hitGrd.second);
 
-            CellKey cKey;
-            CostMap *costMap = this->wsc->getCostMap();
-
-            // bool hitCell = CellUtil::findCellByPoint(costMap, Vector2(pos.x, pos.z), cKey);
-            bool hitCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(pos), cKey);
-
-            if (hitCell)
+            if (evt.button == ButtonType::BUTTON_RIGHT)
             {
-                void (*func)(State *, CellKey &) =
-                    [](State *s, CellKey &cKey)
-                {
-                    Movable *mvb = s->getMovable();
-                    if (mvb)
-                    {
-                        mvb->setTargetCell(cKey);
-                    }
-                };
 
-                core->getRootState()->forEachChild<CellKey &>(
-                    func,
-                    cKey);
-                //
+                setTargetByMouse(evt.x, evt.y);
             }
-            // cout << "worldPoint(" << pickX << ",0," << pickZ << "),cellIdx:[" << cx << "," << cy << "]" << endl;
-        }
-    }
 
-    bool mouseReleased(const MouseButtonEvent &evt) override
-    {
-        if (evt.button == ButtonType::BUTTON_LEFT)
+            return false;
+        }
+
+        bool findCell(Vector3 aPos3, Cell::Instance &cell)
         {
+            return Global::Context<Cell::Center *>::get()->findCellByPoint(aPos3, cell);
         }
-        return false;
-    }
-
-    bool mouseWheelRolled(const MouseWheelEvent &evt) override
-    {
-        Camera *cam = core->getCamera();
-        Ogre::SceneNode *node = cam->getParentSceneNode();
-        Vector3 translate = Ogre::Vector3::NEGATIVE_UNIT_Y * evt.y * *cameraRollSpeedVptr;
-        Vector3 posTarget = node->getPosition() + translate;
-        if (posTarget.y < *this->cameraHighMinVptr)
+        void setTargetByMouse(int mx, int my)
         {
-            posTarget.y = *this->cameraHighMinVptr;
+            // normalized (0,1)
+            Viewport *viewport = core->getViewport();
+            Camera *camera = core->getCamera();
+
+            float ndcX = mx / (float)viewport->getActualWidth();
+            float ndcY = my / (float)viewport->getActualHeight();
+
+            Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
+
+            Ogre::Plane ground(Ogre::Vector3::UNIT_Y, 0); // Y = 0
+            auto hitGrd = ray.intersects(ground);
+            std::cout << "ndc:(" << ndcX << "," << ndcY << ")" << "hit:" << hitGrd.first << std::endl;
+            if (hitGrd.first)
+            {
+                Ogre::Vector3 pos = ray.getPoint(hitGrd.second);
+
+                // bool hitCell = CellUtil::findCellByPoint(costMap, Vector2(pos.x, pos.z), cKey);
+                //bool hitCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(pos), cKey);
+                Cell::Instance cell;
+                bool hitCell = this->findCell(pos, cell);
+
+                if (hitCell)
+                {
+                    CellKey cKey = cell.cKey;
+                    void (*func)(State *, CellKey &) =
+                        [](State *s, CellKey &cKey)
+                    {
+                        Movable *mvb = s->getMovable();
+                        if (mvb)
+                        {
+                            mvb->setTargetCell(cKey);
+                        }
+                    };
+
+                    core->getRootState()->forEachChild<CellKey &>(
+                        func,
+                        cKey);
+                    //
+                }
+                // cout << "worldPoint(" << pickX << ",0," << pickZ << "),cellIdx:[" << cx << "," << cy << "]" << endl;
+            }
         }
-        if (posTarget.y > *this->cameraHighMaxVptr)
+
+        bool mouseReleased(const MouseButtonEvent &evt) override
         {
-            posTarget.y = *this->cameraHighMaxVptr;
+            if (evt.button == ButtonType::BUTTON_LEFT)
+            {
+            }
+            return false;
         }
 
-        node->setPosition(posTarget);
+        bool mouseWheelRolled(const MouseWheelEvent &evt) override
+        {
+            Camera *cam = core->getCamera();
+            Ogre::SceneNode *node = cam->getParentSceneNode();
+            Vector3 translate = Ogre::Vector3::NEGATIVE_UNIT_Y * evt.y * *cameraRollSpeedVptr;
+            Vector3 posTarget = node->getPosition() + translate;
+            if (posTarget.y < *this->cameraHighMinVptr)
+            {
+                posTarget.y = *this->cameraHighMinVptr;
+            }
+            if (posTarget.y > *this->cameraHighMaxVptr)
+            {
+                posTarget.y = *this->cameraHighMaxVptr;
+            }
 
-        global->Var<Vector3>::Bag::setVar(".camera.position", posTarget);
+            node->setPosition(posTarget);
 
-        alignHorizonToTop(node, cam, *this->cameraTopDistanceVptr);
-        return false;
-    }
-    void alignHorizonToTop(Ogre::SceneNode *camNode, Ogre::Camera *cam, Ogre::Real distance)
-    {
-        Ogre::Radian fovY = cam->getFOVy();
-        Ogre::Real camHeight = camNode->getPosition().y; // 假设地面 Y=0
+            global->Var<Vector3>::Bag::setVar(".camera.position", posTarget);
 
-        // 防止高度 <= 0
-        if (camHeight <= 0.1f)
-            camHeight = 0.1f;
+            alignHorizonToTop(node, cam, *this->cameraTopDistanceVptr);
+            return false;
+        }
+        void alignHorizonToTop(Ogre::SceneNode *camNode, Ogre::Camera *cam, Ogre::Real distance)
+        {
+            Ogre::Radian fovY = cam->getFOVy();
+            Ogre::Real camHeight = camNode->getPosition().y; // 假设地面 Y=0
 
-        // 计算相机到目标点的俯角（从水平线向下）
-        Ogre::Radian depressionAngle = Ogre::Math::ATan(camHeight / distance);
+            // 防止高度 <= 0
+            if (camHeight <= 0.1f)
+                camHeight = 0.1f;
 
-        // 目标 pitch：向下转 (depressionAngle + fovY/2)
-        Ogre::Radian targetPitch = -(depressionAngle + fovY / 2);
+            // 计算相机到目标点的俯角（从水平线向下）
+            Ogre::Radian depressionAngle = Ogre::Math::ATan(camHeight / distance);
 
-        // 保持当前 yaw
-        Ogre::Radian currentYaw = camNode->getOrientation().getYaw();
+            // 目标 pitch：向下转 (depressionAngle + fovY/2)
+            Ogre::Radian targetPitch = -(depressionAngle + fovY / 2);
 
-        // 设置新朝向
-        Ogre::Quaternion newOri =
-            Ogre::Quaternion(currentYaw, Ogre::Vector3::UNIT_Y) *
-            Ogre::Quaternion(targetPitch, Ogre::Vector3::UNIT_X);
+            // 保持当前 yaw
+            Ogre::Radian currentYaw = camNode->getOrientation().getYaw();
 
-        camNode->setOrientation(newOri);
-    }
-};
+            // 设置新朝向
+            Ogre::Quaternion newOri =
+                Ogre::Quaternion(currentYaw, Ogre::Vector3::UNIT_Y) *
+                Ogre::Quaternion(targetPitch, Ogre::Vector3::UNIT_X);
 
-};//end of namespace
+            camNode->setOrientation(newOri);
+        }
+    };
+
+}; // end of namespace

@@ -72,7 +72,10 @@ public:
 
         this->global->Var<Vector3>::Bag::forEachVarPtr<int &>(MainUI::forEachVarPtr, counter);
 
-        // stats
+        Vector3 pO = Global::Context<Node2D*>::get()->plane->getOrigin();
+
+        ImGui::Text(fmt::format("({:.1f},{:.1f},{:.1f})", pO.x, pO.y, pO.z).c_str());
+                // stats
 
         const Ogre::RenderTarget::FrameStats &fs = window->getStatistics();
         ImGui::Text(fmt::format("FPS:     {:.2f}", fs.lastFPS).c_str());

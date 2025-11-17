@@ -39,7 +39,7 @@ namespace fog
 
             if (ImGui::Button("Test:TerrainGround"))
             {
-                vertices = TerrainedGround::calculateVertices3D(cellX, cellY, costMap, CostMap::hexSize, heightOffset);
+                vertices ={};// TerrainedGround::calculateVertices3D(cellX, cellY, costMap, CostMap::hexSize, heightOffset);
             }
             if (ImGui::Button("Test:Ground"))
             {

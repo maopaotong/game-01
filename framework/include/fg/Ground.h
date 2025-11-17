@@ -125,36 +125,36 @@ namespace fog
     class TerrainedGround
     {
     public:
-        // net of spider.
-        static TerrainedVertices3 calculateVertices3D(int cellX, int cellY, CostMap *costMap, float rad, float heightOffset = 0.0f)
-        {
-            Vector2 offset = CellUtil::offset(costMap);
-            Vector2 cellCenterIn2DWld = CellUtil::calculateCenter(cellX, cellY, offset, rad);
+        // // net of spider.
+        // static TerrainedVertices3 calculateVertices3D(int cellX, int cellY, CostMap *costMap, float rad, float heightOffset = 0.0f)
+        // {
+        //     Vector2 offset = CellUtil::offset(costMap);
+        //     Vector2 cellCenterIn2DWld = CellUtil::calculateCenter(cellX, cellY, offset, rad);
 
-            std::vector<std::vector<Vector2>> vertices2;
+        //     std::vector<std::vector<Vector2>> vertices2;
 
-            std::vector<Vector2> row2;
-            row2.push_back(cellCenterIn2DWld);
-            vertices2.push_back(row2);
-            int layers = DEFAULT_LAYERS;
+        //     std::vector<Vector2> row2;
+        //     row2.push_back(cellCenterIn2DWld);
+        //     vertices2.push_back(row2);
+        //     int layers = DEFAULT_LAYERS;
 
-            for (int i = 0; i < layers; i++)
-            {
-                int sizeI = std::powf(2, i) * 6;
-                float radI = rad * (i + 1) / layers;
-                row2 = calculateCirclePoints(cellCenterIn2DWld, radI, sizeI);
-                vertices2.push_back(row2);
-            }
+        //     for (int i = 0; i < layers; i++)
+        //     {
+        //         int sizeI = std::powf(2, i) * 6;
+        //         float radI = rad * (i + 1) / layers;
+        //         row2 = calculateCirclePoints(cellCenterIn2DWld, radI, sizeI);
+        //         vertices2.push_back(row2);
+        //     }
 
-            TerrainedVertices3 ret;
-            for (int i = 0; i < vertices2.size(); i++)
-            {
-                std::vector<Vector3> row3I = Ground::Transfer::to3D(vertices2[i], Global::getTerrainHeightAtPositionWithOffset, heightOffset);
-                ret.push_back(row3I);
-            }
+        //     TerrainedVertices3 ret;
+        //     for (int i = 0; i < vertices2.size(); i++)
+        //     {
+        //         std::vector<Vector3> row3I = Ground::Transfer::to3D(vertices2[i], Global::getTerrainHeightAtPositionWithOffset, heightOffset);
+        //         ret.push_back(row3I);
+        //     }
 
-            return ret;
-        }
+        //     return ret;
+        // }
 
         static std::vector<Vector2> calculateCirclePoints(Vector2 center, float rad, float size, float offsetAngle = 0.0f)
         {

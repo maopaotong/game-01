@@ -59,6 +59,10 @@ namespace fog
             SceneManager *sMgr = core->getSceneManager();
             this->create(sMgr, this->entity, this->sceNode);
             this->setSceneNode(sceNode);
+
+            float height = Global::Context<Terrains *>::get()->getHeightAtPosition(Vector3(0, 0, 0));
+
+            sceNode->translate(0, height + this->actorHighOffset, 0);
         }
 
         virtual void create(SceneManager *sMgr, Entity *&entity, SceneNode *&node) = 0;
@@ -87,8 +91,12 @@ namespace fog
             SceneNode *node = actorMo->getParentSceneNode();
             const Vector3 &actorPosition = node->getPosition();
             std::cout << "actor.pos:" << actorPosition << "" << std::endl;
-            CellKey cKey;
-            bool hitActorCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(actorPosition), cKey);
+            // CellKey cKey;
+
+            // bool hitActorCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(actorPosition), cKey);
+            Cell::Instance cell;
+            bool hitActorCell = this->findCell(actorPosition, cell);
+
             ActorState *actor = this;
             if (hitActorCell)
             {
@@ -118,29 +126,28 @@ namespace fog
             {
                 return false;
             }
-            
-            Cell::Center* cells = Global::Context<Cell::Center*>::get() ;
+
+            Cell::Center *cells = Global::Context<Cell::Center *>::get();
 
             // check if this state's position on the target cell
             Vector3 aPos3 = this->sceNode->getPosition();
-            Node2D * root2D = cells->getRoot2D();
+            Node2D *root2D = cells->getRoot2D();
             Vector2 actorPosIn2D = root2D->to2D(aPos3);
             Cell::Instance cell;
-            //bool hitCell = CellUtil::findCellByPoint(costMap, aPos2, aCellKey);
-            bool hitCell = Global::Context<Cell::Center*>::get()->findCellByPoint(aPos3, cell);
+            // bool hitCell = CellUtil::findCellByPoint(costMap, aPos2, aCellKey);
+            bool hitCell = Global::Context<Cell::Center *>::get()->findCellByPoint(aPos3, cell);
             if (hitCell)
             {
                 CellKey aCellKey = cell.cKey;
                 std::vector<Vector2> pathByPoint2DNom = costMap->findPath(cell.cKey, cKey2);
 
-
                 std::vector<Vector2> pathByCellCenterIn2D;
 
-                //CellUtil::translatePathToCellCenter(pathByKey, pathByPosition, CellUtil::offset(costMap));
+                // CellUtil::translatePathToCellCenter(pathByKey, pathByPosition, CellUtil::offset(costMap));
 
-                //Global::Context<Node2D*>::get()->
+                // Global::Context<Node2D*>::get()->
 
-                std::vector<Vector2> pathByPointIn2D = Global::Context<Cell::Center*>::get()->getCellPointListByNomPoints(pathByPoint2DNom);
+                std::vector<Vector2> pathByPointIn2D = Global::Context<Cell::Center *>::get()->getCellPointListByNomPoints(pathByPoint2DNom);
                 float pathSpeed = this->global->Var<float>::Bag::getVarVal(".pathSpeed", 1.0f);
 
                 PathFollow2 *path = new PathFollow2(actorPosIn2D, pathByPointIn2D, pathSpeed);

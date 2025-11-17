@@ -55,11 +55,14 @@ namespace fog
                 Vector2 pos2D = CellUtil::calculateCenter(ck.first, ck.second, costMap);
                 Vector3 pos3D = Ground::Transfer::to3D(pos2D, Global::getTerrainHeightAtPositionWithOffset);
                 ImGui::Text(fmt::format("DistinationCell:[{},{}]({},{},{})", ck.first, ck.second, pos3D.x, pos3D.y, pos3D.z).c_str());
-                
             }
             else
             {
                 ImGui::Text("No Active State");
+                if (ImGui::Button("Active actor"))
+                {
+                    
+                }
             }
 
             ImGui::End();

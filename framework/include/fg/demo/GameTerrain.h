@@ -190,10 +190,6 @@ namespace fog
             return terrainGroup->getOrigin();
         }
 
-        float getDensity() override
-        {
-            return this->worldSize / (this->terrainSize - 1);
-        }
         void defineTerrain(long x, long y, bool flat)
         {
             if (flat)

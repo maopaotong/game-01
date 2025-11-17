@@ -75,6 +75,16 @@ namespace fog
             return CellKey(0, 0);
         }
 
+        Vector3 to3D(Vector2 point)
+        {
+            return Global::Context<Node2D *>::get()->to3D(point);
+        }
+
+        bool findCell(Vector3 aPos3, Cell::Instance &cell)
+        {
+            return Global::Context<Cell::Center *>::get()->findCellByPoint(aPos3, cell);
+        }
+
         SceneNode *getSceneNode()
         {
             return this->sceNode;

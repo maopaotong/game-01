@@ -45,10 +45,10 @@ namespace fog
         }
         */
 
-        static bool findCellByPoint(CostMap *costMap, Vector2 point, CellKey &cKey)
-        {
-            return findCellByPoint(costMap, point.x, point.y, cKey.first, cKey.second);
-        }
+        // static bool findCellByPoint(CostMap *costMap, Vector2 point, CellKey &cKey)
+        // {
+        //     return findCellByPoint(costMap, point.x, point.y, cKey.first, cKey.second);
+        // }
 
         static Vector2 offset(CostMap *costMap)
         {
