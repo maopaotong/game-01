@@ -95,8 +95,8 @@ namespace fog
                 int layer;
                 int layerSize;
                 int preLayerSize;
-                int totalLayer = 6;//settings global
-                int topLayer = 6;
+                int totalLayer = 2;//settings global
+                int topLayer = 2;
                 int botLayer = 0;
                 // to build the mesh, this context alive on the whole building operation.
                 // so it visits each cell and each points of cells.

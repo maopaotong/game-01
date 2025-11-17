@@ -66,7 +66,9 @@ namespace fog
         {
 
             Cell::Center *cc = Global::Context<Cell::Center *>::get();
-            MeshBuild::PointOnCircle buildMesh(obj);
+            //MeshBuild::PointOnCircle buildMesh(obj);
+            MeshBuild::SpiderNet buildMesh(obj);
+
             buildMesh.begin(this->material);
             cc->forEachCell([this, &buildMesh](Cell::Instance &cell)
                             {
