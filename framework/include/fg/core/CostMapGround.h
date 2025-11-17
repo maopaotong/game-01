@@ -4,18 +4,19 @@
 #include "fg/util/CostMap.h"
 #include "fg/util/Polygon2.h"
 
-namespace fog{
-class CostMapGround : public Ground
+namespace fog
 {
-private:
-    CostMap *costMap;
-    Polygon2 polygon;
+    class CostMapGround : public Ground
+    {
+    private:
+        CostMap *costMap;
+        Polygon2 polygon;
 
-public:
-    CostMapGround(CostMap *costMap);
-    CostMap *getCostMap();
-    bool isPointInside(float x, float z) override;
-    bool isPointInside(Vector2 &p) override;
-};
+    public:
+        CostMapGround(CostMap *costMap);
+        CostMap *getCostMap();
+        bool isPointInside(float x, float z) override;
+        bool isPointInside(Vector2 &p) override;
+    };
 
-};//end of namespace
+}; // end of namespace

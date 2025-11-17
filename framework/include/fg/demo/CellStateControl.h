@@ -7,6 +7,9 @@
 #include "fg/State.h"
 #include "fg/Core.h"
 #include "fg/util/CostMap.h"
+#include "fg/Cell.h"
+#include "fg/Global.h"
+
 namespace fog
 {
     using namespace Ogre;
@@ -37,6 +40,32 @@ namespace fog
 
         void buildCellMesh()
         {
+            obj->clear();
+
+            // Begin the manual object
+            obj->begin(MaterialNames::materialNameInUse, Ogre::RenderOperation::OT_TRIANGLE_LIST);
+            Cell::Center *cc = Global::Context<Cell::Center *>::get();
+
+            void (*visit)(Cell::Instance &cell, CellStateControl *) = [](Cell::Instance &cell, CellStateControl *this_)
+            {
+                this_->buildMesh(cell);
+            };
+
+            cc->forEachCell<CellStateControl *>(visit, this);
+
+            // End the manual object
+            obj->end();
+        }
+
+        void buildMesh(Cell::Instance &cell)
+        {
+            int cost = costMap->getCost(cell.cKey.first, cell.cKey.second);
+            Ogre::ColourValue color = getCostColor(cost);
+            cell.buildMesh(obj, color);
+        }
+
+        void buildCellMesh_DEL()
+        {
 
             obj->clear();
 
@@ -56,8 +85,8 @@ namespace fog
             int yStart = 0;
             int yEnd = height;
 
-            //xStart = width / 2;
-            //yStart = height / 2;
+            // xStart = width / 2;
+            // yStart = height / 2;
 
             for (int x = xStart; x < xEnd; x++)
             {
@@ -87,7 +116,6 @@ namespace fog
                         break;
                     }
                 }
-                
             }
 
             // End the manual object

@@ -1,10 +1,10 @@
 #pragma once
-#include "State.h"
 #include "util/Polygon2.h"
 #include "util/CellUtil.h"
 #include <Ogre.h>
 #include <OgreVector.h>
-
+#include "fg/Terrains.h"
+#include "fg/Global.h"
 #define DEFAULT_LAYERS 5
 
 namespace fog
@@ -13,6 +13,10 @@ namespace fog
 
     class Ground
     {
+        
+
+
+
         typedef float (*HeightFunction)(float x, float y, float heightOffset);
 
     public:
@@ -113,6 +117,7 @@ namespace fog
         Ground();
         virtual bool isPointInside(float x, float z) = 0;
         virtual bool isPointInside(Vector2 &p) = 0;
+    
     }; // end of class
 
     typedef std::vector<std::vector<Vector3>> TerrainedVertices3;
@@ -168,7 +173,11 @@ namespace fog
                 ret[i] = Ogre::Vector2(center.x + dx, center.y + dy);
             }
             return ret;
-        }
+        };
+
+
+
+
     };
 
 }; // end of namespace
