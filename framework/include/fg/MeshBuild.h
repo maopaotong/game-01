@@ -45,8 +45,7 @@ namespace fog
                     int layer;
                     void operator()(int pIdx, Vector2 &pointOnCircle)
                     {
-                        Vector2 pointIn2D = pointOnCircle * cell.node->scale + origin;
-                        Vector3 pos = cell.node->plane->to3D(pointIn2D);
+                        Vector3 pos = cell.node->to3D(origin, pointOnCircle);
 
                         obj->position(pos);
                         obj->normal(nom3);
@@ -94,21 +93,53 @@ namespace fog
                 Vector2 origin;
                 Vector3 nom3;
                 int layer;
+                int layerSize;
+                int preLayerSize;
+                int topLayer = 5;
                 // to build the mesh, this context alive on the whole building operation.
                 // so it visits each cell and each points of cells.
+                int idx; // point index
 
                 void operator()(int pIdx, Vector2 &pointOnCircle)
-                {                    
-                    Vector3 pos = cell->node->to3D(origin, pointOnCircle);
+                {
+                    Vector2 pointOnLayer = pointOnCircle * (layer / topLayer);
+                    Vector3 pos = cell->node->to3D(origin, pointOnLayer);
                     obj->position(pos);
                     obj->normal(nom3);
                     obj->colour(color);
-                }
 
-            };
+                    //
+                    int size1 = preLayerSize;
+                    int size2 = layerSize;
+                    int i = layer;
+                    int j = pIdx; //
+
+                    if (i > 0) // skip first layer, process from second ... layer
+                    {
+                        // (j-1-size1)    .   .   .   .   .   .
+                        //         |   \   | \ | \ | \ | \ | \ |
+                        //      (j-1)__(j)___*__*   .   .   .
+
+                        if (j > 0 && j < size1 - 1)
+                        {
+                            obj->triangle(idx, idx - 1 - size1, idx - 1);
+                        }
+
+                        //         . __* __ .__. __. __ .__ .
+                        //           \ | \ | \ | \ | \ | \ |
+                        //         .   .   .   .   .   .   .
+                        if (j > 0 && j < size2)
+                        {
+                            obj->triangle(idx, idx - size1, idx - 1);
+                        }
+                    }
+                    idx++;
+                    //
+                }
+            }; // end of Point Visit
+
             ManualObject *obj;
             int baseIndex;
-            int layers = 1;
             PointVisit visitPoint;
 
             SpiderNet(ManualObject *obj) : obj(obj) {}
@@ -120,6 +151,7 @@ namespace fog
                 //
                 visitPoint.obj = obj;
                 visitPoint.nom3 = Vector3(0, 1, 0);
+                visitPoint.idx = baseIndex;
             }
 
             // each cell visit op.
@@ -129,18 +161,31 @@ namespace fog
                 visitPoint.color = color;
                 visitPoint.origin = cell.getOrigin2D();
 
-                for (int i = 0; i < layers; i++)
+                //
+                for (int i = 0; i < visitPoint.topLayer + 1; i++)
                 {
-                    visitPoint.layer = i + 1;
-                    float sizeI = std::powf(2, i) * 6;
-                    Cell::forEachPointOnCircle(sizeI, 0.0f, visitPoint);
+                    visitPoint.layer = i;
+                    visitPoint.preLayerSize = visitPoint.layerSize;
+                    visitPoint.layerSize = layerSize(i);
+                    if (i == 0)
+                    {
+                        visitPoint(0, Vector2(0, 0));
+                        continue;
+                    }
+
+                    Cell::forEachPointOnCircle(visitPoint.layerSize, 0.0f, visitPoint);
                 }
+            }
+
+            int layerSize(int layer)
+            {
+                return layer == 0 ? 1 : std::powf(2, layer) * 6;
             }
 
             void end()
             {
                 this->obj->end();
             }
-        };
+        }; // end of spider net.
     };
 };
