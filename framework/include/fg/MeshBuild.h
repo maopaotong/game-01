@@ -91,7 +91,10 @@ namespace fog
                 ColourValue color;
                 Cell::Instance *cell;
                 Vector2 origin;
-                Vector3 nom3;
+                bool useDefaultNorm = true;
+                Vector3 defaultNorm;
+                Vector3 norm;
+
                 int layer;
                 int layerSize;
                 int preLayerSize;
@@ -104,10 +107,17 @@ namespace fog
 
                 void operator()(int pIdx, Vector2 &pointOnCircle)
                 {
-                    Vector2 pointOnLayer = pointOnCircle * ((float)layer / (float)totalLayer);                    
-                    Vector3 pos = cell->node->to3D(origin, pointOnLayer, nullptr);
+                    Vector2 pointOnLayer = pointOnCircle * ((float)layer / (float)totalLayer);
+                    Vector3 *pNom = useDefaultNorm ? nullptr : &norm;
+                    Vector3 pos = cell->node->to3D(origin, pointOnLayer, pNom);
+                    if (pNom == nullptr)
+                    {
+                        pNom = &defaultNorm;
+                    }
                     obj->position(pos);
-                    obj->normal(nom3);
+
+                    obj->normal(*pNom);
+
                     obj->colour(color);
 
                     //
@@ -149,6 +159,8 @@ namespace fog
             ManualObject *obj;
             int baseIndex;
             PointVisit visitPoint;
+            bool useDefaultNorm = true;
+            Vector3 defaultNorm = Vector3::UNIT_Y;
 
             SpiderNet(ManualObject *obj) : obj(obj) {}
             void begin(std::string material)
@@ -158,7 +170,9 @@ namespace fog
                 baseIndex = obj->getCurrentVertexCount();
                 //
                 visitPoint.obj = obj;
-                visitPoint.nom3 = Vector3(0, 1, 0);
+                visitPoint.useDefaultNorm = useDefaultNorm;
+                visitPoint.defaultNorm = defaultNorm;
+        
                 visitPoint.idx = baseIndex;
             }
 

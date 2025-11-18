@@ -56,34 +56,34 @@ namespace fog
             // define a plane in terrain space
             // do not normalise as the normalization factor cancels out in the final
             // equation anyway
-            Vector3 norm;
+            Vector4 plane;
             if (startY % 2)
             {
                 // odd row
                 bool secondTri = ((1.0 - yParam) > xParam);
                 if (secondTri)
-                    norm = Math::calculateBasicFaceNormalWithoutNormalize(v0, v1, v3);
+                    plane = Math::calculateFaceNormalWithoutNormalize(v0, v1, v3);
                 else
-                    norm = Math::calculateBasicFaceNormalWithoutNormalize(v1, v2, v3);
+                    plane = Math::calculateFaceNormalWithoutNormalize(v1, v2, v3);
             }
             else
             {
                 // even row
                 bool secondTri = (yParam > xParam);
                 if (secondTri)
-                    norm = Math::calculateBasicFaceNormalWithoutNormalize(v0, v2, v3);
+                    plane = Math::calculateFaceNormalWithoutNormalize(v0, v2, v3);
                 else
-                    norm = Math::calculateBasicFaceNormalWithoutNormalize(v0, v1, v2);
+                    plane = Math::calculateFaceNormalWithoutNormalize(v0, v1, v2);
             }
 
-            Vector4 plane(norm.x, norm.y, norm.z, -(norm.dotProduct(v1)));
             if (pNorm)
             {
+                *pNorm = Vector3(plane.x, plane.z, -plane.y);
+
                 if (normalise)
                 {
-                    norm.normalise();
+                    pNorm->normalise();
                 }
-                *pNorm = norm;
             }
             // Solve plane equation for z
             return (-plane.x * x - plane.y * y - plane.w) / plane.z;
