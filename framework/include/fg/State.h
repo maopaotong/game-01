@@ -75,6 +75,10 @@ namespace fog
             return CellKey(0, 0);
         }
 
+        virtual void collectProperties(){
+            
+        }
+
         Vector3 to3D(Vector2 point)
         {
             return Global::Context<Node2D *>::get()->to3D(point);

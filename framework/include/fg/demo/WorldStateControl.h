@@ -47,6 +47,7 @@ public:
 
         // Create frame listener for main loop
         this->cells = new CellStateControl(costMap, core);
+        this->addChild(this->cells);
 
         this->inputState = new SimpleInputState(core->getCamera(), core->getWindow());
 
@@ -58,6 +59,7 @@ public:
         ActorStateControl *actor = new ActorStateControl(costMap, core);
         actor->init(core);
         this->addChild(actor);
+
         root->addFrameListener(actor);
         MainInputListener *keyHandler = new MainInputListener(this, core);
         core->getAppContext()->addInputListener(keyHandler);

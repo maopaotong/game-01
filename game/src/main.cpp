@@ -30,8 +30,10 @@ int main()
         std::cout << "=========================================\n\n";
 
         // Initialize Ogre application context
-        auto app = std::make_unique<SimpleApp>();
-        app->add(new Game01());
+        Game01 * game01 = new Game01();
+
+        auto app = std::make_unique<SimpleApp>((Game*)game01);
+        app->add(game01);
         app->setup();
         app->startRendering();
         app->close();

@@ -7,25 +7,21 @@
 #include "fmt/format.h"
 #include "fg/util/ImGuiUtil.h"
 #include "UIState.h"
-
+#include "fg/Options.h"
 namespace fog
 {
-    template <typename T>
-    struct Option
-    {
-        std::string name;
-        T value;
-        Option(std::string name, T value) : name(name), value(value) {}
-    };
-
     class OptionsUI : public UIState
     {
-        std::vector<Option<bool>*> boolOptions;
+        protected:
+        Core* core;
+        Options options;
 
     public:
-        OptionsUI(UIState *pState) : UIState(pState)
+        OptionsUI(UIState *pState,Core*core) : UIState(pState)
         {
-            this->boolOptions.push_back(new Option<bool>("Draw All Cell", false));
+            this->core = core;
+            options.add<bool>("Show-plain-cell?", false);
+            options.add<std::string>("Video-Mode", "1024 x 768");
         }
 
         bool open() override
@@ -35,22 +31,47 @@ namespace fog
                 return false;
             }
 
-            for (auto op : this->boolOptions)
-            {
+            this->options.forEach([](std::string name, Options::Option *option)
+                                  {
+                                      if (option->isType<bool *>())
+                                      {
+                                          bool *pValue = option->getValuePtr<bool>();
 
-                if (ImGui::Checkbox(op->name.c_str(), &op->value))
-                {
-                    // ignore bool change.
-                }
+                                              if (ImGui::Checkbox(option->name.c_str(), pValue))
+                                              {
+                                                  // ignore bool change.
+                                              }
+                                          
+
+                                      }else if(option->isType<std::string*>()){
+
+                                        std::string *pValue = option->getValuePtr<std::string>();
+
+                                        ImGui::Text((*pValue).c_str());
+                                      
+                                        } });
+
+            //
+            if (ImGui::Button("Start"))
+            {
+                this->active = false;
+                this->onStart();
             }
 
-            if (ImGui::Button("Apply"))
+            ImGui::SameLine();
+
+            if (ImGui::Button("Return"))
             {
                 this->active = false;
             }
 
             ImGui::End();
             return true;
+        }
+
+        void onStart(){
+            //
+            core->getGame()->start(&this->options);
         }
     };
 

@@ -6,62 +6,74 @@
 #include "Global.h"
 #include "State.h"
 #include "fg/Event.h"
+#include "fg/Game.h"
+
 using namespace Ogre;
 using namespace OgreBites;
 namespace fog
 {
-class Core
-{
-public:
-    virtual ApplicationContext *getAppContext() = 0;
-    virtual ImGuiApp *getImGuiApp() = 0;
-    virtual SceneManager *getSceneManager() = 0;
-    virtual Viewport *getViewport() = 0;
-    virtual Camera *getCamera() = 0;
-    virtual Root *getRoot() = 0;
-    virtual RenderWindow *getWindow() = 0;
-    virtual void addInputListener(InputListener *listener) = 0;
-    virtual void addFrameListener(Ogre::FrameListener *listener) = 0;
-    virtual MaterialManager *getMaterialManager() = 0;
-
-    virtual void setUserObject(const std::string key, std::any value) = 0;
-    virtual bool getUserObject(const std::string key, std::any &value) = 0;
-    virtual State *getRootState() = 0;
-    virtual Global * getGlobal() = 0;
-    virtual Light* getLight() = 0;
-
-    template <typename T>
-    void setUserObject(const std::string key, T *obj)
+    class Core
     {
-        this->setUserObject(key, std::any(obj));
-    }
+        Game *game;
 
-    template <typename T>
-    T *getUserObject(const std::string key)
-    {
-
-        return getUserObject<T>(key, false);
-    }
-
-    template <typename T>
-    T *getUserObject(const std::string key, bool required)
-    {
-        std::any value;
-        T *rt = nullptr;
-        if (this->getUserObject(key, value))
+    public:
+        Core(Game* game) : game(game)
         {
-            T **pp = any_cast<T *>(&value);
-            if (pp != nullptr)
+        }
+        virtual ~Core() {}
+        virtual ApplicationContext *getAppContext() = 0;
+        virtual ImGuiApp *getImGuiApp() = 0;
+        virtual SceneManager *getSceneManager() = 0;
+        virtual Viewport *getViewport() = 0;
+        virtual Camera *getCamera() = 0;
+        virtual Root *getRoot() = 0;
+        virtual RenderWindow *getWindow() = 0;
+        virtual void addInputListener(InputListener *listener) = 0;
+        virtual void addFrameListener(Ogre::FrameListener *listener) = 0;
+        virtual MaterialManager *getMaterialManager() = 0;
+
+        virtual void setUserObject(const std::string key, std::any value) = 0;
+        virtual bool getUserObject(const std::string key, std::any &value) = 0;
+        virtual State *getRootState() = 0;
+        virtual Global *getGlobal() = 0;
+        virtual Light *getLight() = 0;
+        Game *getGame()
+        {
+            return game;
+        };
+
+        template <typename T>
+        void setUserObject(const std::string key, T *obj)
+        {
+            this->setUserObject(key, std::any(obj));
+        }
+
+        template <typename T>
+        T *getUserObject(const std::string key)
+        {
+
+            return getUserObject<T>(key, false);
+        }
+
+        template <typename T>
+        T *getUserObject(const std::string key, bool required)
+        {
+            std::any value;
+            T *rt = nullptr;
+            if (this->getUserObject(key, value))
             {
-                rt = *pp;
+                T **pp = any_cast<T *>(&value);
+                if (pp != nullptr)
+                {
+                    rt = *pp;
+                }
             }
-        }
 
-        if (rt == nullptr && required)
-        {
-            throw std::runtime_error("No such user object with key=" + key + " or type of the value mis-match.");
+            if (rt == nullptr && required)
+            {
+                throw std::runtime_error("No such user object with key=" + key + " or type of the value mis-match.");
+            }
+            return rt;
         }
-        return rt;
-    }
-};
+    };
 };

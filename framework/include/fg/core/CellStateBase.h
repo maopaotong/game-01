@@ -36,7 +36,7 @@ namespace fog
             //
         }
 
-        void init() {
+        virtual void init() override {
             rebuildMesh();
         }
         

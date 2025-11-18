@@ -32,8 +32,9 @@ namespace fog
         ActiveTrayUI *activeTrayUI = nullptr;
         MainUI *mainUI = nullptr;
         SceneNodeUI *sceneNodeUI = nullptr;
-        CommandUI * cmdUI;
+        CommandUI *cmdUI;
         EntryUI *entryUI;
+
     public:
         OnFrameUI(Core *core, CostMap *costMap)
         {
@@ -47,18 +48,19 @@ namespace fog
             this->activeTrayUI = new ActiveTrayUI(core, costMap);
             this->mainUI = new MainUI(core, costMap);
             this->sceneNodeUI = new SceneNodeUI(core);
-            this->cmdUI = new CommandUI(core,costMap);
-            this->entryUI = new EntryUI(nullptr);
+            this->cmdUI = new CommandUI(core, costMap);
+
+            this->entryUI = new EntryUI(nullptr, core);
             this->entryUI->init();
         }
 
         void onFrame(const FrameEvent &evt)
         {
             ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.7f));
-            this->mainUI->Open();
-            //this->activeTrayUI->Open();
-            //this->sceneNodeUI->Open();
-            //this->cmdUI->Open();
+            // this->mainUI->Open();
+            // this->activeTrayUI->Open();
+            // this->sceneNodeUI->Open();
+            // this->cmdUI->Open();
 
             this->entryUI->open();
 

@@ -8,7 +8,7 @@
 #include "fg/App.h"
 #include "fg/core/SimpleCore.h"
 #include "fg/Global.h"
-
+#include "fg/Game.h"
 namespace fog{
 
 using namespace OgreBites;
@@ -22,9 +22,9 @@ private:
 
 
 public:
-    SimpleApp()
+    SimpleApp(Game* game)
     {
-        this->core = new SimpleCore();
+        this->core = new SimpleCore(game);
     }
 
     void add(Module *mod) override

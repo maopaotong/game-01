@@ -14,35 +14,40 @@ namespace fog
 
     class EntryUI : public UIState
     {
-        struct ChildInfo{
-            UIState* ui;
+        struct ChildInfo
+        {
+            UIState *ui;
             std::string name;
         };
 
     protected:
         std::vector<ChildInfo> childInfos;
+        Core *core;
+
     public:
-        EntryUI(UIState *pState) : UIState(pState)
+        EntryUI(UIState *pState, Core *core) : UIState(pState), core(core)
         {
-            
         }
 
-        void init() override{
-            
-            this->add("Options", new OptionsUI(this));
-            
+        void init() override
+        {
+
+            this->add("Options", new OptionsUI(this, core));
         }
-        void add(std::string name, UIState* child){
+        void add(std::string name, UIState *child)
+        {
             UIState::add(child);
-            ChildInfo ci={child,name};
+            ChildInfo ci = {child, name};
             childInfos.push_back(ci);
-        }   
-        
+        }
+
         bool open() override
         {
             UIState::open();
-            for(auto ci:childInfos){
-                if(ImGui::Button(ci.name.c_str())){
+            for (auto ci : childInfos)
+            {
+                if (ImGui::Button(ci.name.c_str()))
+                {
                     ci.ui->setActive(true);
                 }
             }

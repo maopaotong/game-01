@@ -14,10 +14,12 @@
 #include <OgreRenderWindow.h>
 #include "fg/demo/GameTerrain.h"
 #include "fg/ui/OnFrameUI.h"
+#include "fg/Game.h"
+#include "fg/State.h"
+#include "fg/Options.h"
 namespace fog
 {
-
-    class Game01 : public Module
+    class Game01 : public Module, Game
     {
         Global *global;
         Core *core;
@@ -67,7 +69,7 @@ namespace fog
             Global::Context<Terrains *>::set(terrains);
             //
             fog::Plane *p = new fog::Plane(terrains);
-            
+
             float scale = 30.0f;
             Node2D *root2D = new Node2D(p, scale); //
 
@@ -76,7 +78,7 @@ namespace fog
             Cell::Center *cells = new Cell::Center(root2D, costMap);
             cells->translateToCenter();
 
-            //root2D->position = -cells->getCenterIn2D(); // move center to (0,0)
+            // root2D->position = -cells->getCenterIn2D(); // move center to (0,0)
             Global::Context<Cell::Center *>::set(cells);
 
             //
@@ -108,6 +110,24 @@ namespace fog
             }
 
             return cm;
+        }
+
+        void start(Options *options) override
+        {
+            // rebuild cells
+            void (*func)(State *, Options *) = [](State *state, Options *options)
+            {
+                CellStateControl *csc = dynamic_cast<CellStateControl *>(state);
+
+                if (csc)
+                {
+                    bool *showPlainCellPtr = options->getOption("Show-plain-cell?")->getValuePtr<bool>();
+                    csc->showCost1 = *showPlainCellPtr;
+                    std::cout << "" << "" <<std:: endl;
+                    csc->rebuildMesh();
+                }
+            };
+            core->getRootState()->forEachChild<Options*>(true, func, options);
         }
     };
 };
