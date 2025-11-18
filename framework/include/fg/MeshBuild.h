@@ -8,6 +8,11 @@
 #include <OgreColourValue.h>
 #include "fg/Terrains.h"
 #include "Cell.h"
+#define FG_REPORT_ERROR_INDEX_OUT_OF_RANGE 0
+#define FG_SPIDER_TOTAL_LAYER 3
+#define FG_SPIDER_TOP_LAYER 3
+#define FG_SPIDER_BOTTOM_LAYER 0
+
 using namespace Ogre;
 
 namespace fog
@@ -82,25 +87,158 @@ namespace fog
             }
         };
 
+        struct Vertex
+        {
+            Vector3 position;
+            ColourValue colour;
+            Vector3 normal;
+            bool isNormalInit = false;
+            void addNormal(Vector3 norm)
+            {
+                if (!isNormalInit)
+                {
+                    this->normal = norm;
+                    this->isNormalInit = true;
+                    return;
+                }
+                this->normal += norm;
+                this->normal.normalise();
+            }
+        };
+
+        struct TriangleIndexData
+        {
+            int v1;
+            int v2;
+            int v3;
+        };
+
+        class AutoNormManualObject
+        {
+        public:
+            ManualObject *obj;
+            int baseIndex;
+            std::vector<Vertex> vertices;
+
+            std::vector<TriangleIndexData> triangles;
+
+            void begin(ManualObject *obj)
+            {
+                this->obj = obj;
+                this->resetBaseIndex();
+            }
+            void resetBaseIndex()
+            {
+                this->baseIndex = obj->getCurrentVertexCount();
+            }
+
+            void position(Vector3 pos)
+            {
+                Vertex v;
+                v.position = pos;
+                vertices.push_back(v);
+            }
+
+            void colour(ColourValue color)
+            {
+                int size1 = vertices.size();
+                vertices[size1 - 1].colour = color;
+            }
+
+            void triangle(int v1, int v2, int v3)
+            {
+                int idx1 = v1 - baseIndex;
+                int idx2 = v2 - baseIndex;
+                int idx3 = v3 - baseIndex;
+                //
+                int size1 = vertices.size();
+#if FG_REPORT_ERROR_INDEX_OUT_OF_RANGE
+                if (idx1 < 0 || idx1 > size1 - 1)
+                {
+                    //
+                    throw std::runtime_error("vertex index is out of range, please make sure the vertex is added. and make sure the data is not flushed already.");
+                }
+                if (idx2 < 0 || idx2 > size1 - 1)
+                {
+                    //
+                    throw std::runtime_error("not supported feature.");
+                }
+                if (idx3 < 0 || idx3 > size1 - 1)
+                {
+                    //
+                    throw std::runtime_error("not supported feature.");
+                }
+#endif
+
+                TriangleIndexData tid = {idx1, idx2, idx3};
+
+                triangles.push_back(tid);
+            }
+            void commit()
+            {
+
+                // calculate normal
+                int size2 = triangles.size();
+
+                for (int i = 0; i < size2; i++)
+                {
+                    Vertex &v1 = vertices[triangles[i].v1];
+                    Vertex &v2 = vertices[triangles[i].v2];
+                    Vertex &v3 = vertices[triangles[i].v3];
+
+                    Vector3 p1 = v1.position;
+                    Vector3 p2 = v2.position;
+                    Vector3 p3 = v3.position;
+
+                    Vector4 plane = Math::calculateFaceNormalWithoutNormalize(p1, p2, p3);
+                    Vector3 norm(plane.x, plane.y, plane.z);
+                    norm.normalise();
+                    v1.addNormal(norm);
+                    v2.addNormal(norm);
+                    v3.addNormal(norm);
+                }
+
+                int size1 = vertices.size();
+                // flush data
+                for (int i = 0; i < size1; i++)
+                {
+                    obj->position(vertices[i].position);
+
+                    if (vertices[i].isNormalInit)
+                    {
+                        obj->normal(vertices[i].normal);
+                    }
+
+                    obj->colour(vertices[i].colour);
+                }
+
+                // flush index
+                for (int i = 0; i < size2; i++)
+                {
+                    obj->triangle(triangles[i].v1 + baseIndex, triangles[i].v2 + baseIndex, triangles[i].v3 + baseIndex);
+                }
+                triangles.clear();
+                vertices.clear();
+                resetBaseIndex();
+            }
+        };
+
         class SpiderNet
         {
         public:
             struct PointVisit
             {
-                ManualObject *obj;
+                AutoNormManualObject *obj;
                 ColourValue color;
                 Cell::Instance *cell;
                 Vector2 origin;
-                bool useDefaultNorm = true;
-                Vector3 defaultNorm;
-                Vector3 norm;
 
                 int layer;
                 int layerSize;
                 int preLayerSize;
-                int totalLayer = 2; // settings global
-                int topLayer = 2;
-                int botLayer = 0;
+                int totalLayer = FG_SPIDER_TOTAL_LAYER; // settings global
+                int topLayer = FG_SPIDER_TOP_LAYER;
+                int botLayer = FG_SPIDER_BOTTOM_LAYER;
                 // to build the mesh, this context alive on the whole building operation.
                 // so it visits each cell and each points of cells.
                 int idx; // point index
@@ -108,16 +246,9 @@ namespace fog
                 void operator()(int pIdx, Vector2 &pointOnCircle)
                 {
                     Vector2 pointOnLayer = pointOnCircle * ((float)layer / (float)totalLayer);
-                    Vector3 *pNom = useDefaultNorm ? nullptr : &norm;
-                    Vector3 pos = cell->node->to3D(origin, pointOnLayer, pNom);
-                    if (pNom == nullptr)
-                    {
-                        pNom = &defaultNorm;
-                    }
+                    Vector3 pos = cell->node->to3D(origin, pointOnLayer, nullptr);
+
                     obj->position(pos);
-
-                    obj->normal(*pNom);
-
                     obj->colour(color);
 
                     //
@@ -161,6 +292,7 @@ namespace fog
             PointVisit visitPoint;
             bool useDefaultNorm = true;
             Vector3 defaultNorm = Vector3::UNIT_Y;
+            AutoNormManualObject objProxy;
 
             SpiderNet(ManualObject *obj) : obj(obj) {}
             void begin(std::string material)
@@ -169,10 +301,10 @@ namespace fog
                 obj->begin(material, Ogre::RenderOperation::OT_TRIANGLE_LIST);
                 baseIndex = obj->getCurrentVertexCount();
                 //
-                visitPoint.obj = obj;
-                visitPoint.useDefaultNorm = useDefaultNorm;
-                visitPoint.defaultNorm = defaultNorm;
-        
+                visitPoint.obj = &objProxy;
+
+                objProxy.begin(obj);
+
                 visitPoint.idx = baseIndex;
             }
 
@@ -192,6 +324,7 @@ namespace fog
 
                     Cell::forEachPointOnCircle(visitPoint.layerSize, 0.0f, visitPoint);
                 }
+                objProxy.commit();
             }
 
             int layerSize(int layer)
