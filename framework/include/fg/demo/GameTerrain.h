@@ -12,6 +12,7 @@
 #include <OgreShaderGenerator.h>
 #include "fg/Ground.h"
 #include "fg/Terrains.h"
+#include "fg/util/OgreCode.h"
 namespace fog
 {
     using namespace Ogre;
@@ -25,7 +26,7 @@ namespace fog
     //- Do not delete the pointer by shared pointer.
     //- We need to detroy it before app closing.
 
-    class GameTerrain : public State, public Terrains
+    class GameTerrains : public State, public Terrains
     {
         const String FFP_Transform = "FFP_Transform";
         const float flatHight = 0.0f;
@@ -47,7 +48,7 @@ namespace fog
         TerrainMaterialGeneratorA *defaultTMG = nullptr;
 
     public:
-        virtual ~GameTerrain()
+        virtual ~GameTerrains()
         {
 
             if (terrainGroup)
@@ -180,9 +181,34 @@ namespace fog
             blendMap1->update();
         }
 
-        float getHeightAtPosition(Vector3&pos) override
+        float getHeightWithNormalAtWorldPosition(Vector3 posInWld, Vector3 *norm) override
         {
-            return terrainGroup->getHeightAtWorldPosition(pos);
+            long x, y;
+            terrainGroup->convertWorldPositionToTerrainSlot(posInWld, &x, &y);
+            if (x != 0 || y != 0)
+            {
+                if (norm)
+                {
+                    *norm = Vector3(0, 1, 0);
+                }
+                return 0;
+            }
+
+            Terrain *ter = terrainGroup->getTerrain(0, 0);
+
+            int size = ter->getSize();
+
+            Vector3 posInTer;
+            ter->getTerrainPosition(posInWld, &posInTer);
+            struct HeightAtPoint
+            {
+                Terrain *ter;
+                float operator()(uint32 x, uint32 y)
+                {
+                    return ter->getHeightAtPoint(x, y);
+                }
+            } getHeightAtPoint = {ter};
+            return OgreCode::getHeightAtTerrainPosition(posInTer.x, posInTer.y, getHeightAtPoint, size, norm, true);
         }
 
         Vector3 getOrigin() override

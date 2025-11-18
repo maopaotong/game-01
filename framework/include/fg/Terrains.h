@@ -1,7 +1,6 @@
 #pragma once
 #include <Ogre.h>
 #include <OgreVector.h>
-
 namespace fog
 {
     using namespace Ogre;
@@ -11,9 +10,13 @@ namespace fog
     public:
         virtual ~Terrains() {};
 
-        virtual float getHeightAtPosition(Vector3 &pos) = 0;
+        virtual float getHeightWithNormalAtWorldPosition(Vector3 pos, Vector3 *norm) = 0;
+
+        float getHeightAtWorldPosition(Vector3 pos)
+        {
+            return getHeightWithNormalAtWorldPosition(pos, nullptr);
+        }
 
         virtual Vector3 getOrigin() = 0;
-
     };
 };

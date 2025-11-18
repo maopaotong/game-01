@@ -45,7 +45,7 @@ namespace fog
                     int layer;
                     void operator()(int pIdx, Vector2 &pointOnCircle)
                     {
-                        Vector3 pos = cell.node->to3D(origin, pointOnCircle);
+                        Vector3 pos = cell.node->to3D(origin, pointOnCircle, &nom3);
 
                         obj->position(pos);
                         obj->normal(nom3);
@@ -95,7 +95,7 @@ namespace fog
                 int layer;
                 int layerSize;
                 int preLayerSize;
-                int totalLayer = 2;//settings global
+                int totalLayer = 2; // settings global
                 int topLayer = 2;
                 int botLayer = 0;
                 // to build the mesh, this context alive on the whole building operation.
@@ -104,8 +104,8 @@ namespace fog
 
                 void operator()(int pIdx, Vector2 &pointOnCircle)
                 {
-                    Vector2 pointOnLayer = pointOnCircle * ((float)layer / (float)totalLayer);
-                    Vector3 pos = cell->node->to3D(origin, pointOnLayer);
+                    Vector2 pointOnLayer = pointOnCircle * ((float)layer / (float)totalLayer);                    
+                    Vector3 pos = cell->node->to3D(origin, pointOnLayer, nullptr);
                     obj->position(pos);
                     obj->normal(nom3);
                     obj->colour(color);

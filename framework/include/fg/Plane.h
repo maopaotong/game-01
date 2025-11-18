@@ -7,13 +7,14 @@ using namespace Ogre;
 
 namespace fog
 {
+
     struct Height
     {
         Terrains *terrains;
         Height(Terrains *terrains) : terrains(terrains) {}
-        float operator()(Vector3 &pos)
+        float operator()(Vector3 &pos, Vector3 *pNorm)
         {
-            return terrains->getHeightAtPosition(pos);
+            return terrains->getHeightWithNormalAtWorldPosition(pos, pNorm);
         }
     };
 
@@ -36,11 +37,12 @@ namespace fog
             this->origin = origin;
         }
 
-        Vector3 to3D(Vector2 point, float heightOffset = 0.0f)
+        Vector3 to3D(Vector2 point, Vector3 *norm)
         {
             Vector3 ret = Vector3(point.x, 0, -point.y);
             ret = ret + origin;
-            ret.y = height(ret) + heightOffset;
+
+            ret.y = height(ret, norm);
             return ret;
         };
 
@@ -53,7 +55,7 @@ namespace fog
 
         Vector2 to2D(Vector3 position)
         {
-            
+
             Vector2 ret = Vector2(position.x - origin.x, -(position.z - origin.z));
             return ret;
         };
@@ -74,16 +76,22 @@ namespace fog
             return ret;
         }
 
-        Vector3 to3D(Vector2 cellOrigin, Vector2 pointInCell, float heightOffset = 0.0f){
+        Vector3 to3D(Vector2 cellOrigin, Vector2 pointInCell, Vector3 *norm)
+        {
             Vector2 pointIn2D = pointInCell * this->scale + cellOrigin;
-            Vector3 positionIn3D = this->plane->to3D(pointIn2D);
+            Vector3 positionIn3D = this->plane->to3D(pointIn2D, norm);
             return positionIn3D;
         }
 
-        Vector3 to3D(Vector2 p2D, float heightOffset = 0.0f)
+        Vector3 to3D(Vector2 p2D)
         {
-            return this->plane->to3D(p2D, heightOffset);
+            return to3D(p2D, nullptr);
         }
+        Vector3 to3D(Vector2 p2D, Vector3 *norm)
+        {
+            return this->plane->to3D(p2D, norm);
+        }
+
     };
 
     struct Object2D

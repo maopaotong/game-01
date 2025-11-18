@@ -60,7 +60,7 @@ namespace fog
             this->create(sMgr, this->entity, this->sceNode);
             this->setSceneNode(sceNode);
 
-            float height = Global::Context<Terrains *>::get()->getHeightAtPosition(Vector3(0, 0, 0));
+            float height = Global::Context<Terrains *>::get()->getHeightWithNormalAtWorldPosition(Vector3(0, 0, 0), nullptr);
 
             sceNode->translate(0, height + this->actorHighOffset, 0);
         }

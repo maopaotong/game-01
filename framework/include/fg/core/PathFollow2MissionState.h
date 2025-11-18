@@ -16,7 +16,8 @@ namespace fog
         PathFollow2 *path;
 
         AnimationStateSet *aniSet;
-        float heightOffset = 0.0f;
+
+        Vector3 offset;
 
         float animateTimeSpeedFactor;
 
@@ -26,7 +27,7 @@ namespace fog
 
             this->path = path;
             this->aniSet = aniSet;
-            this->heightOffset = heightOffset;
+            this->offset = Vector3(0, heightOffset, 0);
             for (std::string name : aniNames)
             {
                 AnimationState *as = this->aniSet->getAnimationState(name);
@@ -46,7 +47,7 @@ namespace fog
         Vector3 to3D(Vector2 pointIn2D)
         {
 
-            return Global::Context<Node2D *>::get()->to3D(pointIn2D, this->heightOffset);
+            return Global::Context<Node2D *>::get()->to3D(pointIn2D) + this->offset;
         }
 
         bool frameStarted(const Ogre::FrameEvent &evt) override

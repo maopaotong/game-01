@@ -60,7 +60,7 @@ namespace fog
             // Create materials before buding mesh?
             MaterialFactory::createMaterials(core->getMaterialManager());
             //
-            GameTerrain *terrains = new GameTerrain();
+            GameTerrains *terrains = new GameTerrains();
             RenderSystem *rSys = core->getRoot()->getRenderSystem();
             Light *light = core->getLight();
             terrains->load(rSys, sceMgr, light);
