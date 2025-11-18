@@ -94,7 +94,7 @@ namespace fog
         {
             int width = 30;
             int height = 25;
-            CostMap *cm = new CostMap(60, 50);
+            CostMap *cm = new CostMap(width, height);
             std::random_device rd;
             std::mt19937 gen(rd());
 
