@@ -8,7 +8,7 @@
 #include "fg/util/ImGuiUtil.h"
 #include "UIState.h"
 #include "OptionsUI.h"
-
+#include "StatisticUI.h"
 namespace fog
 {
 
@@ -23,9 +23,10 @@ namespace fog
     protected:
         std::vector<ChildInfo> childInfos;
         Core *core;
+        CostMap *costMap;
 
     public:
-        EntryUI(UIState *pState, Core *core) : UIState(pState), core(core)
+        EntryUI(UIState *pState, Core *core, CostMap *costMap) : UIState(pState), core(core), costMap(costMap)
         {
         }
 
@@ -33,6 +34,9 @@ namespace fog
         {
 
             this->add("Options", new OptionsUI(this, core));
+            this->add("Active Actor", new ActiveTrayUI(this, core,costMap));
+            this->add("Statistic", new StatisticTrayUI(this, core,costMap));
+            
         }
         void add(std::string name, UIState *child)
         {
@@ -48,7 +52,7 @@ namespace fog
             {
                 if (ImGui::Button(ci.name.c_str()))
                 {
-                    ci.ui->setActive(true);
+                    ci.ui->changeActive();
                 }
             }
             UIState::openChildren();

@@ -12,7 +12,10 @@
 #include "fg/Event.h"
 #include "fg/Context.h"
 #include "fg/Global.h"
-
+#include "fg/MeshBuild.h"
+#define WATCH_PROPERTY(monitor, obj_ptr, member_name) \
+    (monitor).add((obj_ptr), &std::remove_pointer_t<decltype(obj_ptr)>::member_name, #member_name)
+    
 namespace fog
 {
     using namespace Ogre;
@@ -75,8 +78,8 @@ namespace fog
             return CellKey(0, 0);
         }
 
-        virtual void collectProperties(){
-            
+        virtual void collectProperties()
+        {
         }
 
         Vector3 to3D(Vector2 point)
@@ -164,7 +167,8 @@ namespace fog
             this->active = active;
             if (changed)
             {
-                Global::Context<ActorPropEC *>::get()->emit(this, std::string("active"));
+                //Global::Context<ActorPropEC *>::get()->emit(this, std::string("active"));
+                Global::Context<Event::Bus*>::get()->emit<State*,std::string&>(this, std::string("active"));
             }
         }
 

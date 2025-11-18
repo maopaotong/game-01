@@ -13,7 +13,7 @@
 #include <string>
 namespace fog
 {
-    typedef Event<Actor *, std::string &>::Center ActorPropEC;
+    typedef Event::Center<Actor *, std::string &> ActorPropEC;
 
     class Global : public Var<float>::Bag,          //
                    public Var<long>::Bag,           //
@@ -22,15 +22,12 @@ namespace fog
                    public Context<Terrains *>,      //
                    public Context<ActorPropEC *>,   //
                    public Context<Cell::Center **>, //
-                   public Context<Node2D *>        //
+                   public Context<Node2D *>   ,     //
+                   public Context<Event::Bus*>
     {
         typedef void (*FloatVarVistFunc)(const std::string name, float *vPtr, Var<float>::Range *range);
 
     public:
-        static float getTerrainHeightAtPositionWithOffset(float x, float y, float offset = 0.0f)
-        {
-
-            return 0.0f;
-        }
+        
     };
 };

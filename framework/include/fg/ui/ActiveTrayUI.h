@@ -5,23 +5,26 @@
 #include "fg/State.h"
 #include "fg/Event.h"
 #include <fmt/format.h>
+#include "UIState.h"
 namespace fog
 {
-    class ActiveTrayUI : public Listener<Actor *, std::string &>
+    class ActiveTrayUI : public Listener<State *, std::string &>, public UIState
     {
         Core *core;
         State *state = nullptr;
         CostMap *costMap;
 
     public:
-        ActiveTrayUI(Core *core, CostMap *costMap)
+        ActiveTrayUI(UIState *pState, Core *core, CostMap *costMap) : UIState(pState)
         {
             this->core = core;
             this->costMap = costMap;
-            Global::Context<ActorPropEC *>::get()->addListener(this);
+            // Global::Context<ActorPropEC *>::get()->addListener(this);
+
+            Global::Context<Event::Bus *>::get()->subscribe<State *, std::string &>(this);
         }
 
-        bool onEvent(Actor *a, std::string &pName) override
+        bool onEvent(State *a, std::string &pName) override
         {
             if (pName == "active")
             {
@@ -40,7 +43,7 @@ namespace fog
             return true;
         }
 
-        bool Open()
+        bool open() override
         {
             if (!ImGui::Begin("Active Tray"))
             {
@@ -53,15 +56,14 @@ namespace fog
                 CellKey ck = state->getDestinationCell();
 
                 Vector2 pos2D = CellUtil::calculateCenter(ck.first, ck.second, costMap);
-                Vector3 pos3D = Ground::Transfer::to3D(pos2D, Global::getTerrainHeightAtPositionWithOffset);
-                ImGui::Text(fmt::format("DistinationCell:[{},{}]({},{},{})", ck.first, ck.second, pos3D.x, pos3D.y, pos3D.z).c_str());
+                // Vector3 pos3D = Ground::Transfer::to3D(pos2D, Global::getTerrainHeightAtPositionWithOffset);
+                // ImGui::Text(fmt::format("DistinationCell:[{},{}]({},{},{})", ck.first, ck.second, pos3D.x, pos3D.y, pos3D.z).c_str());
             }
             else
             {
                 ImGui::Text("No Active State");
                 if (ImGui::Button("Active actor"))
                 {
-                    
                 }
             }
 

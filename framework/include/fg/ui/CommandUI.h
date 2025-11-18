@@ -43,8 +43,8 @@ namespace fog
             }
             if (ImGui::Button("Test:Ground"))
             {
-                std::vector<Vector3> row = Ground::calculateVertices3D(cellX, cellY, costMap, CostMap::hexSize, 1.0f, Global::getTerrainHeightAtPositionWithOffset, heightOffset);
-                vertices = {row};
+                //std::vector<Vector3> row = Ground::calculateVertices3D(cellX, cellY, costMap, CostMap::hexSize, 1.0f, Global::getTerrainHeightAtPositionWithOffset, heightOffset);
+               // vertices = {row};
             }
 
             if (ImGui::Button("Clear"))

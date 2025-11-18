@@ -34,7 +34,11 @@ namespace fog
         UIState(UIState *pState) : pState(pState)
         {
         }
-        virtual void init(){}
+        virtual void init() {}
+        void changeActive()
+        {
+            this->setActive(!this->active);
+        }
         void setActive(bool active)
         {
             this->active = active;
@@ -49,7 +53,8 @@ namespace fog
             children.push_back(child);
         }
 
-        virtual bool open() {
+        virtual bool open()
+        {
             return true;
         };
     };

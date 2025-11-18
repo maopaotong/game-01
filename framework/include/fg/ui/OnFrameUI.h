@@ -45,12 +45,13 @@ namespace fog
             this->sceMgr = core->getSceneManager();
 
             //
-            this->activeTrayUI = new ActiveTrayUI(core, costMap);
+            //this->activeTrayUI = new ActiveTrayUI(core, costMap);
+
             this->mainUI = new MainUI(core, costMap);
             this->sceneNodeUI = new SceneNodeUI(core);
             this->cmdUI = new CommandUI(core, costMap);
 
-            this->entryUI = new EntryUI(nullptr, core);
+            this->entryUI = new EntryUI(nullptr, core,costMap);
             this->entryUI->init();
         }
 

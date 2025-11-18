@@ -15,6 +15,11 @@ namespace fog
     ActorPropEC *Global::Context<ActorPropEC *>::default_ = nullptr;
     template <>
     ActorPropEC *Global::Context<ActorPropEC *>::ctxObj = new ActorPropEC();
+//
+    template <>
+    Event::Bus *Global::Context<Event::Bus *>::default_ = nullptr;
+    template <>
+    Event::Bus *Global::Context<Event::Bus *>::ctxObj = new Event::Bus();
 
     //
     template <>
@@ -27,5 +32,7 @@ namespace fog
     Cell::Center *Global::Context<Cell::Center *>::default_ = nullptr;
     template <>
     Cell::Center *Global::Context<Cell::Center *>::ctxObj = nullptr;
+    //
+    
 
 };
