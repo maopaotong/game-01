@@ -27,6 +27,7 @@ namespace fog
         std::string material = MaterialNames::materialNameInUse;
 
     public:
+    
         CellStateBase(Core *core)
         {
             Ogre::SceneManager *sceneMgr = core->getSceneManager();

@@ -17,7 +17,7 @@ namespace fog
     {
         
     public:
-        BootUI(Core *core, CostMap *costMap) : UIState(pState, "Boot")
+        BootUI(Core *core, CostMap *costMap) : UIState("Boot")
         {
             this->active = true;
         }

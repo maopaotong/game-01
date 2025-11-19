@@ -99,7 +99,7 @@ namespace fog
 
         bool findCell(Vector3 aPos3, Cell::Instance &cell)
         {
-            return Context<Cell::Center *>::get()->findCellByPoint(aPos3, cell);
+            return Context<Cell::Center *>::get()->findCellByWorldPosiion(aPos3, cell);
         }
 
         SceneNode *getSceneNode()

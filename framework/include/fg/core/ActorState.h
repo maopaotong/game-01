@@ -46,7 +46,7 @@ namespace fog
             this->actorHighVptr = core->getGlobal()->Var<float>::Bag::createBindVptr(".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
             this->actorHighOffset = *this->actorHighVptr / 2.0f * *actorScaleVptr;
 
-            pathState = new PathState(costMap, core);
+            pathState = new PathState(core);
             pathState->init();
 
             this->setPickable(this);
@@ -135,7 +135,7 @@ namespace fog
             Vector2 actorPosIn2D = root2D->to2D(aPos3);
             Cell::Instance cell;
             // bool hitCell = CellUtil::findCellByPoint(costMap, aPos2, aCellKey);
-            bool hitCell = Context<Cell::Center *>::get()->findCellByPoint(aPos3, cell);
+            bool hitCell = Context<Cell::Center *>::get()->findCellByWorldPosiion(aPos3, cell);
             if (hitCell)
             {
                 CellKey aCellKey = cell.cKey;

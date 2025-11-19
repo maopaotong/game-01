@@ -20,6 +20,7 @@
 #include "fg/core/SimpleInputState.h"
 #include "fg/core/MouseClickPicker.h"
 #include "fg/Terrains.h"
+#include "fg/demo/ActorSelectControl.h"
 
 namespace fog{
 using namespace Ogre;
@@ -54,11 +55,17 @@ public:
         root->addFrameListener(cameraState);
 
         markStateControls[MarkType::ACTIVE] = new CellMarkStateControl(costMap, core, MarkType::ACTIVE);
-        ActorStateControl *actor = new ActorStateControl(costMap, core);
-        actor->init(core);
-        this->addChild(actor);
+        ActorStateControl *actor1 = new ActorStateControl(costMap, core);
+        actor1->init(core);
+        root->addFrameListener(actor1);
+        
 
-        root->addFrameListener(actor);
+        this->addChild(actor1);
+        ActorSelectControl *actor2 = new ActorSelectControl(costMap, core);
+        actor2->init();
+        actor1->addChild(actor2);
+        root->addFrameListener(actor2);
+
         MainInputListener *keyHandler = new MainInputListener(core);
         core->getAppContext()->addInputListener(keyHandler);
         core->getAppContext()->addInputListener(inputState);

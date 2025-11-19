@@ -19,13 +19,12 @@ namespace fog
     class PathState : public CellStateBase
     {
         std::vector<Ogre::Vector2> currentPath;
-        CostMap *costMap;
         CellKey start = CellKey(-1, -1);
         CellKey end = CellKey(-1, -1);
         std::unordered_set<std::pair<int, int>, PairHash> pathSet;
 
     public:
-        PathState(CostMap *costMap, Core *core) : CellStateBase(core), costMap(costMap)
+        PathState(Core *core) : CellStateBase(core)
         {
         }
 

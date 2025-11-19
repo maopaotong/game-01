@@ -131,7 +131,10 @@ namespace fog
                 Vector3 pos3D = root->to3D(pos2D);
                 root->plane->setOrigin(Vector3(-pos3D.x, 0.0f, -pos3D.z));
             }
-
+            Cell::Instance getAnyCell()
+            {
+                return Cell::Instance(0, 0, root);
+            }
             Node2D *getRoot2D()
             {
                 return root;
@@ -173,7 +176,7 @@ namespace fog
                 return Cell::Instance(CellKey(static_cast<int>(nom.x), static_cast<int>(nom.y)), root);
             }
 
-            bool findCellByPoint(Vector3 positionIn3D, Cell::Instance &cell)
+            bool findCellByWorldPosiion(Vector3 positionIn3D, Cell::Instance &cell)
             {
                 return forCellByPoint(positionIn3D, [&cell](Cell::Instance &cell2)
                                       { cell = cell2; });
