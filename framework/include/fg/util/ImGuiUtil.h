@@ -15,7 +15,6 @@ namespace fog
         {
             ImGui::Text(fmt::format("({:.1f},{:.1f},{:.1f})", pos.x, pos.y, pos.z).c_str());
         };
-        
 
         template <typename... Args>
         static void TextFormat(const std::string str, Args... args)
@@ -39,6 +38,25 @@ namespace fog
             {
                 clickFunc(args);
             }
+        }
+
+        static bool MyToggleButton(const char *label, bool *v)
+        {
+            ImVec4 green = ImVec4(0.2f, 0.6f, 0.2f, 1.0f);
+            if (*v)
+            {
+
+                ImGui::PushStyleColor(ImGuiCol_Button, green);
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, green);
+            }
+            bool clicked = ImGui::Button(label);
+            if (*v)
+            {
+
+                ImGui::PopStyleColor();
+                ImGui::PopStyleColor();
+            }
+            return clicked;
         }
     };
 }; // end of namespace

@@ -34,8 +34,16 @@ namespace fog
         UIState(UIState *pState) : pState(pState)
         {
         }
+        virtual ~UIState()
+        {
+        }
+        UIState(UIState &&) = delete;
+        UIState(UIState &) = delete;
+        UIState &operator=(UIState &&) = delete;
+        UIState &operator=(UIState &) = delete;
+
         virtual void init() {}
-        
+
         void changeActive()
         {
             this->setActive(!this->active);
@@ -43,6 +51,10 @@ namespace fog
         void setActive(bool active)
         {
             this->active = active;
+        }
+        bool *activePtr()
+        {
+            return &this->active;
         }
         bool isActive()
         {

@@ -191,6 +191,12 @@ namespace fog
                     return Property::Ref<T>(); // empty ref.
                 }
             }
+
+            template <typename F>
+            void forEach(F &&func)
+            {
+                options.forEach(std::forward<F>(func));
+            }
         };
     };
 }; //

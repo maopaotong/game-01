@@ -8,6 +8,7 @@
 #include "fg/util/ImGuiUtil.h"
 #include "UIState.h"
 #include "OptionsUI.h"
+#include "PropertyRefsUI.h"
 #include "StatisticUI.h"
 namespace fog
 {
@@ -34,8 +35,10 @@ namespace fog
         {
 
             this->add("Options", new OptionsUI(this, core));
+            this->add("PropertyRefs", new PropertyRefsUI(this, core));
             this->add("Active Actor", new ActiveTrayUI(this, core,costMap));
             this->add("Statistic", new StatisticTrayUI(this, core,costMap));
+            
             
         }
         void add(std::string name, UIState *child)
@@ -50,7 +53,8 @@ namespace fog
             UIState::open();
             for (auto ci : childInfos)
             {
-                if (ImGui::Button(ci.name.c_str()))
+                //if (ImGui::Button(ci.name.c_str()))
+                if (ImGuiUtil::MyToggleButton(ci.name.c_str(), ci.ui->activePtr()))
                 {
                     ci.ui->changeActive();
                 }
