@@ -13,9 +13,10 @@ namespace fog
         Core *core;
         State *state = nullptr;
         CostMap *costMap;
+        Property::Ref<Vector3> actorPosition;
 
     public:
-        ActiveTrayUI( Core *core, CostMap *costMap) : UIState("ActiveActor")
+        ActiveTrayUI(Core *core, CostMap *costMap) : UIState("ActiveActor")
         {
             this->core = core;
             this->costMap = costMap;
@@ -23,6 +24,11 @@ namespace fog
 
             Context<Event::Bus *>::get()->subscribe<State *, std::string &>([this](State *s, std::string &ss)
                                                                             { this->onEvent(s, ss); });
+        }
+        void init() override
+        {
+            //actorPosition = this->getProperty<Vector3>("actor.position");
+            UIState::init();
         }
 
         bool onEvent(State *a, std::string &pName) override
@@ -54,7 +60,8 @@ namespace fog
 
                 Vector2 pos2D = CellUtil::calculateCenter(ck.first, ck.second, costMap);
                 // Vector3 pos3D = Ground::Transfer::to3D(pos2D, Global::getTerrainHeightAtPositionWithOffset);
-                // ImGui::Text(fmt::format("DistinationCell:[{},{}]({},{},{})", ck.first, ck.second, pos3D.x, pos3D.y, pos3D.z).c_str());
+
+                ImGuiUtil::Text(actorPosition);
             }
             else
             {

@@ -29,7 +29,12 @@ namespace fog
                 }
             }
         };
-
+        template <typename T>
+        Property::Ref<T> getProperty(std::string name)
+        {
+            return Context<Property::Bag *>::get()->getProperty<T>(name);
+        }
+        
     public:
         UIState(std::string name) : name(name)
         {

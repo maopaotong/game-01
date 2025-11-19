@@ -70,6 +70,13 @@ namespace fog
             return Context<Property::Bag *>::get()->createProperty<T>(name, defaultValue);
         }
 
+        template <typename T>
+        Property::Ref<T> getProperty(std::string name)
+        {
+            return Context<Property::Bag *>::get()->getProperty<T>(name);
+        }
+        
+
     public:
         State()
         {

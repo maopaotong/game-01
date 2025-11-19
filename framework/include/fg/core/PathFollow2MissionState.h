@@ -8,6 +8,7 @@
 
 namespace fog
 {
+     using Vector3Ref = Property::Ref<Vector3>;
     /**
      * Move a node to a destination.
      */
@@ -20,6 +21,7 @@ namespace fog
         Vector3 offset;
 
         float animateTimeSpeedFactor;
+        Vector3Ref actorPosition;
 
     public:
         PathFollow2MissionState(Global *global, PathFollow2 *path, AnimationStateSet *aniSet, std::vector<std::string> &aniNames, float aniSpeed, float heightOffset = 0.0f) : animateTimeSpeedFactor(aniSpeed)
@@ -37,6 +39,10 @@ namespace fog
             }
             //
             this->setFrameListener(this);
+        }
+        void init()override{
+            actorPosition = this->getProperty<Vector3>("actor.position");
+
         }
 
         PathFollow2 *getPath()
@@ -86,6 +92,7 @@ namespace fog
                     Quaternion orientation = Ground::getRotationTo(direction2D);
                     pNode->setOrientation(orientation);
 
+                    actorPosition = pNode->getPosition();
                     // pNode->lookAt();
 
                     // pNode->setOrientation(Quaternion(Degree(90), Vector3::UNIT_Y));

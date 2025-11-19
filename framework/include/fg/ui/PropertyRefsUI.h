@@ -17,34 +17,48 @@ namespace fog
         Core *core;
 
     public:
-        PropertyRefsUI( Core *core) : UIState("PropertyRefs")
+        PropertyRefsUI(Core *core) : UIState("PropertyRefs")
         {
             this->core = core;
         }
 
         void doOpen() override
         {
-            
+
             Context<Property::Bag *>::get()->forEach([](const std::string &name, const Options::Option *option)
                                                      {
+                                                         ImGui::Text(option->name.c_str());
+                                                         ImGui::SameLine();
+                                                         if (option->isType<bool>())
+                                                         {
 
-                                      if (option->isType<bool>())
-                                      {
-                                          bool &valuePtr = option->getValueRef<bool>();
+                                                             bool &valuePtr = option->getValueRef<bool>();
 
-                                              if (ImGui::Checkbox(option->name.c_str(), &valuePtr))
-                                              {
-                                                  // ignore bool change.
-                                              }
-                                          
+                                                             if (ImGui::Checkbox("", &valuePtr))
+                                                             {
+                                                                 // ignore bool change.
+                                                             }
+                                                         }
+                                                         else if (option->isType<std::string>())
+                                                         {
 
-                                      }else if(option->isType<std::string>()){
+                                                             std::string &valuePtr = option->getValueRef<std::string>();
 
-                                        std::string &valuePtr = option->getValueRef<std::string>();
+                                                             ImGui::Text((valuePtr).c_str());
+                                                         }
+                                                         else if (option->isType<Vector3>())
+                                                         {
 
-                                        ImGui::Text((valuePtr).c_str());
-                                      
-                                        } });
+                                                             Vector3 &valuePtr = option->getValueRef<Vector3>();
+
+                                                             ImGuiUtil::Text(valuePtr);
+                                                         }
+                                                         else
+                                                         {
+                                                             ImGui::Text("TODO");
+                                                         }
+                                                         //
+                                                     });
 
             //
             if (ImGui::Button("Apply"))
@@ -58,13 +72,12 @@ namespace fog
             {
                 this->active = false;
             }
-
         }
 
         void onApply()
         {
             //
-             core->getGame()->apply(nullptr);
+            core->getGame()->apply(nullptr);
         }
     };
 

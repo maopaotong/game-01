@@ -44,6 +44,7 @@ namespace fog
         }
         void add(UIState *child)
         {
+            child->init();
             UIState::add(child);
             ChildInfo ci = {child, child->getName()};
             childInfos.push_back(ci);

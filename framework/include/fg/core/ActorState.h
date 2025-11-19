@@ -15,7 +15,7 @@
 namespace fog
 {
     using namespace Ogre;
-
+    using Vector3Ref = Property::Ref<Vector3>;
     class ActorState : public State, public Pickable, public Ogre::FrameListener, public Movable
     {
 
@@ -34,6 +34,8 @@ namespace fog
         float *actorScaleVptr;
         float *actorHighVptr;
         float actorHighOffset = 0.0f;
+
+        Vector3Ref position;
 
     public:
         ActorState(CostMap *costMap, Core *core)
@@ -56,13 +58,15 @@ namespace fog
 
         void init(Core *core)
         {
+            
             SceneManager *sMgr = core->getSceneManager();
             this->create(sMgr, this->entity, this->sceNode);
             this->setSceneNode(sceNode);
-
+            
             float height = Context<Terrains *>::get()->getHeightWithNormalAtWorldPosition(Vector3(0, 0, 0), nullptr);
-
-            sceNode->translate(0, height + this->actorHighOffset, 0);
+            
+            this->position = this->createProperty("actor.position", Vector3(0, height + this->actorHighOffset, 0));
+            sceNode->translate(this->position);
         }
 
         virtual void create(SceneManager *sMgr, Entity *&entity, SceneNode *&node) = 0;
@@ -157,6 +161,7 @@ namespace fog
                 float aniSpeed = this->global->Var<float>::Bag::getVarVal(".aniSpeed", 1.0f);
                 // new child state.
                 PathFollow2MissionState *missionState = new PathFollow2MissionState(global, path, anisSet, aniNames, aniSpeed, this->actorHighOffset); //
+                missionState->init();
                 // delete missionState;
 
                 if (this->mission)

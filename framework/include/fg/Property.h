@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 #include <type_traits>
+#include <functional>
 #include "Options.h"
 
 namespace fog
@@ -99,9 +100,16 @@ namespace fog
                 return *this;
             }
 
-            Ref &operator=(T &ref)
+            Ref &operator=(T &&value)
             {
-                return bindOrSet(ref);
+                assertBind() = value;
+                return *this;
+            }
+
+            Ref &operator=(const T value)
+            {
+                assertBind() = value;
+                return *this;
             }
 
             Ref &bindOrSet(T &ref)
@@ -115,12 +123,6 @@ namespace fog
                 {
                     doSet(ref);
                 }
-                return *this;
-            }
-
-            Ref &operator=(T &&value)
-            {
-                assertBind() = value;
                 return *this;
             }
 
@@ -163,6 +165,7 @@ namespace fog
         class Bag
         {
             Options options;
+            std::unordered_map<std::string, std::vector<std::function<void(Options::Option*)>>> createListener;
 
         public:
             template <typename T>
@@ -179,19 +182,40 @@ namespace fog
             Property::Ref<T> tryCreateProperty(std::string name, T defaultValue)
             {
                 Options::Option *opt = options.tryAdd<T>(name, defaultValue);
+                return toPropertyRef<T>(opt);
+            }
+
+            template <typename T>
+            Property::Ref<T> toPropertyRef(Options::Option *opt)
+            {
                 if (opt)
                 {
-
                     T &ref = opt->getValueRef<T>();
-
                     return Property::Ref<T>(ref);
                 }
                 else
                 {
+                    
                     return Property::Ref<T>(); // empty ref.
                 }
             }
 
+            template <typename T>
+            Property::Ref<T> getProperty(std::string name, bool requiredNow = true)
+            {
+                Options::Option *opt = options.getOption(name);
+                if (!opt)
+                {
+                    if (requiredNow)
+                    {
+                        throw std::runtime_error("property ref not exists by name:" + name);
+                    }
+
+
+                }
+
+                return toPropertyRef<T>(opt);
+            }
             template <typename F>
             void forEach(F &&func)
             {

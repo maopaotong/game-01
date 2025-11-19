@@ -62,7 +62,11 @@ namespace fog
 
         Option *getOption(std::string name)
         {
-            return options[name].get();
+            auto &it = options.find(name);
+            if(it==options.end()){
+                return nullptr;
+            } 
+            return it->second.get();
         }
 
         template <typename T>

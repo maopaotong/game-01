@@ -30,26 +30,31 @@ int main()
         std::cout << "=========================================\n\n";
 
         // Initialize Ogre application context
-        Game01 * game01 = new Game01();
+        Game01 *game01 = new Game01();
 
-        auto app = std::make_unique<SimpleApp>((Game*)game01);
+        auto app = std::make_unique<SimpleApp>((Game *)game01);
         app->add(game01);
         app->setup();
         app->startRendering();
         app->close();
     }
-    catch(Ogre::Exception& e){
-        std::cerr << "Error: " << e.what() << "\n";
+    catch (const Ogre::Exception &e)
+    {
+        std::cerr << "Ogre::Exception: " << e.what() << "\n";
         return 1;
+    }
+    catch (const std::runtime_error &e)
+    {
+        std::cerr << "std::runtime_error: " << e.what() << "\n";        
     }
     catch (const std::exception &e)
     {
-        std::cerr << "Error: " << e.what() << "\n";
+        std::cerr << "std::exception: " << e.what() << "\n";
         return 1;
     }
-    catch (const char* &e)
+    catch (char *e)
     {
-        std::cerr << "Error: " << e << "\n";
+        std::cerr << "char*: " << e << "\n";
         return 1;
     }
     catch (...)

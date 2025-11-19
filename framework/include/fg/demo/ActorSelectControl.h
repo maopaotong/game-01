@@ -10,12 +10,15 @@
 namespace fog
 {
     using namespace Ogre;
+    using Vector3Ref = Property::Ref<Vector3>;
 
     class ActorSelectControl : public CellStateBase, public Ogre::FrameListener
     {
         Cell::Instance cell;
 
         bool active = false;
+        Vector3Ref actorPosition;
+        Vector3 prePosition;
 
     public:
         ActorSelectControl(CostMap *costMap, Core *core) : CellStateBase(core)
@@ -26,6 +29,8 @@ namespace fog
         {
             Cell::Center *cc = Context<Cell::Center *>::get();
             cell = cc->getAnyCell();
+            actorPosition = this->getProperty<Vector3>("actor.position");
+            //prePosition = actorPosition;
             CellStateBase::init();
         }
 
@@ -71,16 +76,21 @@ namespace fog
 
                 Cell::Center *cc = Context<Cell::Center *>::get();
                 Cell::Instance cell2;
-                Vector3 position = this->parent->getSceneNode()->getPosition();
-
-                if (cc->findCellByWorldPosiion(position, cell2))
+                //Vector3 position = this->parent->getSceneNode()->getPosition();
+                
+                if (prePosition.distance(actorPosition) > CostMap::hexSize)
                 {
-                }
 
-                if (this->cell.cKey != cell2.cKey)
-                {
-                    this->cell = cell2;
-                    this->rebuildMesh(); // todo move the medh build to input event stage, not in frame event?
+                    if (cc->findCellByWorldPosiion(actorPosition, cell2))
+                    {
+                    }
+
+                    if (this->cell.cKey != cell2.cKey)
+                    {
+                        this->cell = cell2;
+                        this->rebuildMesh(); // todo move the medh build to input event stage, not in frame event?
+                    }
+                    prePosition = actorPosition;
                 }
             }
 
