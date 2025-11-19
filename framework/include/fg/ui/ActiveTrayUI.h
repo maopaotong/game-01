@@ -15,7 +15,7 @@ namespace fog
         CostMap *costMap;
 
     public:
-        ActiveTrayUI(UIState *pState, Core *core, CostMap *costMap) : UIState(pState, "ActiveActor")
+        ActiveTrayUI( Core *core, CostMap *costMap) : UIState("ActiveActor")
         {
             this->core = core;
             this->costMap = costMap;

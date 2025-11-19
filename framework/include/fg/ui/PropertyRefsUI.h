@@ -17,7 +17,7 @@ namespace fog
         Core *core;
 
     public:
-        PropertyRefsUI(UIState *pState, Core *core) : UIState(pState,"PropertyRefs")
+        PropertyRefsUI( Core *core) : UIState("PropertyRefs")
         {
             this->core = core;
         }

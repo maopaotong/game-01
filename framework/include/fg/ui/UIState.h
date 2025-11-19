@@ -13,7 +13,7 @@ namespace fog
     class UIState
     {
     protected:
-        UIState *pState;
+        UIState *pState = nullptr;
         std::vector<UIState *> children;
         bool active = false;
         std::string name;
@@ -31,7 +31,7 @@ namespace fog
         };
 
     public:
-        UIState(UIState *pState, std::string name) : pState(pState), name(name)
+        UIState(std::string name) : name(name)
         {
         }
         virtual ~UIState()
@@ -65,17 +65,29 @@ namespace fog
         }
         void add(UIState *child)
         {
-
+            child->pState = this;
             children.push_back(child);
         }
 
+        std::string getFullName()
+        {
+            if (this->pState)
+            {
+                return this->pState->getFullName() + "." + name;
+            }
+            else
+            {
+                return name;
+            }
+        }
         virtual bool open()
         {
             if (!this->active)
             {
                 return false;
             }
-            if (!ImGui::Begin(name.c_str(), &this->active))
+            std::string fName = this->getFullName();
+            if (!ImGui::Begin(fName.c_str(), &this->active))
             {
                 return false;
             }

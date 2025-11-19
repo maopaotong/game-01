@@ -10,6 +10,7 @@
 #include "OptionsUI.h"
 #include "PropertyRefsUI.h"
 #include "StatisticUI.h"
+#include "QuitUI.h"
 namespace fog
 {
 
@@ -27,7 +28,7 @@ namespace fog
         CostMap *costMap;
 
     public:
-        EntryUI(UIState *pState, Core *core, CostMap *costMap) : UIState(pState, "EntryUI"), core(core), costMap(costMap)
+        EntryUI(Core *core, CostMap *costMap) : UIState("EntryUI"), core(core), costMap(costMap)
         {
             this->active = true;
         }
@@ -35,10 +36,11 @@ namespace fog
         void init() override
         {
 
-            this->add(new OptionsUI(this, core));
-            this->add(new PropertyRefsUI(this, core));
-            this->add(new ActiveTrayUI(this, core, costMap));
-            this->add(new StatisticTrayUI(this, core, costMap));
+            this->add(new OptionsUI(core));
+            this->add(new PropertyRefsUI(core));
+            this->add(new ActiveTrayUI(core, costMap));
+            this->add(new StatisticTrayUI(core, costMap));
+            this->add(new QuitUI(core,costMap));
         }
         void add(UIState *child)
         {

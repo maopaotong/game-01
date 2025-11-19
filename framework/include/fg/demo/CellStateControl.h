@@ -38,10 +38,10 @@ namespace fog
         }
         void init() override
         {
-            this->showCost0 = createProperty("showCost0", false);
+            this->showCost0 = createProperty("showCost0", true);
             this->showCost1 = createProperty("showCost1", false);
-            this->showCost2 = createProperty("showCost2", false);
-            this->showCost3 = createProperty("showCost3", false);
+            this->showCost2 = createProperty("showCost2", true);
+            this->showCost3 = createProperty("showCost3", true);
             CellStateBase::init();
         }
         void rebuildMesh() override

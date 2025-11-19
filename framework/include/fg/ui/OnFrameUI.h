@@ -51,7 +51,7 @@ namespace fog
             this->sceneNodeUI = new SceneNodeUI(core);
             this->cmdUI = new CommandUI(core, costMap);
             
-            this->entryUI = new EntryUI(nullptr, core,costMap);
+            this->entryUI = new EntryUI(core,costMap);
             this->entryUI->init();
         }
 

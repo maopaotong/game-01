@@ -17,7 +17,7 @@ namespace fog
         Options options;
 
     public:
-        OptionsUI(UIState *pState, Core *core) : UIState(pState, "Options")
+        OptionsUI(Core *core) : UIState("Options")
         {
             this->core = core;
             options.add("Show-plain-cell?", false);
