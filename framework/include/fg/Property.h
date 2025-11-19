@@ -19,12 +19,10 @@ namespace fog
         template <typename T>
         class Ref
         {
+            std::string name;
             T *ptr_ = nullptr;
 
-            void doSet(T value)
-            {
-                *ptr_ = value;
-            }
+            Listener<Ref<T> &> *listener = nullptr;
 
             void doBind(T &ref)
             {
@@ -33,6 +31,19 @@ namespace fog
             void doBind(T *ptr)
             {
                 ptr_ = ptr;
+                if (listener)
+                {
+                    listener->onEvent(*this);
+                }
+            }
+
+            void doSet(T value)
+            {
+                *ptr_ = value;
+                if (listener)
+                {
+                    listener->onEvent(*this);
+                }
             }
 
         public:
@@ -45,14 +56,13 @@ namespace fog
             {
                 ptr_ = std::addressof(ref);
             };
-            Ref(const Ref &other)
+            Ref(const Ref &other) : ptr_(other.ptr_) {};
+            Ref(Ref &&other) : ptr_(other.ptr_) {};
+
+            std::string getName()
             {
-                ptr_ = other->ptr_;
-            };
-            Ref(Ref &&other)
-            {
-                ptr_ = other->ptr_;
-            };
+                return name;
+            }
 
             void set(T value)
             {
@@ -153,68 +163,34 @@ namespace fog
         class Bag
         {
             Options options;
+
+        public:
             template <typename T>
-            std::reference_wrapper<T> createProperty(std::string name, T defaultValue)
+            Property::Ref<T> createProperty(std::string name, T defaultValue)
             {
-                Option *opt = options.add<T>(name, defaultValue);
-            }
-        };
-
-    protected:
-        struct BaseWatcher
-        {
-            virtual ~BaseWatcher() = default;
-            virtual void checkAndEmit() = 0;
-        };
-        template <typename T, typename U>
-        class Watcher : public BaseWatcher
-        {
-            T *obj_;
-            U T::*member_;
-            U lastValue_;
-            bool hasLast_ = false;
-
-        public:
-            Watcher(T *obj, U T::*mem)
-                : obj_(obj), member_(mem) {}
-
-            void checkAndEmit() override
-            {
-
-                const U &currentValue = obj_->*member_;
-
-                if (!hasLast_ || currentValue != lastValue_)
+                Property::Ref<T> ref = tryCreateProperty<T>(name, defaultValue);
+                if (ref.empty())
                 {
-                    lastValue_ = currentValue;
-                    hasLast_ = true;
-                    EventBus::emit(currentValue); // emit(U)
+                    throw std::runtime_error("cannot create property ref with name:" + name);
+                }
+                return ref;
+            }
+            template <typename T>
+            Property::Ref<T> tryCreateProperty(std::string name, T defaultValue)
+            {
+                Options::Option *opt = options.tryAdd<T>(name, defaultValue);
+                if (opt)
+                {
+
+                    T &ref = opt->getValueRef<T>();
+
+                    return Property::Ref<T>(ref);
+                }
+                else
+                {
+                    return Property::Ref<T>(); // empty ref.
                 }
             }
-        };
-
-    public:
-        class Monitor
-        {
-
-            std::vector<std::unique_ptr<BaseWatcher>> watchers_;
-
-        public:
-            template <typename T, typename U>
-            void add(T *obj, U T::*member)
-            {
-                watchers_.emplace_back(std::make_unique<Watcher<T, U>>(obj, member));
-            }
-
-            void refresh()
-            {
-                for (auto &w : watchers_)
-                {
-                    w->checkAndEmit();
-                }
-            }
-
-        private:
         };
     };
-
-};
+}; //

@@ -68,11 +68,28 @@ namespace fog
         template <typename T>
         Option *add(std::string name, T defaultValue)
         {
+            Option *ret = tryAdd(name, defaultValue);
 
-            std::unique_ptr<Option> optionPtr = std::make_unique<Option>(name, defaultValue);
-            //<std::unique_ptr<Option>>
-            Option *opt = optionPtr.get();
-            options[name] = std::move(optionPtr);
+            if (ret)
+            {
+                return ret;
+            }
+            throw new std::runtime_error("cannot create options with name:" + name);
+        }
+
+        template <typename T>
+        Option *tryAdd(std::string name, T defaultValue)
+        {
+            Option *opt = nullptr;
+            auto it = options.find(name);
+            if (it == options.end())
+            {
+                std::unique_ptr<Option> optionPtr = std::make_unique<Option>(name, defaultValue);
+                //<std::unique_ptr<Option>>
+                opt = optionPtr.get();
+                options[name] = std::move(optionPtr);
+            }
+
             return opt;
         }
 

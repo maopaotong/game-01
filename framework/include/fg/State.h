@@ -67,9 +67,7 @@ namespace fog
         template <typename T>
         Property::Ref<T> createProperty(std::string name, T defaultValue)
         {
-            Options::Option *opt = options.add<T>(name, defaultValue);
-            T& ref = opt->getValueRef<T>();
-            return Property::Ref<T>(ref);
+            return Context<Property::Bag *>::get()->createProperty<T>(name, defaultValue);
         }
 
     public:

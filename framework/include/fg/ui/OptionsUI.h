@@ -20,8 +20,8 @@ namespace fog
         OptionsUI(UIState *pState, Core *core) : UIState(pState)
         {
             this->core = core;
-            options.add<bool>("Show-plain-cell?", false);
-            options.add<std::string>("Video-Mode", "1024 x 768");
+            options.add("Show-plain-cell?", false);
+            options.add("Video-Mode", "1024 x 768");
         }
 
         bool open() override

@@ -65,7 +65,6 @@ public:
         core->getAppContext()->addInputListener(new MouseClickPicker(core->getGlobal(), core->getCamera(), core->getSceneManager(), core->getViewport()));
     }
     virtual void init()override{
-        this->cells->init();
     }
 
     CostMap *getCostMap()
