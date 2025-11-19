@@ -33,10 +33,10 @@ namespace fog
                 };
             }
 
-            Option(const Option &) = delete;//copy
-            Option(Option &&) = delete;//move
-            Option &operator=(const Option &) = delete;//copy assign
-            Option &operator=(Option &&) = delete;//move assign
+            Option(const Option &) = delete;            // copy
+            Option(Option &&) = delete;                 // move
+            Option &operator=(const Option &) = delete; // copy assign
+            Option &operator=(Option &&) = delete;      // move assign
 
             template <typename T>
             bool isType() const
@@ -66,12 +66,14 @@ namespace fog
         }
 
         template <typename T>
-        void add(std::string name, T defaultValue)
+        Option *add(std::string name, T defaultValue)
         {
 
             std::unique_ptr<Option> optionPtr = std::make_unique<Option>(name, defaultValue);
             //<std::unique_ptr<Option>>
+            Option *opt = optionPtr.get();
             options[name] = std::move(optionPtr);
+            return opt;
         }
 
         template <typename F>

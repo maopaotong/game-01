@@ -44,6 +44,7 @@ public:
 
         // Create frame listener for main loop
         this->cells = new CellStateControl(costMap, core);
+        this->cells->init();
         this->addChild(this->cells);
 
         this->inputState = new SimpleInputState(core->getCamera(), core->getWindow());

@@ -13,20 +13,24 @@
 #include "fg/util/CostMap.h"
 #include "fg/MeshBuild.h"
 #include "fg/VarBag.h"
+#include "fg/Property.h"
+
 namespace fog
 {
     using namespace Ogre;
+
+    typedef Property::Ref<bool> boolRef;
 
     //
     class CellStateControl : public CellStateBase
     {
     public:
         CostMap *costMap;
-        bool showCost0 = true;
-        bool showCost1 = true;
-        bool showCost2 = true;
-        bool showCost3 = true;
-        bool showOther = true;
+        boolRef showCost0;
+        boolRef showCost1;
+        boolRef showCost2;
+        boolRef showCost3;
+        boolRef showOther;
 
     public:
         CellStateControl(CostMap *costMap, Core *core) : CellStateBase(core), costMap(costMap)
@@ -34,6 +38,10 @@ namespace fog
         }
         void init() override
         {
+            this->showCost0 = createProperty<bool>("showCost0", false);
+            this->showCost1 = createProperty<bool>("showCost1", false);
+            this->showCost2 = createProperty<bool>("showCost2", false);
+            this->showCost3 = createProperty<bool>("showCost3", false);
             CellStateBase::init();
         }
         void rebuildMesh() override

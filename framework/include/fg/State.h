@@ -13,9 +13,12 @@
 #include "fg/Context.h"
 #include "fg/Global.h"
 #include "fg/MeshBuild.h"
+#include "fg/Property.h"
+#include "fg/Options.h"
+
 #define WATCH_PROPERTY(monitor, obj_ptr, member_name) \
     (monitor).add((obj_ptr), &std::remove_pointer_t<decltype(obj_ptr)>::member_name, #member_name)
-    
+
 namespace fog
 {
     using namespace Ogre;
@@ -59,6 +62,15 @@ namespace fog
         SceneNode *sceNode = nullptr;
         std::vector<State *> *children = nullptr;
         bool active = false;
+        Options options;
+
+        template <typename T>
+        Property::Ref<T> createProperty(std::string name, T defaultValue)
+        {
+            Options::Option *opt = options.add<T>(name, defaultValue);
+            T& ref = opt->getValueRef<T>();
+            return Property::Ref<T>(ref);
+        }
 
     public:
         State()
@@ -167,9 +179,9 @@ namespace fog
             this->active = active;
             if (changed)
             {
-                
-                //Global::Context<ActorPropEC *>::get()->emit(this, std::string("active"));
-                Global::Context<Event::Bus*>::get()->emit<State*,std::string&>(this, std::string("active"));
+
+                // Global::Context<ActorPropEC *>::get()->emit(this, std::string("active"));
+                Global::Context<Event::Bus *>::get()->emit<State *, std::string &>(this, std::string("active"));
             }
         }
 
