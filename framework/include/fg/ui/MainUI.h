@@ -72,7 +72,7 @@ public:
 
         this->global->Var<Vector3>::Bag::forEachVarPtr<int &>(MainUI::forEachVarPtr, counter);
 
-        Vector3 pO = Global::Context<Node2D*>::get()->plane->getOrigin();
+        Vector3 pO = Context<Node2D*>::get()->plane->getOrigin();
 
         ImGui::Text(fmt::format("({:.1f},{:.1f},{:.1f})", pO.x, pO.y, pO.z).c_str());
                 // stats

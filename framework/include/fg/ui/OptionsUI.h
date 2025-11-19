@@ -17,19 +17,15 @@ namespace fog
         Options options;
 
     public:
-        OptionsUI(UIState *pState, Core *core) : UIState(pState)
+        OptionsUI(UIState *pState, Core *core) : UIState(pState, "Options")
         {
             this->core = core;
             options.add("Show-plain-cell?", false);
             options.add("Video-Mode", "1024 x 768");
         }
 
-        bool open() override
+        void doOpen() override
         {
-            if (!ImGui::Begin("Options"))
-            {
-                return false;
-            }
 
             this->options.forEach([](const std::string name, const Options::Option *option)
                                   {
@@ -63,9 +59,6 @@ namespace fog
             {
                 this->active = false;
             }
-
-            ImGui::End();
-            return true;
         }
 
         void onApply()

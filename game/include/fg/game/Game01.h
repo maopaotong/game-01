@@ -42,7 +42,7 @@ namespace fog
         }
         void disactive() override
         {
-            delete Global::Context<Terrains *>::unset();
+            delete Context<Terrains *>::unset();
         }
 
         void active(Core *core) override
@@ -66,20 +66,20 @@ namespace fog
             RenderSystem *rSys = core->getRoot()->getRenderSystem();
             Light *light = core->getLight();
             terrains->load(rSys, sceMgr, light);
-            Global::Context<Terrains *>::set(terrains);
+            Context<Terrains *>::set(terrains);
             //
             fog::Plane *p = new fog::Plane(terrains);
 
             float scale = 30.0f;
             Node2D *root2D = new Node2D(p, scale); //
 
-            Global::Context<Node2D *>::set(root2D);
+            Context<Node2D *>::set(root2D);
 
             Cell::Center *cells = new Cell::Center(root2D, costMap);
             cells->translateToCenter();
 
             // root2D->position = -cells->getCenterIn2D(); // move center to (0,0)
-            Global::Context<Cell::Center *>::set(cells);
+            Context<Cell::Center *>::set(cells);
 
             //
             Ground *ground = new CostMapGround(costMap);
@@ -90,7 +90,7 @@ namespace fog
             std::function<void(Options *)> func = [](Options *) {
 
             };
-            Global::Context<Event::Bus *>::get()->subscribe<Options *>([](Options *) {
+            Context<Event::Bus *>::get()->subscribe<Options *>([](Options *) {
 
             });
             world->init();

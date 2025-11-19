@@ -47,7 +47,7 @@ namespace fog
         void rebuildMesh() override
         {
 
-            Cell::Center *cc = Global::Context<Cell::Center *>::get();
+            Cell::Center *cc = Context<Cell::Center *>::get();
             // MeshBuild::PointOnCircle buildMesh(obj);
             MeshBuild::SpiderNet buildMesh(obj);
             buildMesh.begin(this->material);

@@ -18,12 +18,8 @@ namespace fog
     class Global : public Var<float>::Bag,          //
                    public Var<long>::Bag,           //
                    public Var<Vector3>::Bag,        //
-                   public Var<Actor *>::Bag,        //
-                   public Context<Terrains *>,      //
-                   public Context<ActorPropEC *>,   //
-                   public Context<Cell::Center **>, //
-                   public Context<Node2D *>   ,     //
-                   public Context<Event::Bus*>
+                   public Var<Actor *>::Bag        //
+                  
     {
         typedef void (*FloatVarVistFunc)(const std::string name, float *vPtr, Var<float>::Range *range);
 

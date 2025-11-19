@@ -60,7 +60,7 @@ namespace fog
             this->create(sMgr, this->entity, this->sceNode);
             this->setSceneNode(sceNode);
 
-            float height = Global::Context<Terrains *>::get()->getHeightWithNormalAtWorldPosition(Vector3(0, 0, 0), nullptr);
+            float height = Context<Terrains *>::get()->getHeightWithNormalAtWorldPosition(Vector3(0, 0, 0), nullptr);
 
             sceNode->translate(0, height + this->actorHighOffset, 0);
         }
@@ -127,7 +127,7 @@ namespace fog
                 return false;
             }
 
-            Cell::Center *cells = Global::Context<Cell::Center *>::get();
+            Cell::Center *cells = Context<Cell::Center *>::get();
 
             // check if this state's position on the target cell
             Vector3 aPos3 = this->sceNode->getPosition();
@@ -135,7 +135,7 @@ namespace fog
             Vector2 actorPosIn2D = root2D->to2D(aPos3);
             Cell::Instance cell;
             // bool hitCell = CellUtil::findCellByPoint(costMap, aPos2, aCellKey);
-            bool hitCell = Global::Context<Cell::Center *>::get()->findCellByPoint(aPos3, cell);
+            bool hitCell = Context<Cell::Center *>::get()->findCellByPoint(aPos3, cell);
             if (hitCell)
             {
                 CellKey aCellKey = cell.cKey;
@@ -145,9 +145,9 @@ namespace fog
 
                 // CellUtil::translatePathToCellCenter(pathByKey, pathByPosition, CellUtil::offset(costMap));
 
-                // Global::Context<Node2D*>::get()->
+                // Context<Node2D*>::get()->
 
-                std::vector<Vector2> pathByPointIn2D = Global::Context<Cell::Center *>::get()->getCellPointListByNomPoints(pathByPoint2DNom);
+                std::vector<Vector2> pathByPointIn2D = Context<Cell::Center *>::get()->getCellPointListByNomPoints(pathByPoint2DNom);
                 float pathSpeed = this->global->Var<float>::Bag::getVarVal(".pathSpeed", 1.0f);
 
                 PathFollow2 *path = new PathFollow2(actorPosIn2D, pathByPointIn2D, pathSpeed);

@@ -151,7 +151,7 @@ namespace fog
             float cllMaxXIn2DWld = cellCenterIn2DWld.x + cellWidth / 2.0f;
             float cllMaxYIn2DWld = cellCenterIn2DWld.y + cellHeight / 2.0f;
 
-            Terrains *terrains = Global::Context<Terrains *>::get();
+            Terrains *terrains = Context<Terrains *>::get();
             // dencity of terrain
             float density = terrains->getDensity(); //
             // scope of index of the height map

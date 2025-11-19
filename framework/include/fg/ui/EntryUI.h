@@ -27,40 +27,53 @@ namespace fog
         CostMap *costMap;
 
     public:
-        EntryUI(UIState *pState, Core *core, CostMap *costMap) : UIState(pState), core(core), costMap(costMap)
+        EntryUI(UIState *pState, Core *core, CostMap *costMap) : UIState(pState, "EntryUI"), core(core), costMap(costMap)
         {
+            this->active = true;
         }
 
         void init() override
         {
 
-            this->add("Options", new OptionsUI(this, core));
-            this->add("PropertyRefs", new PropertyRefsUI(this, core));
-            this->add("Active Actor", new ActiveTrayUI(this, core,costMap));
-            this->add("Statistic", new StatisticTrayUI(this, core,costMap));
-            
-            
+            this->add(new OptionsUI(this, core));
+            this->add(new PropertyRefsUI(this, core));
+            this->add(new ActiveTrayUI(this, core, costMap));
+            this->add(new StatisticTrayUI(this, core, costMap));
         }
-        void add(std::string name, UIState *child)
+        void add(UIState *child)
         {
             UIState::add(child);
-            ChildInfo ci = {child, name};
+            ChildInfo ci = {child, child->getName()};
             childInfos.push_back(ci);
         }
-
         bool open() override
         {
-            UIState::open();
+            bool ret = UIState::open();
+            if (!ret)
+            {
+                if (ImGui::Begin("Boot"))
+                {
+                    if (ImGui::Button("EntryUI"))
+                    {
+                        this->active = true;
+                    }
+                }
+                ImGui::End();
+            }
+
+            return true;
+        }
+        void doOpen() override
+        {
+
             for (auto ci : childInfos)
             {
-                //if (ImGui::Button(ci.name.c_str()))
+                // if (ImGui::Button(ci.name.c_str()))
                 if (ImGuiUtil::MyToggleButton(ci.name.c_str(), ci.ui->activePtr()))
                 {
                     ci.ui->changeActive();
                 }
             }
-            UIState::openChildren();
-            return true;
         };
     };
 

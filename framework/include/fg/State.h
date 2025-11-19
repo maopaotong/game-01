@@ -94,12 +94,12 @@ namespace fog
 
         Vector3 to3D(Vector2 point)
         {
-            return Global::Context<Node2D *>::get()->to3D(point);
+            return Context<Node2D *>::get()->to3D(point);
         }
 
         bool findCell(Vector3 aPos3, Cell::Instance &cell)
         {
-            return Global::Context<Cell::Center *>::get()->findCellByPoint(aPos3, cell);
+            return Context<Cell::Center *>::get()->findCellByPoint(aPos3, cell);
         }
 
         SceneNode *getSceneNode()
@@ -178,8 +178,8 @@ namespace fog
             if (changed)
             {
 
-                // Global::Context<ActorPropEC *>::get()->emit(this, std::string("active"));
-                Global::Context<Event::Bus *>::get()->emit<State *, std::string &>(this, std::string("active"));
+                // Context<ActorPropEC *>::get()->emit(this, std::string("active"));
+                Context<Event::Bus *>::get()->emit<State *, std::string &>(this, std::string("active"));
             }
         }
 

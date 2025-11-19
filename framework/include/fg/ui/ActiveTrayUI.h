@@ -15,14 +15,14 @@ namespace fog
         CostMap *costMap;
 
     public:
-        ActiveTrayUI(UIState *pState, Core *core, CostMap *costMap) : UIState(pState)
+        ActiveTrayUI(UIState *pState, Core *core, CostMap *costMap) : UIState(pState, "ActiveActor")
         {
             this->core = core;
             this->costMap = costMap;
-            // Global::Context<ActorPropEC *>::get()->addListener(this);
+            // Context<ActorPropEC *>::get()->addListener(this);
 
-            Global::Context<Event::Bus *>::get()->subscribe<State *, std::string &>([this](State *s, std::string &ss)
-                                                                                    { this->onEvent(s, ss); });
+            Context<Event::Bus *>::get()->subscribe<State *, std::string &>([this](State *s, std::string &ss)
+                                                                            { this->onEvent(s, ss); });
         }
 
         bool onEvent(State *a, std::string &pName) override
@@ -44,12 +44,8 @@ namespace fog
             return true;
         }
 
-        bool open() override
+        void doOpen() override
         {
-            if (!ImGui::Begin("Active Tray"))
-            {
-                return false;
-            }
 
             if (state)
             {
@@ -67,9 +63,6 @@ namespace fog
                 {
                 }
             }
-
-            ImGui::End();
-            return true;
         }
     };
 

@@ -16,8 +16,8 @@ namespace fog
         UIState *pState;
         std::vector<UIState *> children;
         bool active = false;
+        std::string name;
 
-    protected:
         void openChildren()
         {
             for (auto cState : children)
@@ -31,7 +31,7 @@ namespace fog
         };
 
     public:
-        UIState(UIState *pState) : pState(pState)
+        UIState(UIState *pState, std::string name) : pState(pState), name(name)
         {
         }
         virtual ~UIState()
@@ -43,7 +43,10 @@ namespace fog
         UIState &operator=(UIState &) = delete;
 
         virtual void init() {}
-
+        std::string getName()
+        {
+            return name;
+        }
         void changeActive()
         {
             this->setActive(!this->active);
@@ -68,8 +71,22 @@ namespace fog
 
         virtual bool open()
         {
+            if (!this->active)
+            {
+                return false;
+            }
+            if (!ImGui::Begin(name.c_str(), &this->active))
+            {
+                return false;
+            }
+            doOpen();
+            this->openChildren();
+            ImGui::End();
             return true;
         };
+        virtual void doOpen()
+        {
+        }
     };
 
 }; // end of namespace

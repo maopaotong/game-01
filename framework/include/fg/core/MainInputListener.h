@@ -78,7 +78,7 @@ namespace fog
 
         bool findCell(Vector3 aPos3, Cell::Instance &cell)
         {
-            return Global::Context<Cell::Center *>::get()->findCellByPoint(aPos3, cell);
+            return Context<Cell::Center *>::get()->findCellByPoint(aPos3, cell);
         }
         void setTargetByMouse(int mx, int my)
         {

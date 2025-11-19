@@ -47,7 +47,7 @@ namespace fog
         Vector3 to3D(Vector2 pointIn2D)
         {
 
-            return Global::Context<Node2D *>::get()->to3D(pointIn2D) + this->offset;
+            return Context<Node2D *>::get()->to3D(pointIn2D) + this->offset;
         }
 
         bool frameStarted(const Ogre::FrameEvent &evt) override
@@ -66,7 +66,7 @@ namespace fog
                     //
                     Vector3 prevPos = pNode->getPosition();
 
-                    float terH = 0.0f; // Global::Context<Terrains *>::get()->getHeightAtPosition(currentPos2D); // TODO in a common place to translate all .
+                    float terH = 0.0f; // Context<Terrains *>::get()->getHeightAtPosition(currentPos2D); // TODO in a common place to translate all .
 
                     // Vector3 currentPos = Ground::Transfer::to3D(currentPos2D, Global::getTerrainHeightAtPositionWithOffset, heightOffset); //
                     Vector3 currentPos = this->to3D(currentPos2D);

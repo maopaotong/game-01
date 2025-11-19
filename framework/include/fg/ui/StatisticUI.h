@@ -15,16 +15,16 @@ namespace fog
         CostMap *costMap;
 
     public:
-        StatisticTrayUI(UIState *pState, Core *core, CostMap *costMap) : UIState(pState)
+        StatisticTrayUI(UIState *pState, Core *core, CostMap *costMap) : UIState(pState, "StatisticTray")
         {
             this->core = core;
             this->costMap = costMap;
-            // Global::Context<ActorPropEC *>::get()->addListener(this);
+            // Context<ActorPropEC *>::get()->addListener(this);
         }
 
         bool open() override
         {
-            if (!ImGui::Begin("Statistic"))
+            if (!ImGui::Begin("Statistic", &this->active))
             {
                 return false;
             }

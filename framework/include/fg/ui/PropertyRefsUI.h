@@ -17,18 +17,14 @@ namespace fog
         Core *core;
 
     public:
-        PropertyRefsUI(UIState *pState, Core *core) : UIState(pState)
+        PropertyRefsUI(UIState *pState, Core *core) : UIState(pState,"PropertyRefs")
         {
             this->core = core;
         }
 
-        bool open() override
+        void doOpen() override
         {
-            if (!ImGui::Begin("PropertyRefs"))
-            {
-                return false;
-            }
-
+            
             Context<Property::Bag *>::get()->forEach([](const std::string &name, const Options::Option *option)
                                                      {
 
@@ -63,8 +59,6 @@ namespace fog
                 this->active = false;
             }
 
-            ImGui::End();
-            return true;
         }
 
         void onApply()
