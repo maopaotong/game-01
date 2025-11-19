@@ -8,39 +8,57 @@
 
 namespace fog
 {
-    
 
     class Options
     {
     public:
         struct Option
-        {            
+        {
             std::string name;
             std::any valuePtr;
-            std::type_index type;
+            std::function<void()> destructor;
 
-            Option(std::string name, std::any pValue, std::type_index type) : name(name), valuePtr(pValue), type(type)
+            ~Option()
             {
+                destructor();
             }
             template <typename T>
-            bool isType()
+            Option(std::string name, T defaultV) : name(name)
             {
-                return type == typeid(T);
+                T *valueP = new T(defaultV);
+                this->valuePtr = std::make_any<T *>(valueP);
+                this->destructor = [valueP]()
+                {
+                    delete valueP;
+                };
+            }
+
+            Option(const Option &) = delete;//copy
+            Option(Option &&) = delete;//move
+            Option &operator=(const Option &) = delete;//copy assign
+            Option &operator=(Option &&) = delete;//move assign
+
+            template <typename T>
+            bool isType() const
+            {
+                return valuePtr.type() == typeid(T *);
             }
 
             template <typename T>
-            T *getValuePtr()
+            T &getValueRef() const
             {
-                return std::any_cast<T *>(valuePtr);
+                T *p = std::any_cast<T *>(valuePtr);
+                return *p;
             }
         };
 
     protected:
         std::unordered_map<std::string, std::unique_ptr<Option>> options;
-    public:
-        ~Options(){
 
-        }        
+    public:
+        ~Options()
+        {
+        }
 
         Option *getOption(std::string name)
         {
@@ -50,10 +68,10 @@ namespace fog
         template <typename T>
         void add(std::string name, T defaultValue)
         {
-            T *pValue = new T();
-            *pValue = defaultValue;
-            Option *option = new Option(name, std::make_any<T *>(pValue), typeid(T *));
-            options[name] = std::make_unique<Option>(option);
+
+            std::unique_ptr<Option> optionPtr = std::make_unique<Option>(name, defaultValue);
+            //<std::unique_ptr<Option>>
+            options[name] = std::move(optionPtr);
         }
 
         template <typename F>
@@ -64,7 +82,6 @@ namespace fog
                 visit(pair.first, pair.second.get());
             }
         }
-            
     };
 
 };

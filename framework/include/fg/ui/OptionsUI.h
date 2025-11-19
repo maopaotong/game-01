@@ -12,12 +12,12 @@ namespace fog
 {
     class OptionsUI : public UIState
     {
-        protected:
-        Core* core;
+    protected:
+        Core *core;
         Options options;
 
     public:
-        OptionsUI(UIState *pState,Core*core) : UIState(pState)
+        OptionsUI(UIState *pState, Core *core) : UIState(pState)
         {
             this->core = core;
             options.add<bool>("Show-plain-cell?", false);
@@ -31,23 +31,23 @@ namespace fog
                 return false;
             }
 
-            this->options.forEach([](std::string name, Options::Option *option)
+            this->options.forEach([](const std::string name, const Options::Option *option)
                                   {
-                                      if (option->isType<bool *>())
+                                      if (option->isType<bool>())
                                       {
-                                          bool *valuePtr = option->getValuePtr<bool>();
+                                          bool &valuePtr = option->getValueRef<bool>();
 
-                                              if (ImGui::Checkbox(option->name.c_str(), valuePtr))
+                                              if (ImGui::Checkbox(option->name.c_str(), &valuePtr))
                                               {
                                                   // ignore bool change.
                                               }
                                           
 
-                                      }else if(option->isType<std::string*>()){
+                                      }else if(option->isType<std::string>()){
 
-                                        std::string *valuePtr = option->getValuePtr<std::string>();
+                                        std::string &valuePtr = option->getValueRef<std::string>();
 
-                                        ImGui::Text((*valuePtr).c_str());
+                                        ImGui::Text((valuePtr).c_str());
                                       
                                         } });
 
@@ -69,7 +69,8 @@ namespace fog
             return true;
         }
 
-        void onStart(){
+        void onStart()
+        {
             //
             core->getGame()->start(&this->options);
         }

@@ -121,8 +121,8 @@ namespace fog
 
                 if (csc)
                 {
-                    bool *showPlainCellPtr = options->getOption("Show-plain-cell?")->getValuePtr<bool>();
-                    csc->showCost1 = *showPlainCellPtr;
+                    bool &showPlainCellPtr = options->getOption("Show-plain-cell?")->getValueRef<bool>();
+                    csc->showCost1 = showPlainCellPtr;
                     std::cout << "" << "" <<std:: endl;
                     csc->rebuildMesh();
                 }
