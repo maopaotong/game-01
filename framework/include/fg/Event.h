@@ -20,6 +20,10 @@ namespace fog
     class Event
     {
     public:
+        class Mask
+        {
+        };
+
         template <typename... Args>
         class Center
         {
@@ -43,21 +47,28 @@ namespace fog
         class Bus
         {
         public:
-            template <typename... Args>
-            void subscribe(std::function<void(Args...)> callback)
+            // template <typename... Args>
+            // void subscribe(std::function<void(Args...)> callback)
+            // {
+            //     getCallbacks<Args...>().push_back(std::move(callback));
+            // }
+
+            template <typename... Args, typename F>
+            void subscribe(F &&func)
             {
-                getCallbacks<Args...>().push_back(std::move(callback));
+                //
+                getCallbacks<Args...>().emplace_back(std::forward<F>(func));
             }
 
-            template <typename... Args>
-            void subscribe(Listener<Args...> *callback)
-            {
-                std::function<void(Args...)> func = [callback](Args... args)
-                {
-                    callback->onEvent(args...);
-                };
-                subscribe<Args...>(func);
-            }
+            // template <typename... Args>
+            // void subscribe(Listener<Args...> *callback)
+            // {
+            //     std::function<void(Args...)> func = [callback](Args... args)
+            //     {
+            //         callback->onEvent(args...);
+            //     };
+            //     subscribe<Args...>(func);
+            // }
 
             template <typename... Args>
             void emit(Args... args)

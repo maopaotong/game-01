@@ -167,6 +167,7 @@ namespace fog
             this->active = active;
             if (changed)
             {
+                
                 //Global::Context<ActorPropEC *>::get()->emit(this, std::string("active"));
                 Global::Context<Event::Bus*>::get()->emit<State*,std::string&>(this, std::string("active"));
             }

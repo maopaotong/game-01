@@ -52,10 +52,9 @@ namespace fog
                                         } });
 
             //
-            if (ImGui::Button("Start"))
+            if (ImGui::Button("Apply"))
             {
-                this->active = false;
-                this->onStart();
+                this->onApply();
             }
 
             ImGui::SameLine();
@@ -69,10 +68,10 @@ namespace fog
             return true;
         }
 
-        void onStart()
+        void onApply()
         {
             //
-            core->getGame()->start(&this->options);
+            core->getGame()->apply(&this->options);
         }
     };
 

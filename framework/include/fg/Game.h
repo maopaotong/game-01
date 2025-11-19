@@ -8,7 +8,7 @@ namespace fog
     class Game
     {
     public:
-        virtual void start(Options *options) {};
+        virtual void apply(Options *options) {};
         virtual ~Game() {};
     };
 };

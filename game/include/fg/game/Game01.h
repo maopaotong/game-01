@@ -86,7 +86,13 @@ namespace fog
             State *world = new WorldStateControl(costMap, ground, core);
             SceneNode *node = sceMgr->getRootSceneNode();
             world->setSceneNode(node);
+            //
+            std::function<void(Options*)> func = [](Options *) {
 
+            };
+            Global::Context<Event::Bus *>::get()->subscribe<Options*>([](Options *) {
+
+            });
             world->init();
 
             //
@@ -112,7 +118,7 @@ namespace fog
             return cm;
         }
 
-        void start(Options *options) override
+        void apply(Options *options) override
         {
             // rebuild cells
             void (*func)(State *, Options *) = [](State *state, Options *options)
@@ -123,11 +129,11 @@ namespace fog
                 {
                     bool &showPlainCellPtr = options->getOption("Show-plain-cell?")->getValueRef<bool>();
                     csc->showCost1 = showPlainCellPtr;
-                    std::cout << "" << "" <<std:: endl;
+                    std::cout << "" << "" << std::endl;
                     csc->rebuildMesh();
                 }
             };
-            core->getRootState()->forEachChild<Options*>(true, func, options);
+            core->getRootState()->forEachChild<Options *>(true, func, options);
         }
     };
 };

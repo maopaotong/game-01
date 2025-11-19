@@ -21,7 +21,8 @@ namespace fog
             this->costMap = costMap;
             // Global::Context<ActorPropEC *>::get()->addListener(this);
 
-            Global::Context<Event::Bus *>::get()->subscribe<State *, std::string &>(this);
+            Global::Context<Event::Bus *>::get()->subscribe<State *, std::string &>([this](State *s, std::string &ss)
+                                                                                    { this->onEvent(s, ss); });
         }
 
         bool onEvent(State *a, std::string &pName) override
