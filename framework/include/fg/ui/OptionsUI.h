@@ -35,9 +35,9 @@ namespace fog
                                   {
                                       if (option->isType<bool *>())
                                       {
-                                          bool *pValue = option->getValuePtr<bool>();
+                                          bool *valuePtr = option->getValuePtr<bool>();
 
-                                              if (ImGui::Checkbox(option->name.c_str(), pValue))
+                                              if (ImGui::Checkbox(option->name.c_str(), valuePtr))
                                               {
                                                   // ignore bool change.
                                               }
@@ -45,9 +45,9 @@ namespace fog
 
                                       }else if(option->isType<std::string*>()){
 
-                                        std::string *pValue = option->getValuePtr<std::string>();
+                                        std::string *valuePtr = option->getValuePtr<std::string>();
 
-                                        ImGui::Text((*pValue).c_str());
+                                        ImGui::Text((*valuePtr).c_str());
                                       
                                         } });
 

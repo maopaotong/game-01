@@ -4,18 +4,22 @@
 #include <typeindex>
 #include "fg/VarBag.h"
 #include "fg/Global.h"
+#include <memory>
+
 namespace fog
 {
+    
+
     class Options
     {
     public:
         struct Option
-        {
+        {            
             std::string name;
-            std::any pValue;
+            std::any valuePtr;
             std::type_index type;
 
-            Option(std::string name, std::any pValue, std::type_index type) : name(name), pValue(pValue), type(type)
+            Option(std::string name, std::any pValue, std::type_index type) : name(name), valuePtr(pValue), type(type)
             {
             }
             template <typename T>
@@ -25,16 +29,22 @@ namespace fog
             }
 
             template <typename T>
-            T* getValuePtr()
+            T *getValuePtr()
             {
-                return std::any_cast<T*>(pValue);
+                return std::any_cast<T *>(valuePtr);
             }
         };
 
-        std::unordered_map<std::string, Option *> options;
+    protected:
+        std::unordered_map<std::string, std::unique_ptr<Option>> options;
+    public:
+        ~Options(){
 
-        Option * getOption(std::string name){
-            return options[name];
+        }        
+
+        Option *getOption(std::string name)
+        {
+            return options[name].get();
         }
 
         template <typename T>
@@ -42,18 +52,19 @@ namespace fog
         {
             T *pValue = new T();
             *pValue = defaultValue;
-            Option *option = new Option(name, std::make_any<T*>(pValue), typeid(T *));
-            options[name] = option;
+            Option *option = new Option(name, std::make_any<T *>(pValue), typeid(T *));
+            options[name] = std::make_unique<Option>(option);
         }
 
         template <typename F>
         void forEach(F &&visit)
         {
-            for (auto pair : options)
+            for (const auto &pair : options)
             {
-                visit(pair.first, pair.second);
+                visit(pair.first, pair.second.get());
             }
         }
+            
     };
 
 };

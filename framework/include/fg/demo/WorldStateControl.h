@@ -9,13 +9,11 @@
 #include <unordered_map>
 #include "fg/util/CellUtil.h"
 #include "fg/State.h"
-#include "fg/IWorld.h"
 #include "fg/core/MainInputListener.h"
 #include "fg/demo/ActorStateControl.h"
 #include "fg/demo/CellStateControl.h"
 #include "fg/demo/CellMarkStateControl.h"
 #include "fg/State.h"
-#include "fg/CostMapControl.h"
 #include "fg/Core.h"
 #include "fg/core/CameraState.h"
 #include "fg/WorldState.h"
@@ -26,13 +24,12 @@
 namespace fog{
 using namespace Ogre;
 // root state & control.
-class WorldStateControl : public WorldState, public IWorld
+class WorldStateControl : public WorldState  
 {
 protected:
     CellStateControl *cells;
 
     CostMap *costMap;
-    CostMapControl *costMapControl;
 
     std::unordered_map<MarkType, CellMarkStateControl *> markStateControls;
 
@@ -61,7 +58,7 @@ public:
         this->addChild(actor);
 
         root->addFrameListener(actor);
-        MainInputListener *keyHandler = new MainInputListener(this, core);
+        MainInputListener *keyHandler = new MainInputListener(core);
         core->getAppContext()->addInputListener(keyHandler);
         core->getAppContext()->addInputListener(inputState);
         core->getAppContext()->addInputListener(new MouseClickPicker(core->getGlobal(), core->getCamera(), core->getSceneManager(), core->getViewport()));

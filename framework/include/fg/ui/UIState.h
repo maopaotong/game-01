@@ -35,6 +35,7 @@ namespace fog
         {
         }
         virtual void init() {}
+        
         void changeActive()
         {
             this->setActive(!this->active);

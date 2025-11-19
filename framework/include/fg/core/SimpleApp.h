@@ -3,7 +3,6 @@
 #include <OgreLogManager.h>
 
 #include "fg/util/HexGridPrinter.h"
-#include "fg/CostMapControl.h"
 #include "fg/Module.h"
 #include "fg/App.h"
 #include "fg/core/SimpleCore.h"

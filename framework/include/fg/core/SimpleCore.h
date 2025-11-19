@@ -7,7 +7,6 @@
 // #include "imgui_impl_opengl3.h"
 #include "ImGuiAppContext.h"
 #include "fg/util/HexGridPrinter.h"
-#include "fg/CostMapControl.h"
 #include "fg/Module.h"
 #include <unordered_map>
 #define FG_LIGHT_DIRECTION_X 300

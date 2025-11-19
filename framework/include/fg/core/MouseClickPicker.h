@@ -27,7 +27,6 @@
 #include <iostream>
 #include "fg/util/CellMark.h"
 #include "fg/util/CellUtil.h"
-#include "fg/IWorld.h"
 #include "fg/Pickable.h"
 #include "fg/Global.h"
 

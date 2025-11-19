@@ -27,7 +27,6 @@
 #include <iostream>
 #include "fg/util/CellMark.h"
 #include "fg/util/CellUtil.h"
-#include "fg/IWorld.h"
 #include "fg/Ground.h"
 #include "fg/Core.h"
 
@@ -46,7 +45,6 @@ namespace fog
         static constexpr float DEFAULT_CAMERA_ROLL_SPEED = (DEFAULT_CAMERA_HITH_MAX - DEFAULT_CAMERA_HIGH_MIN) / 10.0f;
 
     private:
-        IWorld *wsc;
 
         Core *core;
         float *cameraTopDistanceVptr;
@@ -56,11 +54,9 @@ namespace fog
         Global *global;
 
     public:
-        MainInputListener(IWorld *wsc,
-                          Core *core)
+        MainInputListener(Core *core)
         {
             this->core = core;
-            this->wsc = wsc;
             global = core->getGlobal();
             this->cameraTopDistanceVptr = global->Var<float>::Bag::createBindVptr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
             this->cameraHighMinVptr = global->Var<float>::Bag::createBindVptr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
