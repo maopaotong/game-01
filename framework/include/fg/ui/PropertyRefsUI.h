@@ -34,7 +34,7 @@ namespace fog
 
                                                              bool &valuePtr = option->getValueRef<bool>();
 
-                                                             if (ImGui::Checkbox("", &valuePtr))
+                                                             if (ImGui::Checkbox("V", &valuePtr))
                                                              {
                                                                  // ignore bool change.
                                                              }

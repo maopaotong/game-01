@@ -9,6 +9,7 @@
 #include <memory>
 #include <type_traits>
 #include <functional>
+
 #include "Options.h"
 
 namespace fog
@@ -17,13 +18,33 @@ namespace fog
     {
 
     public:
+        struct LaterBind
+        {
+            std::any ptr;
+
+            template <typename T>
+            T *getPtr()
+            {
+                if (!ptr.has_value())
+                {
+                    return nullptr;
+                }
+                return std::any_cast<T *>(ptr);
+            }
+
+            template <typename T>
+            void setPtr(T *ptr_)
+            {
+                this->ptr = ptr_;
+            }
+        };
+
         template <typename T>
         class Ref
         {
             std::string name;
             T *ptr_ = nullptr;
-
-            Listener<Ref<T> &> *listener = nullptr;
+            std::shared_ptr<LaterBind> later;
 
             void doBind(T &ref)
             {
@@ -32,25 +53,20 @@ namespace fog
             void doBind(T *ptr)
             {
                 ptr_ = ptr;
-                if (listener)
-                {
-                    listener->onEvent(*this);
-                }
             }
 
             void doSet(T value)
             {
                 *ptr_ = value;
-                if (listener)
-                {
-                    listener->onEvent(*this);
-                }
             }
 
         public:
-            Ref() {
+            Ref() : later(nullptr)
+            {
+            }
+            Ref(std::shared_ptr<LaterBind> later) : later(later) {
 
-            };
+                                                    };
 
             Ref(T &&) = delete;
             Ref(T &ref)
@@ -59,7 +75,9 @@ namespace fog
             };
             Ref(const Ref &other) : ptr_(other.ptr_) {};
             Ref(Ref &&other) : ptr_(other.ptr_) {};
-
+            Ref(T *ptr) : ptr_(ptr)
+            {
+            }
             std::string getName()
             {
                 return name;
@@ -77,26 +95,15 @@ namespace fog
 
             Ref &operator=(const Ref &other)
             {
-                return bindOrSet();
+                this->ptr_ = other.ptr_;
+                this->later = other.later;
+                return *this;
             }
 
             Ref &operator=(Ref &&other)
             {
-                if (this->empty())
-                {
-                    doBind(other.ptr_);
-                }
-                else
-                {
-                    if (!other.empty())
-                    {
-                        this->doSet(*other.ptr_);
-                    }
-                    else
-                    {
-                        // do nothing.
-                    }
-                }
+                this->ptr_ = other.ptr_;
+                this->later = other.later;
                 return *this;
             }
 
@@ -112,27 +119,12 @@ namespace fog
                 return *this;
             }
 
-            Ref &bindOrSet(T &ref)
-            {
-
-                if (empty())
-                {
-                    doBind(ref);
-                }
-                else
-                {
-                    doSet(ref);
-                }
-                return *this;
-            }
-
-            void bind(T &ref)
-            {
-                assertEmpty();
-                doBind(ref);
-            }
-
             bool empty() const { return ptr_ == nullptr; }
+
+            bool emptyAllTime()
+            {
+                return ptr_ == nullptr && !later;
+            }
 
             operator T &() &
             {
@@ -141,62 +133,101 @@ namespace fog
 
             operator const T &() const &
             {
-                return assertBind();
+                if (ptr_)
+                {
+                    return *ptr_;
+                }
+                LaterBind *lb = this->later.get();
+                if (lb)
+                {
+                    T *ptr2 = lb->getPtr<T>();
+                    if (!ptr2)
+                    {
+                        throw std::runtime_error("cannot resolve Property::Ref for now.");
+                    }
+                    return *ptr2;//resolve from later bind.
+                }
+
+                throw std::runtime_error("cannot bind and no later bind.");
             }
 
-            void assertEmpty()
+            T &assertBind()
             {
                 if (ptr_)
                 {
-                    throw std::runtime_error("property ref not empty.");
+                    return *ptr_;
                 }
-            }
-
-            T &assertBind() const
-            {
-                if (!ptr_)
+                LaterBind *lb = this->later.get();
+                if (lb)
                 {
-                    throw std::runtime_error("property ref is empty.");
+                    T *ptr2 = lb->getPtr<T>();
+                    if (ptr2)
+                    {
+
+                        this->ptr_ = ptr2;
+                        later = nullptr; // release shared ptr.
+                        return *ptr_;
+                    }
                 }
-                return *ptr_;
+
+                throw std::runtime_error("property ref is empty or not available for now.");
             }
         };
 
         class Bag
         {
             Options options;
-            std::unordered_map<std::string, std::vector<std::function<void(Options::Option*)>>> createListener;
+            std::unordered_map<std::string, std::shared_ptr<LaterBind>> laterBinds;
 
         public:
             template <typename T>
             Property::Ref<T> createProperty(std::string name, T defaultValue)
             {
-                Property::Ref<T> ref = tryCreateProperty<T>(name, defaultValue);
-                if (ref.empty())
-                {
-                    throw std::runtime_error("cannot create property ref with name:" + name);
-                }
-                return ref;
-            }
-            template <typename T>
-            Property::Ref<T> tryCreateProperty(std::string name, T defaultValue)
-            {
-                Options::Option *opt = options.tryAdd<T>(name, defaultValue);
-                return toPropertyRef<T>(opt);
+                return createProperty<T>(name, defaultValue, false);
             }
 
             template <typename T>
-            Property::Ref<T> toPropertyRef(Options::Option *opt)
+            Property::Ref<T> createProperty(std::string name, T defaultValue, bool allowLater)
             {
-                if (opt)
+
+                Options::Option *opt = options.tryAdd<T>(name, defaultValue);
+                if (!opt)
                 {
-                    T &ref = opt->getValueRef<T>();
-                    return Property::Ref<T>(ref);
+                    if (!allowLater)
+                    {
+                        throw std::runtime_error("cannot create property ref with name:" + name);
+                    }
+                    return makeLater<T>(name);
+                    //
                 }
                 else
                 {
-                    
-                    return Property::Ref<T>(); // empty ref.
+
+                    // notify other later ref.
+                    auto it = laterBinds.find(name);
+                    if (it != laterBinds.end())
+                    {
+                        laterBinds[name]->setPtr(opt);
+                        laterBinds.erase(name); // release the later bind.
+                    }
+
+                    return Property::Ref<T>(opt->getValueRef<T>()); // bind this ref for now, no need to bind later.
+                }
+            }
+            template <typename T>
+            Property::Ref<T> makeLater(std::string name)
+            {
+                auto it = laterBinds.find(name);
+                if (it == laterBinds.end())
+                {
+                    auto later = std::make_shared<LaterBind>();
+                    laterBinds[name] = later;
+                    // empty and later bind.
+                    return Property::Ref<T>(later);
+                }
+                else
+                {
+                    return Property::Ref<T>(it->second);
                 }
             }
 
@@ -204,17 +235,20 @@ namespace fog
             Property::Ref<T> getProperty(std::string name, bool requiredNow = true)
             {
                 Options::Option *opt = options.getOption(name);
-                if (!opt)
+                if (opt)
+                {
+                    T &ref = opt->getValueRef<T>();
+                    return Property::Ref<T>(ref);
+                }
+                else
                 {
                     if (requiredNow)
                     {
                         throw std::runtime_error("property ref not exists by name:" + name);
                     }
 
-
+                    return makeLater<T>(name);
                 }
-
-                return toPropertyRef<T>(opt);
             }
             template <typename F>
             void forEach(F &&func)
