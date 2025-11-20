@@ -24,9 +24,11 @@ namespace fog
 
         void doOpen() override
         {
+            int id = 0;
 
-            Context<Property::Bag *>::get()->forEach([](const std::string &name, const Options::Option *option)
+            Context<Property::Bag *>::get()->forEach([&id](const std::string &name, const Options::Option *option)
                                                      {
+                                                         ImGui::PushID("PropertyRefUIID" + id++);
                                                          ImGui::Text(option->name.c_str());
                                                          ImGui::SameLine();
                                                          if (option->isType<bool>())
@@ -57,6 +59,7 @@ namespace fog
                                                          {
                                                              ImGui::Text("TODO");
                                                          }
+                                                         ImGui::PopID();
                                                          //
                                                      });
 

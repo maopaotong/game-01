@@ -207,7 +207,9 @@ namespace fog
                     auto it = laterBinds.find(name);
                     if (it != laterBinds.end())
                     {
-                        laterBinds[name]->setPtr(opt);
+                        T* ptr = &opt->getValueRef<T>();
+
+                        laterBinds[name]->setPtr<T>(ptr);
                         laterBinds.erase(name); // release the later bind.
                     }
 

@@ -26,26 +26,31 @@ namespace fog
 
         void doOpen() override
         {
-
-            this->options.forEach([](const std::string name, const Options::Option *option)
+            int id = 0;
+            this->options.forEach([&id](const std::string name, const Options::Option *option)
                                   {
+                                      ImGui::PushID("OptionsUID" + id++);
+
                                       if (option->isType<bool>())
                                       {
                                           bool &valuePtr = option->getValueRef<bool>();
 
-                                              if (ImGui::Checkbox(option->name.c_str(), &valuePtr))
-                                              {
-                                                  // ignore bool change.
-                                              }
-                                          
+                                          if (ImGui::Checkbox(option->name.c_str(), &valuePtr))
+                                          {
+                                              // ignore bool change.
+                                          }
+                                      }
+                                      else if (option->isType<std::string>())
+                                      {
 
-                                      }else if(option->isType<std::string>()){
+                                          std::string &valuePtr = option->getValueRef<std::string>();
 
-                                        std::string &valuePtr = option->getValueRef<std::string>();
+                                          ImGui::Text((valuePtr).c_str());
 
-                                        ImGui::Text((valuePtr).c_str());
-                                      
-                                        } });
+                                      } //
+                                      ImGui::PopID(); //
+                                  } //
+            );
 
             //
             if (ImGui::Button("Apply"))
