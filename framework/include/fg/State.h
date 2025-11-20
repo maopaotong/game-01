@@ -74,7 +74,6 @@ namespace fog
         {
             return Context<Property::Bag *>::get()->getProperty<T>(name);
         }
-        
 
     public:
         State()
@@ -86,8 +85,17 @@ namespace fog
         {
             std::cout << "~State()" << this << "" << std::endl;
         }
+        virtual Task::Owner * createTaskOwner() {
+            return nullptr;
+        }
+        virtual std::type_index getTaskOwnerType()
+        {
+            return std::type_index(typeid(nullptr));
+        }
 
-        virtual void init() {};
+        virtual void init() {
+
+        };
 
         virtual void collectProperties()
         {
@@ -183,6 +191,25 @@ namespace fog
         void forEachChild(void (*func)(State *, Args...), Args... args)
         {
             forEachChild<Args...>(true, func, args...);
+        }
+
+        template <typename F>
+        void forEachChild(F &&func, bool recursive = true)
+        {
+            std::vector<State *> *tmp = this->children;
+            for (auto it = tmp->begin(); it != tmp->end(); ++it)
+            {
+                State *s = *it;
+                bool brk = func(s);
+                if (brk)
+                {
+                    break;
+                }
+                if (recursive)
+                {
+                    s->forEachChild(func);
+                }
+            }
         }
 
         template <typename... Args>

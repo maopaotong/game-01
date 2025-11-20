@@ -10,38 +10,22 @@
 #include "fg/Task.h"
 #include "fg/Master.h"
 #include "fg/Actor.h"
+#include "fg/State.h"
 
 namespace fog
 {
-    class DefaultActor : public Actor
-    {
-        std::vector<Task *> tasks;
 
-    public:
-        CellKey getDestinationCell()
-        {
-        }
-
-        bool tryTakeTask(Task *t)
-        {
-            tasks.push_back(t);
-            
-            // waiting the player to make decision.
-            return true;
-        }
-
-    };
-    class DefaultMaster : public Master
+    class DefaultMaster : public Master, public FrameListener
     {
         Actor *defaultActor = nullptr;
-        std::vector<Actor *> actors;
         std::unordered_map<long, std::unique_ptr<Task>> allTasks;
         std::unordered_set<long> tasksToBeAssigned;
         std::unordered_set<long> tasksToBeChecked;
         long nextId = 0;
+        State *root;
 
     public:
-        DefaultMaster()
+        DefaultMaster(State *root) : root(root)
         {
         }
 
@@ -52,45 +36,76 @@ namespace fog
             nextId++;
         }
 
+        Task::Owner *tryCreateOwner(std::type_index ownerType)
+        {
+
+            Task::Owner *ret = nullptr;
+
+            root->forEachChild([&ret, ownerType](State *state)
+                               {
+                
+                std::type_index otype = state->getTaskOwnerType();
+                if(ownerType == otype){
+                    ret = state->createTaskOwner();        
+                    return true;
+                }
+                return false; });
+
+            return ret;
+        }
+        bool frameStarted(const FrameEvent &evt)
+        {
+            this->step(evt.timeSinceLastFrame);
+            return true;
+        }
+        bool frameRenderingQueued(const FrameEvent &evt)
+        {
+            (void)evt;
+            return true;
+        }
         bool step(long time) override
         {
 
+            std::unordered_set<long> doneSet;
             for (auto tid : tasksToBeChecked)
             {
                 auto it = allTasks.find(tid);
-                Task *task = it->second.get();
-                if (task->isDone() || task->step(time))
+                if (it->first)
                 {
-                    allTasks.erase(it);
+                    Task *task = it->second.get();
+                    if (task->isDone() || task->step(time))
+                    {
+                        doneSet.insert(tid);
+                    }
                 }
             }
+            for (auto tid : doneSet)
+            {
 
+                allTasks.erase(tid);
+                doneSet.erase(tid);
+            }
+
+            std::unordered_set<long> processed;
             for (auto tid : tasksToBeAssigned)
             {
 
                 Task *task = allTasks[tid].get();
-                Actor *actor = nullptr;
-                for (int j = 0; j < actors.size(); j++)
+                Task::Owner *owner = this->tryCreateOwner(task->getOwnerType());
+                if (owner)
                 {
-                    Actor *actorJ = actors[j];
-                    if (actorJ->tryTakeTask(task))
-                    {
-                        actor = actorJ;
-                        break;
-                    }
-                }
 
-                if (!actor)
+                    task->start(owner);
+                    processed.insert(tid);
+                }
+                else
                 {
-                    if (defaultActor->tryTakeTask(task))
-                    {
-                        actor = defaultActor;
-                    }
+                    // ignore task.
                 }
-                if (!actor)
-                { // no actor to take the task.
-                    throw std::runtime_error("no actor to take the task.");
-                }
+            }
+
+            for (auto tid : processed)
+            {
                 tasksToBeAssigned.erase(tid);
                 tasksToBeChecked.insert(tid);
             }

@@ -17,6 +17,7 @@
 #include "fg/Game.h"
 #include "fg/State.h"
 #include "fg/Options.h"
+#include "fg/demo/DefaultMaster.h"
 namespace fog
 {
     class Game01 : public Module, Game
@@ -96,6 +97,9 @@ namespace fog
             world->init();
 
             //
+            DefaultMaster* master = new DefaultMaster(world);
+            Context<Master*>::set(master);
+            core->addFrameListener(master);
         }
 
         CostMap *createCostMap()

@@ -39,9 +39,10 @@ namespace fog
         Vector3Ref position;
 
         MoveToCellTask *task = nullptr;
+        Core *core;
 
     public:
-        ActorState(CostMap *costMap, Core *core)
+        ActorState(CostMap *costMap, Core *core) : core(core)
         {
             this->global = core->getGlobal();
 
@@ -58,7 +59,7 @@ namespace fog
             this->setFrameListener(this);
         }
 
-        void init(Core *core)
+        virtual void init() override
         {
 
             SceneManager *sMgr = core->getSceneManager();
@@ -131,29 +132,19 @@ namespace fog
             return this->pathState->getDestinationCell();
         }
 
-        virtual bool tryTakeTask(Task *task)
+        virtual Task::Owner *createTaskOwner() override
         {
-            if (this->active)
-            {
-                std::type_index type = task->getTaskType();
-                if (type == typeid(MoveToCellTask))
-                {
-                    this->task = dynamic_cast<MoveToCellTask *>(task);
 
-                    MoveToCellTask::Owner *owner = new MoveToCellTask::Owner();
-                    owner->actorHighOffset = this->actorHighOffset;
-                    owner->aniNames = aniNames;
-                    owner->entity=this->entity;
-                    owner->pathState = this->pathState;
-                    owner->sceNode = this->sceNode;
-                    owner->state = this;                    
-                    this->task->setOwner(owner);
-                    
-                    return true;
-                }
-            }
-            return false;
+            MoveToCellTask::Owner *owner = new MoveToCellTask::Owner();
+            owner->actorHighOffset = this->actorHighOffset;
+            owner->aniNames = aniNames;
+            owner->entity = this->entity;
+            owner->pathState = this->pathState;
+            owner->sceNode = this->sceNode;
+            owner->state = this;
+            return owner;
         }
+        
         bool frameStarted(const FrameEvent &evt) override
         {
             void (*func)(State *, const FrameEvent &evt) = [](State *cState, const FrameEvent &evt)

@@ -56,7 +56,7 @@ public:
 
         markStateControls[MarkType::ACTIVE] = new CellMarkStateControl(costMap, core, MarkType::ACTIVE);
         ActorStateControl *actor1 = new ActorStateControl(costMap, core);
-        actor1->init(core);
+        actor1->init();
         root->addFrameListener(actor1);
         
 
@@ -66,11 +66,12 @@ public:
         actor1->addChild(actor2);
         root->addFrameListener(actor2);
 
-        MainInputListener *keyHandler = new MainInputListener(core);
+        MainInputListener *keyHandler = new MainInputListener(costMap,core);
         core->getAppContext()->addInputListener(keyHandler);
         core->getAppContext()->addInputListener(inputState);
         core->getAppContext()->addInputListener(new MouseClickPicker(core->getGlobal(), core->getCamera(), core->getSceneManager(), core->getViewport()));
     }
+
     virtual void init()override{
     }
 
@@ -78,5 +79,6 @@ public:
     {
         return costMap;
     }
+
 };
 };//end of namespace

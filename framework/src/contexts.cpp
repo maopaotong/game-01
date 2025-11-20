@@ -46,7 +46,7 @@ namespace fog
     Master *Context<Master *>::default_ = nullptr;
 
     template <>
-    Master *Context<Master *>::ctxObj = new DefaultMaster();
+    Master *Context<Master *>::ctxObj = nullptr;
     
     //
     

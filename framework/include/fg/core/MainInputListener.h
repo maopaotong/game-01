@@ -47,16 +47,15 @@ namespace fog
         static constexpr float DEFAULT_CAMERA_ROLL_SPEED = (DEFAULT_CAMERA_HITH_MAX - DEFAULT_CAMERA_HIGH_MIN) / 10.0f;
 
     private:
-
         Core *core;
         float *cameraTopDistanceVptr;
         float *cameraHighMinVptr;
         float *cameraHighMaxVptr;
         float *cameraRollSpeedVptr;
         Global *global;
-
+        CostMap* costMap;
     public:
-        MainInputListener(Core *core)
+        MainInputListener(CostMap *costMap, Core *core):costMap(costMap)
         {
             this->core = core;
             global = core->getGlobal();
@@ -101,15 +100,15 @@ namespace fog
                 Ogre::Vector3 pos = ray.getPoint(hitGrd.second);
 
                 // bool hitCell = CellUtil::findCellByPoint(costMap, Vector2(pos.x, pos.z), cKey);
-                //bool hitCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(pos), cKey);
+                // bool hitCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(pos), cKey);
                 Cell::Instance cell;
                 bool hitCell = this->findCell(pos, cell);
 
                 if (hitCell)
                 {
                     CellKey cKey = cell.cKey;
-                    Master * master = Context<Master*>::get();
-                    master->add(new MoveToCellTask(cKey));
+                    Master *master = Context<Master *>::get();
+                    master->add(new MoveToCellTask(costMap, global, cKey));
                     //
                 }
                 // cout << "worldPoint(" << pickX << ",0," << pickZ << "),cellIdx:[" << cx << "," << cy << "]" << endl;

@@ -19,6 +19,8 @@ namespace fog
     public:
         class Owner
         {
+        public:
+            virtual ~Owner() {}
         };
 
         template <typename T, typename O>
@@ -35,6 +37,8 @@ namespace fog
         {
             return ownerType;
         }
+
+        virtual void start(Owner *owner) = 0;
 
         virtual bool isDone() = 0;
         virtual bool step(long time) = 0;

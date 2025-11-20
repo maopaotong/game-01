@@ -6,32 +6,41 @@
 #include "fg/core/ActorState.h"
 #include "fg/Core.h"
 #include "fg/Terrains.h"
+#include "fg/MoveToCellTask.h"
 
-namespace fog{
-using namespace Ogre;
-
-class ActorStateControl : public ActorState
+namespace fog
 {
+    using namespace Ogre;
 
-
-    CostMap *costMap;
-   
-public:
-    ActorStateControl(CostMap *costMap, Core *core) : ActorState(costMap, core)
-    {
-        
-    }
-    void create(SceneManager *sMgr, Entity *&entity, SceneNode *&node) override
+    class ActorStateControl : public ActorState
     {
 
-        entity = sMgr->createEntity("Sinbad.mesh");
-        entity->setQueryFlags(0x00000001);
-        
-        sceNode = sMgr->getRootSceneNode()->createChildSceneNode("SinbadNode");
-        sceNode->setScale(*actorScaleVptr, *actorScaleVptr, *actorScaleVptr);
-        sceNode->attachObject(entity);
-       
-        // todo collect auto
-    }
-};
-};//end of namespace
+        CostMap *costMap;
+
+    public:
+        ActorStateControl(CostMap *costMap, Core *core) : ActorState(costMap, core)
+        {
+        }
+        void create(SceneManager *sMgr, Entity *&entity, SceneNode *&node) override
+        {
+
+            entity = sMgr->createEntity("Sinbad.mesh");
+            entity->setQueryFlags(0x00000001);
+
+            sceNode = sMgr->getRootSceneNode()->createChildSceneNode("SinbadNode");
+            sceNode->setScale(*actorScaleVptr, *actorScaleVptr, *actorScaleVptr);
+            sceNode->attachObject(entity);
+
+            // todo collect auto
+        }
+        virtual void init() override
+        {
+            ActorState::init();
+        }
+
+        std::type_index getTaskOwnerType() override
+        {
+            return std::type_index(typeid(MoveToCellTask::Owner));
+        }
+    };
+}; // end of namespace

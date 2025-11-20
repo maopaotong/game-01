@@ -43,19 +43,21 @@ namespace fog
         //
         MoveToCellTask::Owner *owner;
         //
-        PathFollow2MissionState *mission;
-        PathFollow2 *path;
+        PathFollow2MissionState *mission = nullptr;
+        PathFollow2 *path = nullptr;
 
     public:
-        MoveToCellTask(CellKey cKey2) : cKey2(cKey2), Task(std::in_place_type<MoveToCellTask>, std::in_place_type<MoveToCellTask::Owner>)
+        MoveToCellTask(CostMap *costMap, Global *global, CellKey cKey2) : costMap(costMap), global(global), cKey2(cKey2), Task(std::in_place_type<MoveToCellTask>, std::in_place_type<MoveToCellTask::Owner>)
         {
         }
 
-        bool isDone(){
+        bool isDone()
+        {
             return false;
         }
-        
-        bool step(long time){
+
+        bool step(long time)
+        {
             return false;
         }
 
@@ -68,9 +70,10 @@ namespace fog
         {
             this->path = path;
         }
-        void init()
+        void start(Task::Owner *own) override
         {
 
+            this->owner = dynamic_cast<MoveToCellTask::Owner *>(own);
             Cell::Center *cells = Context<Cell::Center *>::get();
 
             // check if this state's position on the target cell
