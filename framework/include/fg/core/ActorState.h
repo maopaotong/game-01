@@ -11,12 +11,13 @@
 #include "fg/util/CollectionUtil.h"
 #include "fg/Movable.h"
 #include "fg/Actor.h"
+#include "fg/MoveToCellTask.h"
 
 namespace fog
 {
     using namespace Ogre;
     using Vector3Ref = Property::Ref<Vector3>;
-    class ActorState : public State, public Pickable, public Ogre::FrameListener, public Movable
+    class ActorState : public State, public Pickable, public Ogre::FrameListener, public Actor
     {
 
         constexpr static float ACTOR_SCALE = 5.0f;
@@ -37,6 +38,8 @@ namespace fog
 
         Vector3Ref position;
 
+        MoveToCellTask *task = nullptr;
+
     public:
         ActorState(CostMap *costMap, Core *core)
         {
@@ -53,18 +56,17 @@ namespace fog
 
             this->setPickable(this);
             this->setFrameListener(this);
-            this->setMovable(this);
         }
 
         void init(Core *core)
         {
-            
+
             SceneManager *sMgr = core->getSceneManager();
             this->create(sMgr, this->entity, this->sceNode);
             this->setSceneNode(sceNode);
-            
+
             float height = Context<Terrains *>::get()->getHeightWithNormalAtWorldPosition(Vector3(0, 0, 0), nullptr);
-            
+
             this->position = this->createProperty("actor.position", Vector3(0, height + this->actorHighOffset, 0));
             sceNode->translate(this->position);
         }
@@ -124,63 +126,33 @@ namespace fog
             return this->active;
         }
 
-        bool setTargetCell(CellKey &cKey2) override
-        {
-            if (!this->isActive())
-            {
-                return false;
-            }
-
-            Cell::Center *cells = Context<Cell::Center *>::get();
-
-            // check if this state's position on the target cell
-            Vector3 aPos3 = this->sceNode->getPosition();
-            Node2D *root2D = cells->getRoot2D();
-            Vector2 actorPosIn2D = root2D->to2D(aPos3);
-            Cell::Instance cell;
-            // bool hitCell = CellUtil::findCellByPoint(costMap, aPos2, aCellKey);
-            bool hitCell = Context<Cell::Center *>::get()->findCellByWorldPosiion(aPos3, cell);
-            if (hitCell)
-            {
-                CellKey aCellKey = cell.cKey;
-                std::vector<Vector2> pathByPoint2DNom = costMap->findPath(cell.cKey, cKey2);
-
-                std::vector<Vector2> pathByCellCenterIn2D;
-
-                // CellUtil::translatePathToCellCenter(pathByKey, pathByPosition, CellUtil::offset(costMap));
-
-                // Context<Node2D*>::get()->
-
-                std::vector<Vector2> pathByPointIn2D = Context<Cell::Center *>::get()->getCellPointListByNomPoints(pathByPoint2DNom);
-                float pathSpeed = this->global->Var<float>::Bag::getVarVal(".pathSpeed", 1.0f);
-
-                PathFollow2 *path = new PathFollow2(actorPosIn2D, pathByPointIn2D, pathSpeed);
-                this->setPath(path);
-                pathState->setPath(pathByPoint2DNom, aCellKey, cKey2);
-                AnimationStateSet *anisSet = entity->getAllAnimationStates();
-                float aniSpeed = this->global->Var<float>::Bag::getVarVal(".aniSpeed", 1.0f);
-                // new child state.
-                PathFollow2MissionState *missionState = new PathFollow2MissionState(global, path, anisSet, aniNames, aniSpeed, this->actorHighOffset); //
-                missionState->init();
-                // delete missionState;
-
-                if (this->mission)
-                {
-                    // int size = this->children->size();
-                    this->removeChild(this->mission);
-                    // std::cout << "children:size" << size << ",after remove child size:" << this->children->size() << std::endl;
-
-                    delete this->mission;
-                }
-                this->addChild(missionState);
-                this->mission = missionState;
-            }
-
-            return true;
-        }
         virtual CellKey getDestinationCell() override
         {
             return this->pathState->getDestinationCell();
+        }
+
+        virtual bool tryTakeTask(Task *task)
+        {
+            if (this->active)
+            {
+                std::type_index type = task->getTaskType();
+                if (type == typeid(MoveToCellTask))
+                {
+                    this->task = dynamic_cast<MoveToCellTask *>(task);
+
+                    MoveToCellTask::Owner *owner = new MoveToCellTask::Owner();
+                    owner->actorHighOffset = this->actorHighOffset;
+                    owner->aniNames = aniNames;
+                    owner->entity=this->entity;
+                    owner->pathState = this->pathState;
+                    owner->sceNode = this->sceNode;
+                    owner->state = this;                    
+                    this->task->setOwner(owner);
+                    
+                    return true;
+                }
+            }
+            return false;
         }
         bool frameStarted(const FrameEvent &evt) override
         {

@@ -2,21 +2,21 @@
 #include <string>
 #include <vector>
 #include <typeindex>
-#include "fg/VarBag.h"
-#include "fg/Global.h"
-
 #include <vector>
 #include <memory>
 #include <type_traits>
 #include <functional>
 
-#include "Options.h"
+#include "Task.h"
 
 namespace fog
 {
-    class Inventory
+
+    class Master
     {
-        
+    public:
+        virtual bool step(long time) = 0;
+        virtual void add(Task *task) = 0;
     };
-    
+
 }; //

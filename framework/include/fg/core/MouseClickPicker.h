@@ -29,7 +29,7 @@
 #include "fg/util/CellUtil.h"
 #include "fg/Pickable.h"
 #include "fg/Global.h"
-
+#include "fg/Master.h"
 namespace fog
 {
     using namespace OgreBites;
@@ -69,9 +69,11 @@ namespace fog
             Actor *actor = nullptr;
             if (picked)
             {
-                actor = dynamic_cast<State *>(picked);
+                actor = dynamic_cast<Actor *>(picked);
+                if(actor){
+                    global->Var<Actor *>::Bag::setVar(".activeActor", actor);
+                }                
             }
-            global->Var<Actor *>::Bag::setVar(".activeActor", actor);
             return actor;
         }
 

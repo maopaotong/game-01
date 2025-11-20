@@ -14,9 +14,14 @@
 
 namespace fog
 {
-    class Inventory
+    class Policy
+    {
+    };
+
+    class DefaultPolicy
     {
         
     };
-    
+
+
 }; //

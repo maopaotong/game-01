@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 #include <Ogre.h>
 #include <OgreFrameListener.h>
 #include <OgreAnimationState.h>

@@ -56,9 +56,9 @@ namespace fog
             if (state)
             {
                 ImGui::Text(("Active State: " + std::to_string((uintptr_t)state)).c_str());
-                CellKey ck = state->getDestinationCell();
-
-                Vector2 pos2D = CellUtil::calculateCenter(ck.first, ck.second, costMap);
+                                
+                //CellKey ck = state->getDestinationCell();
+                //Vector2 pos2D = CellUtil::calculateCenter(ck.first, ck.second, costMap);
                 // Vector3 pos3D = Ground::Transfer::to3D(pos2D, Global::getTerrainHeightAtPositionWithOffset);
 
                 ImGuiUtil::Text(actorPosition);

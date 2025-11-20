@@ -29,6 +29,8 @@
 #include "fg/util/CellUtil.h"
 #include "fg/Ground.h"
 #include "fg/Core.h"
+#include "fg/Master.h"
+#include "fg/MoveToCellTask.h"
 
 namespace fog
 {
@@ -106,19 +108,8 @@ namespace fog
                 if (hitCell)
                 {
                     CellKey cKey = cell.cKey;
-                    void (*func)(State *, CellKey &) =
-                        [](State *s, CellKey &cKey)
-                    {
-                        Movable *mvb = s->getMovable();
-                        if (mvb)
-                        {
-                            mvb->setTargetCell(cKey);
-                        }
-                    };
-
-                    core->getRootState()->forEachChild<CellKey &>(
-                        func,
-                        cKey);
+                    Master * master = Context<Master*>::get();
+                    master->add(new MoveToCellTask(cKey));
                     //
                 }
                 // cout << "worldPoint(" << pickX << ",0," << pickZ << "),cellIdx:[" << cx << "," << cy << "]" << endl;

@@ -23,7 +23,7 @@ namespace fog
 {
     using namespace Ogre;
 
-    class State : public Actor
+    class State
     {
     public:
         static State *get(Node *node)
@@ -58,7 +58,6 @@ namespace fog
         State *parent = nullptr;
         FrameListener *frameListener = nullptr;
         Pickable *pickable = nullptr;
-        Movable *movable = nullptr;
         SceneNode *sceNode = nullptr;
         std::vector<State *> *children = nullptr;
         bool active = false;
@@ -89,11 +88,6 @@ namespace fog
         }
 
         virtual void init() {};
-
-        virtual CellKey getDestinationCell() override
-        {
-            return CellKey(0, 0);
-        }
 
         virtual void collectProperties()
         {
@@ -166,16 +160,6 @@ namespace fog
         void setFrameListener(FrameListener *listener)
         {
             this->frameListener = listener;
-        }
-
-        Movable *getMovable()
-        {
-            return this->movable;
-        }
-
-        void setMovable(Movable *mvb)
-        {
-            this->movable = mvb;
         }
 
         void setActive(bool active)
