@@ -74,47 +74,47 @@ namespace fog
         {
 
             std::unordered_set<long> doneSet;
-            for (auto tid : tasksToBeChecked)
+
+            for (auto it = tasksToBeChecked.begin(); it != tasksToBeChecked.end();)
             {
-                auto it = allTasks.find(tid);
-                if (it->first)
+
+                long tid = *it;
+
+                auto it2 = allTasks.find(tid);
+                bool ereased = false;
+                if (it2->first)
                 {
-                    Task *task = it->second.get();
+                    Task *task = it2->second.get();
                     if (task->isDone() || task->step(time))
                     {
-                        doneSet.insert(tid);
+                        allTasks[tid]->destroy();
+                        allTasks.erase(tid);
+                        it = tasksToBeChecked.erase(it);
+                        ereased = true;
                     }
                 }
-            }
-            for (auto tid : doneSet)
-            {
-                allTasks[tid]->destroy();
-                tasksToBeChecked.erase(tid);
-                allTasks.erase(tid);
+                if (!ereased)
+                {
+                    it++;
+                }
             }
 
-            std::unordered_set<long> assignedTaskIds;
-            for (auto tid : tasksToBeAssigned)
+            for (auto it = tasksToBeAssigned.begin(); it != tasksToBeAssigned.end();)
             {
 
+                long tid = *it;
                 Task *task = allTasks[tid].get();
                 Task::Owner *owner = this->tryCreateOwner(task->getOwnerType());
                 if (owner)
                 {
-
                     task->start(owner);
-                    assignedTaskIds.insert(tid);
+                    tasksToBeChecked.insert(tid);
+                    it = tasksToBeAssigned.erase(it);
                 }
                 else
                 {
-                    // ignore task.
+                    it++;
                 }
-            }
-
-            for (auto tid : assignedTaskIds)
-            {
-                tasksToBeAssigned.erase(tid);
-                tasksToBeChecked.insert(tid);
             }
 
             if (allTasks.empty())
