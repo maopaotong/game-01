@@ -21,7 +21,7 @@ namespace fog
         std::unordered_map<long, std::unique_ptr<Task>> allTasks;
         std::unordered_set<long> tasksToBeAssigned;
         std::unordered_set<long> tasksToBeChecked;
-        long nextId = 0;
+        long nextId = 1;
         State *root;
 
     public:
@@ -29,6 +29,13 @@ namespace fog
         {
         }
 
+        void getAllTask(std::unordered_map<long, Task *> &map) override
+        {
+            for (auto it = this->allTasks.begin(); it != allTasks.end(); it++)
+            {
+                map[it->first] = it->second.get();
+            }
+        }
         void add(Task *task) override
         {
             allTasks[nextId] = std::unique_ptr<Task>(task);
@@ -81,12 +88,12 @@ namespace fog
             }
             for (auto tid : doneSet)
             {
-
+                allTasks[tid]->destroy();
+                tasksToBeChecked.erase(tid);
                 allTasks.erase(tid);
-                doneSet.erase(tid);
             }
 
-            std::unordered_set<long> processed;
+            std::unordered_set<long> assignedTaskIds;
             for (auto tid : tasksToBeAssigned)
             {
 
@@ -96,7 +103,7 @@ namespace fog
                 {
 
                     task->start(owner);
-                    processed.insert(tid);
+                    assignedTaskIds.insert(tid);
                 }
                 else
                 {
@@ -104,7 +111,7 @@ namespace fog
                 }
             }
 
-            for (auto tid : processed)
+            for (auto tid : assignedTaskIds)
             {
                 tasksToBeAssigned.erase(tid);
                 tasksToBeChecked.insert(tid);

@@ -11,6 +11,7 @@
 #include "PropertyRefsUI.h"
 #include "StatisticUI.h"
 #include "QuitUI.h"
+#include "TasksUI.h"
 namespace fog
 {
 
@@ -40,7 +41,10 @@ namespace fog
             this->add(new PropertyRefsUI(core));
             this->add(new ActiveTrayUI(core, costMap));
             this->add(new StatisticTrayUI(core, costMap));
-            this->add(new QuitUI(core,costMap));
+            this->add(new TasksUI(core));
+
+            //Quit:
+            this->add(new QuitUI(core, costMap));
         }
         void add(UIState *child)
         {

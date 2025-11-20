@@ -53,11 +53,30 @@ namespace fog
 
         bool isDone()
         {
-            return false;
+            if (this->mission)
+            {
+
+                return this->mission->isDone();
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        void destroy() override
+        {
+            if (this->mission)
+            {
+                owner->state->removeChild(this->mission);
+                delete this->mission;
+                this->mission = nullptr;
+            }
         }
 
         bool step(long time)
         {
+            // todo call mission's step method.
             return false;
         }
 
@@ -103,22 +122,12 @@ namespace fog
                 AnimationStateSet *anisSet = owner->entity->getAllAnimationStates();
                 float aniSpeed = this->global->Var<float>::Bag::getVarVal(".aniSpeed", 1.0f);
                 // new child state.
-                PathFollow2MissionState *missionState = new PathFollow2MissionState(global, path, anisSet, owner->aniNames, aniSpeed, owner->actorHighOffset); //
-                missionState->init();
+                this->mission = new PathFollow2MissionState(global, path, anisSet, owner->aniNames, aniSpeed, owner->actorHighOffset); //
+                mission->init();
+
                 // delete missionState;
-
-                if (this->mission)
-                {
-                    // int size = this->children->size();
-                    // this->removeChild(this->mission);
-                    owner->state->removeChild(this->mission);
-                    // std::cout << "children:size" << size << ",after remove child size:" << this->children->size() << std::endl;
-
-                    delete this->mission;
-                }
                 // this->addChild(missionState);
-                owner->state->addChild(missionState);
-                this->mission = missionState;
+                owner->state->addChild(mission);
             }
         }
     };

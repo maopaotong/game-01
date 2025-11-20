@@ -19,8 +19,24 @@ namespace fog
     public:
         class Owner
         {
+            std::unordered_map<long, Task *> tasks;
+
         public:
             virtual ~Owner() {}
+            void add(long id, Task *task)
+            {
+                tasks[id] = task;
+            }
+
+            void erase(long id)
+            {
+
+                Task *task = tasks[id];
+                if (!task->isDone())
+                {
+                }
+                tasks.erase(id);
+            }
         };
 
         template <typename T, typename O>
@@ -42,6 +58,7 @@ namespace fog
 
         virtual bool isDone() = 0;
         virtual bool step(long time) = 0;
+        virtual void destroy() = 0;
     };
 
 }; //
