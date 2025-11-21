@@ -84,7 +84,7 @@ public:
         {
             ImGui::Begin("Hello");
             
-            Actor *actor = global->Var<Actor*>::Bag::getVarVal(".activeState", nullptr);
+            Actor *actor = Context<Var<Actor*>::Bag*>::get()->getVarVal(".activeState", nullptr);
 
             if (actor)
             {

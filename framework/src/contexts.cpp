@@ -7,6 +7,24 @@ namespace fog
     //
 
     template <>
+    Var<float>::Bag *Context<Var<float>::Bag *>::default_ = nullptr;
+
+    template <>
+    Var<float>::Bag *Context<Var<float>::Bag *>::ctxObj = new Var<float>::Bag();
+    
+    template <>
+    Var<Vector3>::Bag *Context<Var<Vector3>::Bag *>::default_ = nullptr;
+
+    template <>
+    Var<Vector3>::Bag *Context<Var<Vector3>::Bag *>::ctxObj = new Var<Vector3>::Bag();
+
+    template <>
+    Var<Actor*>::Bag *Context<Var<Actor*>::Bag *>::default_ = nullptr;
+
+    template <>
+    Var<Actor*>::Bag *Context<Var<Actor*>::Bag *>::ctxObj = new Var<Actor*>::Bag();
+
+    template <>
     Property::Bag *Context<Property::Bag *>::default_ = nullptr;
 
     template <>

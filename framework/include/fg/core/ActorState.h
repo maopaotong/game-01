@@ -40,16 +40,16 @@ namespace fog
 
         class MoveToCellTaskOwner : public MoveToCell::Owner
         {
-            Global *global;
             CostMap *costMap;
-            Core * core;
+            Core *core;
+
         public:
-            MoveToCellTaskOwner(Global *global, CostMap *costMap,Core* core) : MoveToCell::Owner(1), costMap(costMap), global(global),core(core)
+            MoveToCellTaskOwner(Global *global, CostMap *costMap, Core *core) : MoveToCell::Owner(1), costMap(costMap), core(core)
             {
             }
             bool tryTakeTarget(Tasks::Target *target) override
             {
-                this->pushOrWait(new MoveToCell::Task(static_cast<Targets::MoveToCell *>(target), this, costMap, global,core));
+                this->pushOrWait(new MoveToCell::Task(static_cast<Targets::MoveToCell *>(target), this, costMap, core));
                 //
                 return true;
             }
@@ -58,12 +58,14 @@ namespace fog
     public:
         ActorState(CostMap *costMap, Core *core) : core(core)
         {
-            this->global = core->getGlobal();
 
             this->costMap = costMap;
 
-            this->actorScaleVptr = core->getGlobal()->Var<float>::Bag::createBindVptr(".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
-            this->actorHighVptr = core->getGlobal()->Var<float>::Bag::createBindVptr(".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
+            // this->actorScaleVptr = core->getGlobal()->Var<float>::Bag::createBindVptr(".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
+            // this->actorHighVptr = core->getGlobal()->Var<float>::Bag::createBindVptr(".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
+            this->actorScaleVptr = Context<Var<float>::Bag *>::get()->createBindVptr(".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
+            this->actorHighVptr =Context<Var<float>::Bag *>::get()->createBindVptr(".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
+
             this->actorHighOffset = *this->actorHighVptr / 2.0f * *actorScaleVptr;
 
             this->setPickable(this);
@@ -86,7 +88,7 @@ namespace fog
             this->position = this->createProperty("actor.position", Vector3(0, height + this->actorHighOffset, 0));
             sceNode->translate(this->position);
             // init task owner.
-            MoveToCell::Owner *owner = new MoveToCellTaskOwner(global, costMap,core);
+            MoveToCell::Owner *owner = new MoveToCellTaskOwner(global, costMap, core);
             owner->actorHighOffset = this->actorHighOffset;
             owner->aniNames = aniNames;
             owner->entity = this->entity;
@@ -130,11 +132,10 @@ namespace fog
                 }
                 else
                 {
-                    actor->setActive(false);                    
+                    actor->setActive(false);
                 }
             }
             return this->active;
         }
-       
     };
 }; // end of namespace

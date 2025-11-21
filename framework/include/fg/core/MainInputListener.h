@@ -52,17 +52,15 @@ namespace fog
         float *cameraHighMinVptr;
         float *cameraHighMaxVptr;
         float *cameraRollSpeedVptr;
-        Global *global;
         CostMap* costMap;
     public:
         MainInputListener(CostMap *costMap, Core *core):costMap(costMap)
         {
             this->core = core;
-            global = core->getGlobal();
-            this->cameraTopDistanceVptr = global->Var<float>::Bag::createBindVptr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
-            this->cameraHighMinVptr = global->Var<float>::Bag::createBindVptr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
-            this->cameraHighMaxVptr = global->Var<float>::Bag::createBindVptr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
-            this->cameraRollSpeedVptr = global->Var<float>::Bag::createBindVptr(".cameraRollSpeed", DEFAULT_CAMERA_ROLL_SPEED, 0.0f, DEFAULT_CAMERA_ROLL_SPEED * 3);           //
+            this->cameraTopDistanceVptr = Context<Var<float>::Bag*>::get()->createBindVptr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
+            this->cameraHighMinVptr = Context<Var<float>::Bag*>::get()->createBindVptr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
+            this->cameraHighMaxVptr = Context<Var<float>::Bag*>::get()->createBindVptr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
+            this->cameraRollSpeedVptr = Context<Var<float>::Bag*>::get()->createBindVptr(".cameraRollSpeed", DEFAULT_CAMERA_ROLL_SPEED, 0.0f, DEFAULT_CAMERA_ROLL_SPEED * 3);           //
         }
 
         bool mousePressed(const MouseButtonEvent &evt) override
@@ -155,7 +153,7 @@ namespace fog
 
             node->setPosition(posTarget);
 
-            global->Var<Vector3>::Bag::setVar(".camera.position", posTarget);
+            Context<Var<Vector3>::Bag*>::get()->setVar(".camera.position", posTarget);
 
             alignHorizonToTop(node, cam, *this->cameraTopDistanceVptr);
             return false;

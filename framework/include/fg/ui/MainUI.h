@@ -18,7 +18,6 @@
 namespace fog{
 class MainUI
 {
-    Global *global;
     Core *core;
     bool breakRenderRequested = false;
     RenderWindow *window;
@@ -30,11 +29,10 @@ public:
     MainUI(Core *core,CostMap* costMap)
     {
         this->core = core;
-        this->global = core->getGlobal();
         this->window = core->getWindow();
         this->vp = core->getViewport();
         this->sceMgr = core->getSceneManager();
-        this->initGlobalVarPtr(core->getGlobal());
+        this->initGlobalVarPtr();
         // active tray
 
         //
@@ -58,7 +56,7 @@ public:
         ImGui::Indent(15.0f);
         int actors = 0;
 
-        this->global->Var<Actor*>::Bag::forEachVarPtr<int &>(MainUI::forEachVarPtr, actors);
+        Context<Var<Actor*>::Bag*>::get()->forEachVarPtr<int &>(MainUI::forEachVarPtr, actors);
         ImGui::Unindent(15.0f);
 
         vp = core->getViewport();
@@ -68,9 +66,8 @@ public:
         ImGui::Text(fmt::format("Window.pixel:      {},{}", window->getWidth(), window->getHeight()).c_str());
 
         int counter = 0;
-        this->global->Var<float>::Bag::forEachVarPtr<int &>(MainUI::forEachVarPtr, counter);
 
-        this->global->Var<Vector3>::Bag::forEachVarPtr<int &>(MainUI::forEachVarPtr, counter);
+        Context<Var<Vector3>::Bag*>::get()->forEachVarPtr<int &>(MainUI::forEachVarPtr, counter);
 
         Vector3 pO = Context<Node2D*>::get()->plane->getOrigin();
 
@@ -123,10 +120,10 @@ public:
         ImGui::SliderFloat(name.c_str(), vPtr, min, max);
     }
 
-    void initGlobalVarPtr(Global *glb)
+    void initGlobalVarPtr()
     {
-        glb->Var<float>::Bag::createBindVptr(".aniSpeed", 0.55f, 0.0f, 2.0f);
-        glb->Var<float>::Bag::createBindVptr(".pathSpeed", 1.0f, 1.0f, 10.0f);
+        Context<Var<float>::Bag*>::get()->createBindVptr(".aniSpeed", 0.55f, 0.0f, 2.0f);
+        Context<Var<float>::Bag*>::get()->createBindVptr(".pathSpeed", 1.0f, 1.0f, 10.0f);
     }
 };
 };//end of namespace

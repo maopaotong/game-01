@@ -24,7 +24,7 @@ namespace fog
         Vector3Ref actorPosition;
 
     public:
-        PathFollow2MissionState(Global *global, PathFollow2 *path, AnimationStateSet *aniSet, std::vector<std::string> &aniNames, float aniSpeed, float heightOffset = 0.0f) : animateTimeSpeedFactor(aniSpeed)
+        PathFollow2MissionState(PathFollow2 *path, AnimationStateSet *aniSet, std::vector<std::string> &aniNames, float aniSpeed, float heightOffset = 0.0f) : animateTimeSpeedFactor(aniSpeed)
         {
 
             this->path = path;

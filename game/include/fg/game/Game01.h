@@ -22,7 +22,6 @@ namespace fog
 {
     class Game01 : public Module, Game//, public FrameListener
     {
-        Global *global;
         Core *core;
         bool breakRenderRequested = false;
         RenderWindow *window;
@@ -49,7 +48,6 @@ namespace fog
         void active(Core *core) override
         {
             this->core = core;
-            this->global = core->getGlobal();
             this->window = core->getWindow();
             this->vp = core->getViewport();
             this->sceMgr = core->getSceneManager();

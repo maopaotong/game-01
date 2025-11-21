@@ -42,12 +42,10 @@ namespace fog
         Viewport *viewport;
         Camera *camera;
         SceneManager *sMgr;
-        Global *global;
 
     public:
-        MouseClickPicker(Global *global, Camera *cam, SceneManager *sMgr, Viewport *vp)
+        MouseClickPicker( Camera *cam, SceneManager *sMgr, Viewport *vp)
         {
-            this->global = global;
             this->camera = cam;
             this->sMgr = sMgr;
             this->viewport = vp;
@@ -70,7 +68,7 @@ namespace fog
             {
                 actor = dynamic_cast<Actor *>(picked);
                 if(actor){
-                    global->Var<Actor *>::Bag::setVar(".activeActor", actor);
+                    Context<Var<Actor *>::Bag*>::get()->setVar(".activeActor", actor);
                 }                
             }
             return actor;

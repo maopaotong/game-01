@@ -23,7 +23,6 @@ namespace fog
 {
     class OnFrameUI : public ImGuiApp::FrameListener
     {
-        Global *global;
         Core *core;
         bool breakRenderRequested = false;
         RenderWindow *window;
@@ -39,7 +38,6 @@ namespace fog
         OnFrameUI(Core *core, CostMap *costMap)
         {
             this->core = core;
-            this->global = core->getGlobal();
             this->window = core->getWindow();
             this->vp = core->getViewport();
             this->sceMgr = core->getSceneManager();

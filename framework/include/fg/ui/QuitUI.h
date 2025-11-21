@@ -19,7 +19,6 @@ namespace fog
 {
     class QuitUI : public UIState
     {
-        Global *global;
         Core *core;
         bool breakRenderRequested = false;
         RenderWindow *window;
@@ -31,7 +30,6 @@ namespace fog
         QuitUI(Core *core, CostMap *costMap) : UIState("Quit")
         {
             this->core = core;
-            this->global = core->getGlobal();
             this->window = core->getWindow();
             this->vp = core->getViewport();
             this->sceMgr = core->getSceneManager();

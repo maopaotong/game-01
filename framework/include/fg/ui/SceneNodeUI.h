@@ -24,7 +24,6 @@ class SceneNodeUI
     template <typename... Args>
     using SceneNodeVistFunc = bool (*)(int depth, SceneNode *cNode, Args... args);
 
-    Global *global;
     Core *core;
     bool breakRenderRequested = false;
     RenderWindow *window;
@@ -36,7 +35,6 @@ public:
     SceneNodeUI(Core *core)
     {
         this->core = core;
-        this->global = core->getGlobal();
         this->window = core->getWindow();
         this->vp = core->getViewport();
         this->sceMgr = core->getSceneManager();

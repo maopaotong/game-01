@@ -21,7 +21,6 @@ namespace fog
                    public Var<Actor *>::Bag        //
                   
     {
-        typedef void (*FloatVarVistFunc)(const std::string name, float *vPtr, Var<float>::Range *range);
 
     public:
         

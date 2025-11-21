@@ -36,7 +36,6 @@ namespace fog
     public:
         SimpleCore(Game*game) : Core(game)
         {
-            this->global = new Global();
             appCtx = new ImGuiAppContext("HexagonalGridVisualizer");
 
             appCtx->initApp();
@@ -102,10 +101,7 @@ namespace fog
         Viewport *getViewport() override { return this->vp; }
         Camera *getCamera() override { return this->camera; }
         Root *getRoot() override { return this->root; };
-        Global *getGlobal() override
-        {
-            return this->global;
-        }
+        
         Light *getLight()
         {
             return this->light;

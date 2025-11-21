@@ -72,7 +72,6 @@ namespace fog
         protected:
             Core *core;
             CostMap *costMap;
-            Global *global;
             CellKey cKey2;
             //
             PathFollow2MissionState *mission = nullptr;
@@ -81,7 +80,7 @@ namespace fog
             PathFollow2 *pathFollow2;
 
         public:
-            Task(Targets::MoveToCell *target, Owner *owner, CostMap *costMap, Global *global, Core *core) : core(core), costMap(costMap), global(global), cKey2(target->cKey),
+            Task(Targets::MoveToCell *target, Owner *owner, CostMap *costMap, Core *core) : core(core), costMap(costMap), cKey2(target->cKey),
                                                                                                target(target), owner(owner), Tasks::Task(target, owner)
             {
             }
@@ -192,8 +191,9 @@ namespace fog
                 // Context<Node2D*>::get()->
 
                 std::vector<Vector2> pathByPointIn2D = Context<Cell::Center *>::get()->getCellPointListByNomPoints(pathByPoint2DNom);
-                float pathSpeed = this->global->Var<float>::Bag::getVarVal(".pathSpeed", 1.0f);
+                //float pathSpeed = this->Context<Var<float>::Bag*>::get()->getVarVal(".pathSpeed", 1.0f);
 
+                float pathSpeed = Context<Var<float>::Bag*>::get()->getVarVal(".pathSpeed", 1.0f);
                 PathFollow2 *path = new PathFollow2(actorPosIn2D, pathByPointIn2D, pathSpeed);
                 pathStateRef = new PathState(core);
                 pathStateRef->init();
@@ -212,9 +212,11 @@ namespace fog
                 }
 
                 AnimationStateSet *anisSet = owner->entity->getAllAnimationStates();
-                float aniSpeed = this->global->Var<float>::Bag::getVarVal(".aniSpeed", 1.0f);
+                //float aniSpeed = this->Context<Var<float>::Bag*>::get()->getVarVal(".aniSpeed", 1.0f);
+                float aniSpeed = Context<Var<float>::Bag*>::get()->getVarVal(".aniSpeed", 1.0f);
+
                 // new child state.
-                PathFollow2MissionState *mission = new PathFollow2MissionState(global, path2D, anisSet, owner->aniNames, aniSpeed, owner->actorHighOffset); //
+                PathFollow2MissionState *mission = new PathFollow2MissionState(path2D, anisSet, owner->aniNames, aniSpeed, owner->actorHighOffset); //
                 mission->init();
                 // delete missionState;
                 // this->addChild(missionState);
