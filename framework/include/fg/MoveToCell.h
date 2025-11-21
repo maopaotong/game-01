@@ -39,7 +39,7 @@ namespace fog
         public:
             Owner(long mask) : Tasks::Owner(mask), Tasks::Task(nullptr, nullptr)
             {
-                this->push(this);
+                this->doPush(this);
             }
 
             std::vector<std::string> aniNames = {"RunBase", "RunTop"};
@@ -49,10 +49,23 @@ namespace fog
             float actorHighOffset;
             State *state;
 
+            bool init() override
+            {
+                return true;
+            }
             bool step(float time) override
             {
                 return true;
             }
+            bool pause() override
+            {
+                return true;
+            }
+
+            void resume() override
+            {
+            }
+            void wait() {}
 
             void destroy()
             {
@@ -72,7 +85,6 @@ namespace fog
             CellKey cKey2;
             //
             PathFollow2MissionState *mission = nullptr;
-            PathFollow2 *path = nullptr;
             bool failed = false;
 
         public:
@@ -81,55 +93,69 @@ namespace fog
             {
             }
 
+            bool init() override
+            {
+                this->mission = this->tryCreateMission();
+                if (!this->mission)
+                {
+                    return false;
+                }
+                return true;
+            }
+
             void destroy() override
             {
                 owner->state->removeChild(this->mission);
                 delete this->mission;
             }
 
+            bool pause() override
+            {
+                return true;
+            }
+
+            void resume() override
+            {
+            }
+            void wait() override
+            {
+            }
+
             bool step(float time) override
             {
-                if (this->failed)
-                {
-                    return false;
-                }
-                // todo call mission's step method.
-                if (!this->mission)
-                {
-                    this->mission = this->tryCreateMission();
-                    if (!this->mission)
-                    {
-                        this->failed = true; // failed to create mission.
-                        // so stop this task, do not call step next time.
-                        return false;
-                    }
-                }
                 return mission->step(time);
             }
 
-            void setPath(PathFollow2 *path)
+            bool tryResolveOwnerCell(CellKey &cKey, Vector2 &actorPosIn2D)
             {
-                this->path = path;
-            }
-
-            PathFollow2MissionState *tryCreateMission()
-            {
-
                 Cell::Center *cells = Context<Cell::Center *>::get();
 
                 // check if this state's position on the target cell
                 Vector3 aPos3 = this->owner->sceNode->getPosition();
                 Node2D *root2D = cells->getRoot2D();
-                Vector2 actorPosIn2D = root2D->to2D(aPos3);
+                actorPosIn2D = root2D->to2D(aPos3);
                 Cell::Instance cell;
                 // bool hitCell = CellUtil::findCellByPoint(costMap, aPos2, aCellKey);
                 bool hitCell = Context<Cell::Center *>::get()->findCellByWorldPosiion(aPos3, cell);
                 if (!hitCell)
                 {
+                    return false;
+                }
+                cKey = cell.cKey;
+                return true;
+            }
+
+            PathFollow2 *tryBuildPath()
+            {
+
+                CellKey aCellKey;
+                Vector2 actorPosIn2D;
+                if (!this->tryResolveOwnerCell(aCellKey, actorPosIn2D))
+                {
                     return nullptr;
                 }
-                CellKey aCellKey = cell.cKey;
-                std::vector<Vector2> pathByPoint2DNom = costMap->findPath(cell.cKey, cKey2);
+
+                std::vector<Vector2> pathByPoint2DNom = costMap->findPath(aCellKey, cKey2);
 
                 std::vector<Vector2> pathByCellCenterIn2D;
 
@@ -141,8 +167,18 @@ namespace fog
                 float pathSpeed = this->global->Var<float>::Bag::getVarVal(".pathSpeed", 1.0f);
 
                 PathFollow2 *path = new PathFollow2(actorPosIn2D, pathByPointIn2D, pathSpeed);
-                this->setPath(path);
                 owner->pathState->setPath(pathByPoint2DNom, aCellKey, cKey2);
+                return path;
+            }
+            PathFollow2MissionState *tryCreateMission()
+            {
+
+                PathFollow2 *path = tryBuildPath();
+                if (!path)
+                {
+                    return nullptr;
+                }
+
                 AnimationStateSet *anisSet = owner->entity->getAllAnimationStates();
                 float aniSpeed = this->global->Var<float>::Bag::getVarVal(".aniSpeed", 1.0f);
                 // new child state.
