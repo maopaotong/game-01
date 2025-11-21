@@ -44,7 +44,6 @@ namespace fog
 
             std::vector<std::string> aniNames = {"RunBase", "RunTop"};
             SceneNode *sceNode;
-            PathState *pathState;
             Entity *entity;
             float actorHighOffset;
             State *state;
@@ -80,16 +79,19 @@ namespace fog
             Target *target;
 
         protected:
+            Core *core;
             CostMap *costMap;
             Global *global;
             CellKey cKey2;
             //
             PathFollow2MissionState *mission = nullptr;
             bool failed = false;
+            PathState *pathState;
+            PathFollow2 *pathFollow2;
 
         public:
-            Task(Target *target, Owner *owner, CostMap *costMap, Global *global) : costMap(costMap), global(global), cKey2(target->cKey),
-                                                                                   target(target), owner(owner), Tasks::Task(target, owner)
+            Task(Target *target, Owner *owner, CostMap *costMap, Global *global, Core *core) : core(core), costMap(costMap), global(global), cKey2(target->cKey),
+                                                                                               target(target), owner(owner), Tasks::Task(target, owner)
             {
             }
 
@@ -105,6 +107,10 @@ namespace fog
                     owner->state->removeChild(this->mission);
                     delete this->mission;
                     this->mission = nullptr;
+                    delete this->pathFollow2;
+                    this->pathFollow2 = nullptr;
+                    delete this->pathState;
+                    this->pathState = nullptr;
                 }
             }
 
@@ -165,7 +171,7 @@ namespace fog
                 return true;
             }
 
-            PathFollow2 *tryBuildPath(MoveToCell::Task *preTask)
+            PathFollow2 *tryBuildPath(MoveToCell::Task *preTask, PathState *&pathStateRef)
             {
 
                 CellKey aCellKey;
@@ -198,15 +204,18 @@ namespace fog
                 float pathSpeed = this->global->Var<float>::Bag::getVarVal(".pathSpeed", 1.0f);
 
                 PathFollow2 *path = new PathFollow2(actorPosIn2D, pathByPointIn2D, pathSpeed);
-                owner->pathState->setPath(pathByPoint2DNom, aCellKey, cKey2);
+                pathStateRef = new PathState(core);
+                pathStateRef->init();
+                pathStateRef->setPath(pathByPoint2DNom, aCellKey, cKey2);
                 return path;
             }
 
             bool tryBuildMission(MoveToCell::Task *preTask)
             {
 
-                PathFollow2 *path = tryBuildPath(preTask);
-                if (!path)
+                PathState *pathStateRef;
+                PathFollow2 *path2D = tryBuildPath(preTask, pathStateRef);
+                if (!path2D)
                 {
                     return false;
                 }
@@ -214,12 +223,14 @@ namespace fog
                 AnimationStateSet *anisSet = owner->entity->getAllAnimationStates();
                 float aniSpeed = this->global->Var<float>::Bag::getVarVal(".aniSpeed", 1.0f);
                 // new child state.
-                PathFollow2MissionState *mission = new PathFollow2MissionState(global, path, anisSet, owner->aniNames, aniSpeed, owner->actorHighOffset); //
+                PathFollow2MissionState *mission = new PathFollow2MissionState(global, path2D, anisSet, owner->aniNames, aniSpeed, owner->actorHighOffset); //
                 mission->init();
                 // delete missionState;
                 // this->addChild(missionState);
                 owner->state->addChild(mission);
                 this->mission = mission;
+                this->pathState = pathStateRef;
+                this->pathFollow2 = path2D;
                 return true;
             }
         };

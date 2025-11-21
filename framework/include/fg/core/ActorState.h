@@ -24,10 +24,8 @@ namespace fog
         constexpr static float ACTOR_HEIGHT = 10.0f;
 
     protected:
-        PathFollow2 *pathFolow = nullptr;
         Ogre::Entity *entity;
         CostMap *costMap;
-        PathState *pathState;
 
         PathFollow2MissionState *mission = nullptr;
         std::vector<std::string> aniNames = {"RunBase", "RunTop"};
@@ -44,14 +42,14 @@ namespace fog
         {
             Global *global;
             CostMap *costMap;
-
+            Core * core;
         public:
-            MoveToCellTaskOwner(Global *global, CostMap *costMap) : MoveToCell::Owner(1), costMap(costMap), global(global)
+            MoveToCellTaskOwner(Global *global, CostMap *costMap,Core* core) : MoveToCell::Owner(1), costMap(costMap), global(global),core(core)
             {
             }
             bool tryTakeTarget(Tasks::Target *target) override
             {
-                this->pushOrWait(new MoveToCell::Task(static_cast<MoveToCell::Target *>(target), this, costMap, global));
+                this->pushOrWait(new MoveToCell::Task(static_cast<MoveToCell::Target *>(target), this, costMap, global,core));
                 //
                 return true;
             }
@@ -67,9 +65,6 @@ namespace fog
             this->actorScaleVptr = core->getGlobal()->Var<float>::Bag::createBindVptr(".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
             this->actorHighVptr = core->getGlobal()->Var<float>::Bag::createBindVptr(".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
             this->actorHighOffset = *this->actorHighVptr / 2.0f * *actorScaleVptr;
-
-            pathState = new PathState(core);
-            pathState->init();
 
             this->setPickable(this);
             this->setFrameListener(this);
@@ -91,11 +86,10 @@ namespace fog
             this->position = this->createProperty("actor.position", Vector3(0, height + this->actorHighOffset, 0));
             sceNode->translate(this->position);
             // init task owner.
-            MoveToCell::Owner *owner = new MoveToCellTaskOwner(global, costMap);
+            MoveToCell::Owner *owner = new MoveToCellTaskOwner(global, costMap,core);
             owner->actorHighOffset = this->actorHighOffset;
             owner->aniNames = aniNames;
             owner->entity = this->entity;
-            owner->pathState = this->pathState;
             owner->sceNode = this->sceNode;
             owner->state = this;
 
@@ -113,14 +107,6 @@ namespace fog
             return this->entity;
         }
 
-        PathFollow2 *getPath()
-        {
-            return this->pathFolow;
-        }
-        void setPath(PathFollow2 *path)
-        {
-            this->pathFolow = path;
-        }
         bool pickUp(MovableObject *actorMo) override
         {
             // cout << "ActorState::afterPick" << endl;
@@ -144,24 +130,11 @@ namespace fog
                 }
                 else
                 {
-                    actor->setActive(false);
-                    actor->setPath(nullptr);
-                    CellKey start;
-                    if (this->pathState->getStart(start))
-                    {
-                        //    markStateControls[MarkType::ACTIVE]->mark(start, false);
-                        this->pathState->clearPath();
-                    }
+                    actor->setActive(false);                    
                 }
             }
             return this->active;
         }
-
-        virtual CellKey getDestinationCell() override
-        {
-            return this->pathState->getDestinationCell();
-        }
-
         bool frameStarted(const FrameEvent &evt) override
         {
             void (*func)(State *, const FrameEvent &evt) = [](State *cState, const FrameEvent &evt)

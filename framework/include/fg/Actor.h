@@ -9,7 +9,6 @@ namespace fog
     {
     public:
         virtual ~Actor() = default;
-        virtual CellKey  getDestinationCell() = 0;
         
     };
 };

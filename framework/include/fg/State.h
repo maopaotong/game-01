@@ -86,6 +86,9 @@ namespace fog
         }
         virtual ~State()
         {
+            //todo delete child.
+            //todo remove sceneNode...
+            
             std::cout << "~State()" << this << "" << std::endl;
         }
         Tasks::Owner *getTaskOwner()
