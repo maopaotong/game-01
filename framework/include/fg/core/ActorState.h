@@ -55,16 +55,18 @@ namespace fog
             }
         };
 
+        std::string name;
+
     public:
-        ActorState(CostMap *costMap, Core *core) : core(core)
+        ActorState(std::string name, CostMap *costMap, Core *core) : name(name), core(core)
         {
 
             this->costMap = costMap;
 
             // this->actorScaleVptr = core->getGlobal()->Var<float>::Bag::createBindVptr(".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
             // this->actorHighVptr = core->getGlobal()->Var<float>::Bag::createBindVptr(".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
-            this->actorScaleVptr = Context<Var<float>::Bag *>::get()->createBindVptr(".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
-            this->actorHighVptr =Context<Var<float>::Bag *>::get()->createBindVptr(".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
+            this->actorScaleVptr = Context<Var<float>::Bag *>::get()->createBindVptr(name + ".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
+            this->actorHighVptr = Context<Var<float>::Bag *>::get()->createBindVptr(name + ".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
 
             this->actorHighOffset = *this->actorHighVptr / 2.0f * *actorScaleVptr;
 
@@ -85,7 +87,7 @@ namespace fog
 
             float height = Context<Terrains *>::get()->getHeightWithNormalAtWorldPosition(Vector3(0, 0, 0), nullptr);
 
-            this->position = this->createProperty("actor.position", Vector3(0, height + this->actorHighOffset, 0));
+            this->position = this->createProperty(name + ".actor.position", Vector3(0, height + this->actorHighOffset, 0));
             sceNode->translate(this->position);
             // init task owner.
             MoveToCell::Owner *owner = new MoveToCellTaskOwner(global, costMap, core);

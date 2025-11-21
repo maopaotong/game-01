@@ -29,7 +29,7 @@ namespace fog
         {
             Cell::Center *cc = Context<Cell::Center *>::get();
             cell = cc->getAnyCell();
-            actorPosition = this->getProperty<Vector3>("actor.position");
+            actorPosition = this->getProperty<Vector3>("actor1"".actor.position");
             //prePosition = actorPosition;
             CellStateBase::init();
         }

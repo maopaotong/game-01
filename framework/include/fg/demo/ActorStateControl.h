@@ -18,7 +18,7 @@ namespace fog
         CostMap *costMap;
 
     public:
-        ActorStateControl(CostMap *costMap, Core *core) : ActorState(costMap, core)
+        ActorStateControl(std::string name, CostMap *costMap, Core *core) : ActorState(name, costMap, core)
         {
         }
         void create(SceneManager *sMgr, Entity *&entity, SceneNode *&node) override
@@ -27,7 +27,7 @@ namespace fog
             entity = sMgr->createEntity("Sinbad.mesh");
             entity->setQueryFlags(0x00000001);
 
-            sceNode = sMgr->getRootSceneNode()->createChildSceneNode("SinbadNode");
+            sceNode = sMgr->getRootSceneNode()->createChildSceneNode();
             sceNode->setScale(*actorScaleVptr, *actorScaleVptr, *actorScaleVptr);
             sceNode->attachObject(entity);
 
@@ -37,6 +37,5 @@ namespace fog
         {
             ActorState::init();
         }
-
     };
 }; // end of namespace

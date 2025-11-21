@@ -55,18 +55,19 @@ public:
         root->addFrameListener(cameraState);
 
         markStateControls[MarkType::ACTIVE] = new CellMarkStateControl(costMap, core, MarkType::ACTIVE);
-        ActorStateControl *actor1 = new ActorStateControl(costMap, core);
+        ActorStateControl *actor1 = new ActorStateControl("actor1",costMap, core);
         actor1->init();
-        // root->addFrameListener(actor1);
-
-        
-        
-
         this->addChild(actor1);
-        ActorSelectControl *actor2 = new ActorSelectControl(costMap, core);
+        
+        ActorStateControl *actor2 = new ActorStateControl("actor2",costMap, core);
         actor2->init();
-        actor1->addChild(actor2);
-        root->addFrameListener(actor2);
+        this->addChild(actor2);
+        
+        ActorSelectControl *actorS1 = new ActorSelectControl(costMap, core);
+        actorS1->init();
+        actor1->addChild(actorS1);
+
+        root->addFrameListener(actorS1);
 
         MainInputListener *keyHandler = new MainInputListener(costMap,core);
         core->getAppContext()->addInputListener(keyHandler);

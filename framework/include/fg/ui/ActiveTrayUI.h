@@ -27,7 +27,7 @@ namespace fog
         }
         void init() override
         {
-            actorPosition = this->getProperty<Vector3>("actor.position", false);
+            actorPosition = this->getProperty<Vector3>("actor1"".actor.position", false);
             UIState::init();
         }
 
