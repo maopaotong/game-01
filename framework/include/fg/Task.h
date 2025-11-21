@@ -7,6 +7,7 @@
 #include <memory>
 #include <type_traits>
 #include <functional>
+#include <stack>
 
 namespace fog
 {
@@ -37,6 +38,11 @@ namespace fog
                 }
                 tasks.erase(id);
             }
+        };
+
+        class Stack{
+            std::stack<std::unique_ptr<Task>> stack;
+            
         };
 
         template <typename T, typename O>

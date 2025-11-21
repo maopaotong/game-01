@@ -59,6 +59,10 @@ namespace fog
             this->setFrameListener(this);
         }
 
+        virtual ~ActorState(){
+
+        }
+        
         virtual void init() override
         {
 
@@ -152,7 +156,7 @@ namespace fog
                 FrameListener *fl = cState->getFrameListener();
                 if (fl)
                 {
-                    fl->frameStarted(evt);
+                   // fl->frameStarted(evt);
                 }
             };
             this->forEachChild<const FrameEvent &>(func, evt);

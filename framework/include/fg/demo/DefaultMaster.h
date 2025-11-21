@@ -74,7 +74,7 @@ namespace fog
         {
 
             std::unordered_set<long> doneSet;
-
+            
             for (auto it = tasksToBeChecked.begin(); it != tasksToBeChecked.end();)
             {
 
@@ -116,6 +116,18 @@ namespace fog
                     it++;
                 }
             }
+
+            //for each idle state, ask the manager for a task.
+            root->forEachChild([time](State* state){
+                Task* task = state->getTask();
+                if(task){
+                    task->step(time);
+                    if(task->isDone()){
+                        state->pop();
+                    }
+                }
+                return false;
+            });
 
             if (allTasks.empty())
             {

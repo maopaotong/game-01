@@ -58,6 +58,8 @@ public:
         ActorStateControl *actor1 = new ActorStateControl(costMap, core);
         actor1->init();
         root->addFrameListener(actor1);
+
+        
         
 
         this->addChild(actor1);

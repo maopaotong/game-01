@@ -3,6 +3,7 @@
 #include <Ogre.h>
 #include <OgreNode.h>
 #include <type_traits>
+#include <stack>
 #include <functional>
 #include <iostream>
 #include "PathFollow2.h"
@@ -62,6 +63,7 @@ namespace fog
         std::vector<State *> *children = nullptr;
         bool active = false;
         Options options;
+        std::stack<std::unique_ptr<Task>> tasks;
 
         template <typename T>
         Property::Ref<T> createProperty(std::string name, T defaultValue)
@@ -91,6 +93,22 @@ namespace fog
         virtual std::type_index getTaskOwnerType()
         {
             return std::type_index(typeid(nullptr));
+        }
+
+        void push(Task * task){
+
+            this->tasks.push(std::unique_ptr<Task>(task));
+
+        }
+        void pop(){
+            this->tasks.pop();
+        }
+        Task * getTask(){
+            
+            if(tasks.empty()){
+                return nullptr;
+            }
+            return tasks.top().get();
         }
 
         virtual void init() {
