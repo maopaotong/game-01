@@ -8,13 +8,12 @@
 #include <type_traits>
 #include <functional>
 #include <utility>
-#include "Tasks.h"
 #include <Ogre.h>
-#include "Cell.h"
-#include "Context.h"
+#include <fg/Cell.h>
+#include <fg/Context.h>
 #include "OgreSceneNode.h"
 #include "fg/util/CostMap.h"
-#include "Global.h"
+#include <fg/Global.h>
 #include "fg/PathFollow2.h"
 #include "fg/core/PathState.h"
 #include "fg/core/PathFollow2MissionState.h"
@@ -25,15 +24,7 @@ namespace fog
     class MoveToCell
     {
     public:
-        struct Target : public Tasks::Target
-        {
-
-            CellKey cKey;
-            Target(CellKey cKey) : cKey(cKey)
-            {
-            }
-        };
-
+        
         class Owner : public Tasks::Owner, public Tasks::Task
         {
         public:
@@ -76,7 +67,7 @@ namespace fog
         {
 
             Owner *owner;
-            Target *target;
+            Targets::MoveToCell *target;
 
         protected:
             Core *core;
@@ -90,7 +81,7 @@ namespace fog
             PathFollow2 *pathFollow2;
 
         public:
-            Task(Target *target, Owner *owner, CostMap *costMap, Global *global, Core *core) : core(core), costMap(costMap), global(global), cKey2(target->cKey),
+            Task(Targets::MoveToCell *target, Owner *owner, CostMap *costMap, Global *global, Core *core) : core(core), costMap(costMap), global(global), cKey2(target->cKey),
                                                                                                target(target), owner(owner), Tasks::Task(target, owner)
             {
             }

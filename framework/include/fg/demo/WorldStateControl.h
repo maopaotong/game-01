@@ -57,7 +57,7 @@ public:
         markStateControls[MarkType::ACTIVE] = new CellMarkStateControl(costMap, core, MarkType::ACTIVE);
         ActorStateControl *actor1 = new ActorStateControl(costMap, core);
         actor1->init();
-        root->addFrameListener(actor1);
+        // root->addFrameListener(actor1);
 
         
         

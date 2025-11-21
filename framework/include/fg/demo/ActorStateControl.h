@@ -6,7 +6,7 @@
 #include "fg/core/ActorState.h"
 #include "fg/Core.h"
 #include "fg/Terrains.h"
-#include "fg/MoveToCell.h"
+#include "fg/core/MoveToCell.h"
 
 namespace fog
 {

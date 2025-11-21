@@ -30,7 +30,7 @@
 #include "fg/Ground.h"
 #include "fg/Core.h"
 #include "fg/Master.h"
-#include "fg/MoveToCell.h"
+#include "fg/Targets.h"
 
 namespace fog
 {
@@ -111,7 +111,7 @@ namespace fog
                     //Master *master = Context<Master *>::get();
 
                     //master->add(new MoveToCellTask(costMap, global, cKey));
-                    MoveToCell::Target* target = new MoveToCell::Target(cKey);
+                    Targets::MoveToCell* target = new Targets::MoveToCell(cKey);
                     core->getRootState() ->forEachChild([target](State* state){
                         Tasks::Owner * owner = state->getTaskOwner();
                         

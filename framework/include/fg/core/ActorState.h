@@ -11,13 +11,13 @@
 #include "fg/util/CollectionUtil.h"
 #include "fg/Movable.h"
 #include "fg/Actor.h"
-#include "fg/MoveToCell.h"
+#include "fg/core/MoveToCell.h"
 
 namespace fog
 {
     using namespace Ogre;
     using Vector3Ref = Property::Ref<Vector3>;
-    class ActorState : public State, public Pickable, public Ogre::FrameListener, public Actor
+    class ActorState : public State, public Pickable, public Actor
     {
 
         constexpr static float ACTOR_SCALE = 5.0f;
@@ -49,7 +49,7 @@ namespace fog
             }
             bool tryTakeTarget(Tasks::Target *target) override
             {
-                this->pushOrWait(new MoveToCell::Task(static_cast<MoveToCell::Target *>(target), this, costMap, global,core));
+                this->pushOrWait(new MoveToCell::Task(static_cast<Targets::MoveToCell *>(target), this, costMap, global,core));
                 //
                 return true;
             }
@@ -67,7 +67,7 @@ namespace fog
             this->actorHighOffset = *this->actorHighVptr / 2.0f * *actorScaleVptr;
 
             this->setPickable(this);
-            this->setFrameListener(this);
+            // this->setFrameListener(this);
         }
 
         virtual ~ActorState()
@@ -135,18 +135,6 @@ namespace fog
             }
             return this->active;
         }
-        bool frameStarted(const FrameEvent &evt) override
-        {
-            void (*func)(State *, const FrameEvent &evt) = [](State *cState, const FrameEvent &evt)
-            {
-                FrameListener *fl = cState->getFrameListener();
-                if (fl)
-                {
-                    // fl->frameStarted(evt);
-                }
-            };
-            this->forEachChild<const FrameEvent &>(func, evt);
-            return true;
-        }
+       
     };
 }; // end of namespace
