@@ -42,11 +42,6 @@ namespace fog
             Task(Target *target, Owner *owner) : owner(owner), target(target)
             {
             }
-            /**
-             * is the step0
-             * @return false: will be delete and no nother method is called .
-             */
-            virtual bool init() = 0;
             virtual bool step(float time) override = 0;
             /**
              * if the task is pauseable , new task will push to the top of the stack.
@@ -56,9 +51,9 @@ namespace fog
              *
              */
             virtual bool pause() = 0;
-            virtual void resume() = 0;
+            virtual bool resume() = 0;
             virtual void destroy() = 0;
-            virtual void wait() = 0;
+            virtual bool wait(Task* toWait) = 0;
         };
 
         class Owner
@@ -74,8 +69,12 @@ namespace fog
 
             void append(Task *task)
             {
+                Task* toWait = this->top();
+                if(!queue.empty()){
+                    toWait = queue.at(queue.size()-1);
+                }
                 queue.push_back(task);
-                task->wait();
+                task->wait(toWait);
             }
 
             void doPush(Task *task)
@@ -88,6 +87,7 @@ namespace fog
                 if (this->top()->pause())
                 {
                     this->doPush(task);
+
                     return true;
                 }
                 
@@ -114,19 +114,16 @@ namespace fog
 
             virtual bool tryTakeTarget(Target *target) = 0;
 
-            void push(Task *task)
+            void pushOrWait(Task *task)
             {
 
-                if (!task->init())
-                {
-                    delete task;
-                    return;
-                }
                 if (this->tryPush(task))
                 {
+
                     return;
                 }
                 this->append(task);
+
             }
 
             Task *top()
@@ -138,7 +135,9 @@ namespace fog
             {
                 this->stack.pop();
                 this->popCounter++;
-
+                //
+                //trying to push the task from queue,until there is any top of task cannot de paused.
+                //
                 for (auto it = this->queue.begin(); it != this->queue.end();)
                 {
                     Task *task = *it;
@@ -152,6 +151,7 @@ namespace fog
                         break;
                     }
                 }
+                //resume one from the top.
 
                 this->top()->resume();
             }
@@ -164,6 +164,9 @@ namespace fog
             long getPopCounter()
             {
                 return popCounter;
+            }
+            long queueSize(){
+                return this->queue.size();
             }
         };
         class Runner : public FrameListener

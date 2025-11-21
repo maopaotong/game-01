@@ -75,44 +75,6 @@ namespace fog
                 return Cell::getOrigin2D(cKey.first, cKey.second, node->scale);
             }
 
-            // void buildMesh(ManualObject *obj, ColourValue color)
-            // {
-            //     Vector2 origin = this->getOrigin2D();
-            //     Vector3 nom3(0, 1, 0);
-
-            //     struct Visit
-            //     {
-            //         ManualObject *obj;
-            //         ColourValue color;
-            //         Cell::Instance *this_;
-            //         Vector2 origin;
-            //         Vector3 nom3;
-            //         int layer;
-            //         void operator()(int pIdx, Vector2 &pointOnCircle)
-            //         {
-            //             Vector2 pointIn2D = pointOnCircle * this_->node->scale + origin;
-            //             Vector3 positionIn3D = this_->node->plane->to3D(pointIn2D);
-
-            //             obj->position(positionIn3D);
-            //             obj->normal(nom3);
-            //             obj->colour(color);
-            //         }
-            //     } visit{
-            //         obj,
-            //         color,
-            //         this,
-            //         origin,
-            //         nom3,
-            //     };
-
-            //     int LAYERS = 1;
-            //     for (int i = 0; i < LAYERS; i++)
-            //     {
-            //         visit.layer = i + 1;
-            //         float sizeI = std::powf(2, i) * 6;
-            //         forEachPointOnCircle(sizeI, 0.0f, visit);
-            //     }
-            // }
         };
 
         class Center
@@ -131,6 +93,11 @@ namespace fog
                 Vector3 pos3D = root->to3D(pos2D);
                 root->plane->setOrigin(Vector3(-pos3D.x, 0.0f, -pos3D.z));
             }
+            
+            Cell::Instance getCell(CellKey cKey){
+                return Cell::Instance(cKey, root);
+            }
+
             Cell::Instance getAnyCell()
             {
                 return Cell::Instance(0, 0, root);

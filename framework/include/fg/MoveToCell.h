@@ -49,10 +49,6 @@ namespace fog
             float actorHighOffset;
             State *state;
 
-            bool init() override
-            {
-                return true;
-            }
             bool step(float time) override
             {
                 return true;
@@ -62,12 +58,16 @@ namespace fog
                 return true;
             }
 
-            void resume() override
+            bool resume() override
             {
+                return true;
             }
-            void wait() {}
+            bool wait(Task *toWait) override
+            {
+                return true;
+            }
 
-            void destroy()
+            void destroy() override
             {
                 // todo destoy the owner by remove owner from monitor.
             }
@@ -93,36 +93,56 @@ namespace fog
             {
             }
 
-            bool init() override
-            {
-                this->mission = this->tryCreateMission();
-                if (!this->mission)
-                {
-                    return false;
-                }
-                return true;
-            }
-
             void destroy() override
             {
-                owner->state->removeChild(this->mission);
-                delete this->mission;
+                this->deleteMission();
+            }
+
+            void deleteMission()
+            {
+                if (this->mission)
+                {
+                    owner->state->removeChild(this->mission);
+                    delete this->mission;
+                    this->mission = nullptr;
+                }
             }
 
             bool pause() override
             {
-                return true;
+                return false;
             }
 
-            void resume() override
+            bool resume() override
             {
+                if (this->mission)
+                {
+                    return true;
+                }
+                return this->tryBuildMission(nullptr);
             }
-            void wait() override
+
+            bool wait(Tasks::Task *toWait) override
             {
+                this->deleteMission();
+                auto preTask = dynamic_cast<MoveToCell::Task *>(toWait);
+                if (!preTask)
+                {
+                    return false;
+                }
+                this->tryBuildMission(preTask);
+                return true;
             }
 
             bool step(float time) override
             {
+                if (!this->mission)
+                {
+                    if (!this->tryBuildMission(nullptr))
+                    {
+                        return false;
+                    }
+                }
                 return mission->step(time);
             }
 
@@ -145,14 +165,25 @@ namespace fog
                 return true;
             }
 
-            PathFollow2 *tryBuildPath()
+            PathFollow2 *tryBuildPath(MoveToCell::Task *preTask)
             {
 
                 CellKey aCellKey;
                 Vector2 actorPosIn2D;
-                if (!this->tryResolveOwnerCell(aCellKey, actorPosIn2D))
+
+                if (preTask)
                 {
-                    return nullptr;
+                    aCellKey = preTask->cKey2;
+                    Cell::Center *cells = Context<Cell::Center *>::get();
+                    actorPosIn2D = cells->getCell(aCellKey).getOrigin2D();
+                }
+                else
+                {
+
+                    if (!this->tryResolveOwnerCell(aCellKey, actorPosIn2D))
+                    {
+                        return nullptr;
+                    }
                 }
 
                 std::vector<Vector2> pathByPoint2DNom = costMap->findPath(aCellKey, cKey2);
@@ -170,13 +201,14 @@ namespace fog
                 owner->pathState->setPath(pathByPoint2DNom, aCellKey, cKey2);
                 return path;
             }
-            PathFollow2MissionState *tryCreateMission()
+
+            bool tryBuildMission(MoveToCell::Task *preTask)
             {
 
-                PathFollow2 *path = tryBuildPath();
+                PathFollow2 *path = tryBuildPath(preTask);
                 if (!path)
                 {
-                    return nullptr;
+                    return false;
                 }
 
                 AnimationStateSet *anisSet = owner->entity->getAllAnimationStates();
@@ -187,8 +219,8 @@ namespace fog
                 // delete missionState;
                 // this->addChild(missionState);
                 owner->state->addChild(mission);
-
-                return mission;
+                this->mission = mission;
+                return true;
             }
         };
 

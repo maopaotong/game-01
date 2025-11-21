@@ -51,7 +51,7 @@ namespace fog
             }
             bool tryTakeTarget(Tasks::Target *target) override
             {
-                this->push(new MoveToCell::Task(static_cast<MoveToCell::Target *>(target), this, costMap, global));
+                this->pushOrWait(new MoveToCell::Task(static_cast<MoveToCell::Target *>(target), this, costMap, global));
                 //
                 return true;
             }

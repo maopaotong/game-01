@@ -33,7 +33,10 @@ namespace fog
                 if(owner){
                     ImGui::Text(("owner.stackSize:" + std::to_string(owner->stackSize())).c_str()); //
                     ImGui::SameLine();                                 //
+                    ImGui::Text(("owner.queueCounter:" + std::to_string(owner->queueSize())).c_str());
+                    ImGui::SameLine();                                 //
                     ImGui::Text(("owner.popCounter:" + std::to_string(owner->getPopCounter())).c_str());
+                    
                 }
                 return true;
                 //
