@@ -11,7 +11,7 @@
 #include "fg/util/CollectionUtil.h"
 #include "fg/Movable.h"
 #include "fg/Actor.h"
-#include "fg/MoveToCellTask.h"
+#include "fg/MoveToCell.h"
 
 namespace fog
 {
@@ -38,8 +38,24 @@ namespace fog
 
         Vector3Ref position;
 
-        MoveToCellTask *task = nullptr;
         Core *core;
+
+        class MoveToCellTaskOwner : public MoveToCell::Owner
+        {
+            Global *global;
+            CostMap *costMap;
+
+        public:
+            MoveToCellTaskOwner(Global *global, CostMap *costMap) : MoveToCell::Owner(1), costMap(costMap), global(global)
+            {
+            }
+            bool tryTakeTarget(Tasks::Target *target) override
+            {
+                this->push(new MoveToCell::Task(static_cast<MoveToCell::Target *>(target), this, costMap, global));
+                //
+                return true;
+            }
+        };
 
     public:
         ActorState(CostMap *costMap, Core *core) : core(core)
@@ -59,10 +75,10 @@ namespace fog
             this->setFrameListener(this);
         }
 
-        virtual ~ActorState(){
-
+        virtual ~ActorState()
+        {
         }
-        
+
         virtual void init() override
         {
 
@@ -74,6 +90,16 @@ namespace fog
 
             this->position = this->createProperty("actor.position", Vector3(0, height + this->actorHighOffset, 0));
             sceNode->translate(this->position);
+            // init task owner.
+            MoveToCell::Owner *owner = new MoveToCellTaskOwner(global, costMap);
+            owner->actorHighOffset = this->actorHighOffset;
+            owner->aniNames = aniNames;
+            owner->entity = this->entity;
+            owner->pathState = this->pathState;
+            owner->sceNode = this->sceNode;
+            owner->state = this;
+
+            this->taskOwner = owner;
         }
 
         virtual void create(SceneManager *sMgr, Entity *&entity, SceneNode *&node) = 0;
@@ -136,19 +162,6 @@ namespace fog
             return this->pathState->getDestinationCell();
         }
 
-        virtual Task::Owner *createTaskOwner() override
-        {
-
-            MoveToCellTask::Owner *owner = new MoveToCellTask::Owner();
-            owner->actorHighOffset = this->actorHighOffset;
-            owner->aniNames = aniNames;
-            owner->entity = this->entity;
-            owner->pathState = this->pathState;
-            owner->sceNode = this->sceNode;
-            owner->state = this;
-            return owner;
-        }
-        
         bool frameStarted(const FrameEvent &evt) override
         {
             void (*func)(State *, const FrameEvent &evt) = [](State *cState, const FrameEvent &evt)
@@ -156,7 +169,7 @@ namespace fog
                 FrameListener *fl = cState->getFrameListener();
                 if (fl)
                 {
-                   // fl->frameStarted(evt);
+                    // fl->frameStarted(evt);
                 }
             };
             this->forEachChild<const FrameEvent &>(func, evt);

@@ -8,7 +8,6 @@
 #include "fg/util/ImGuiUtil.h"
 #include "UIState.h"
 #include "fg/Options.h"
-#include "fg/Master.h"
 namespace fog
 {
     class TasksUI : public UIState
@@ -26,16 +25,20 @@ namespace fog
         void doOpen() override
         {
             int id = 0;
-            Context<Master *>::get()->forEachTask([](long id, Task *task)
-                                                  {
-                                                      ImGui::Text(("id:" + std::to_string(id)).c_str()); //
-                                                      ImGui::SameLine();                                 //
-                                                      ImGui::Text(("type:" + std::string(task->getTaskType().name())).c_str());
-                                                      //
-                                                  });
+            
+            core->getRootState()->forEachChild([](State* state)
+            {
+                Tasks::Owner * owner = state->getTaskOwner();
 
-            ImGui::SameLine();
-
+                if(owner){
+                    ImGui::Text(("owner.stackSize:" + std::to_string(owner->stackSize())).c_str()); //
+                    ImGui::SameLine();                                 //
+                    ImGui::Text(("owner.popCounter:" + std::to_string(owner->getPopCounter())).c_str());
+                }
+                return true;
+                //
+            });
+            
             if (ImGui::Button("Return"))
             {
                 this->active = false;

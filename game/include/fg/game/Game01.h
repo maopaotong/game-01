@@ -17,10 +17,10 @@
 #include "fg/Game.h"
 #include "fg/State.h"
 #include "fg/Options.h"
-#include "fg/demo/DefaultMaster.h"
+#include "fg/TaskRunner.h"
 namespace fog
 {
-    class Game01 : public Module, Game
+    class Game01 : public Module, Game//, public FrameListener
     {
         Global *global;
         Core *core;
@@ -96,10 +96,7 @@ namespace fog
             });
             world->init();
 
-            //
-            DefaultMaster* master = new DefaultMaster(world);
-            Context<Master*>::set(master);
-            core->addFrameListener(master);
+            core->addFrameListener(new TaskRunner(world));
         }
 
         CostMap *createCostMap()
@@ -145,5 +142,20 @@ namespace fog
 
             core->getRootState()->forEachChild<Options *>(true, func, options);
         }
+        /*
+        bool frameStarted(const FrameEvent &evt) override
+        {
+            core->getRootState()->forEachChild([&evt](State *state)
+            {
+                Tasks::Owner *owner = state->getTaskOwner();
+                if (owner)
+                {
+                    owner->top()->step(evt.timeSinceLastFrame);
+                }
+                return true; });
+                return true;
+            }
+            */
+
     };
 };

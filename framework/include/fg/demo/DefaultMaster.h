@@ -7,14 +7,15 @@
 #include <type_traits>
 #include <functional>
 
-#include "fg/Task.h"
+#include "fg/Tasks.h"
 #include "fg/Master.h"
 #include "fg/Actor.h"
 #include "fg/State.h"
 
 namespace fog
 {
-
+/*
+*/
     class DefaultMaster : public Master, public FrameListener
     {
         Actor *defaultActor = nullptr;

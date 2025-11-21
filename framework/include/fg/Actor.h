@@ -1,7 +1,7 @@
 #pragma once
 #include <Ogre.h>
 #include "fg/util/CellMark.h"
-#include "fg/Task.h"
+
 namespace fog
 {
 

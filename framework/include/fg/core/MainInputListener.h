@@ -30,7 +30,7 @@
 #include "fg/Ground.h"
 #include "fg/Core.h"
 #include "fg/Master.h"
-#include "fg/MoveToCellTask.h"
+#include "fg/MoveToCell.h"
 
 namespace fog
 {
@@ -107,8 +107,23 @@ namespace fog
                 if (hitCell)
                 {
                     CellKey cKey = cell.cKey;
-                    Master *master = Context<Master *>::get();
-                    master->add(new MoveToCellTask(costMap, global, cKey));
+                    
+                    //Master *master = Context<Master *>::get();
+
+                    //master->add(new MoveToCellTask(costMap, global, cKey));
+                    MoveToCell::Target* target = new MoveToCell::Target(cKey);
+                    core->getRootState() ->forEachChild([target](State* state){
+                        Tasks::Owner * owner = state->getTaskOwner();
+                        
+                        if(owner  ){
+                            bool take = owner->tryTakeTarget(target);
+                            if(take){                                
+                                return false;
+                            }
+                        }
+                        return true;
+                    });;
+
                     //
                 }
                 // cout << "worldPoint(" << pickX << ",0," << pickZ << "),cellIdx:[" << cx << "," << cy << "]" << endl;

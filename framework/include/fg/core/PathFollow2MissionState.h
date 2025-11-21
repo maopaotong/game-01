@@ -8,11 +8,11 @@
 
 namespace fog
 {
-     using Vector3Ref = Property::Ref<Vector3>;
+    using Vector3Ref = Property::Ref<Vector3>;
     /**
      * Move a node to a destination.
      */
-    class PathFollow2MissionState : public MissionState, public FrameListener
+    class PathFollow2MissionState : public MissionState, public Stairs
     {
         PathFollow2 *path;
 
@@ -38,11 +38,11 @@ namespace fog
                 as->setWeight(1.0f);
             }
             //
-            this->setFrameListener(this);
+            // this->setFrameListener(this);
         }
-        void init()override{
+        void init() override
+        {
             actorPosition = this->getProperty<Vector3>("actor.position");
-
         }
 
         PathFollow2 *getPath()
@@ -56,58 +56,59 @@ namespace fog
             return Context<Node2D *>::get()->to3D(pointIn2D) + this->offset;
         }
 
-        bool frameStarted(const Ogre::FrameEvent &evt) override
+        // bool frameStarted(const Ogre::FrameEvent &evt) override
+        bool step(float timeSinceLastFrame)
         {
+            if (this->isDone())
+            {
+                return false;
+            }
             SceneNode *pNode = this->findSceneNode(); // the parent node to operate
 
-            if (pNode) // if the parent has no scene node attached,ignore the update operation.
+            if (!pNode) // if the parent has no scene node attached,ignore the update operation.
             {
-                PathFollow2 *pathFollow = this->getPath();
-
-                Vector2 currentPos2D;
-                Vector2 direction2D;
-                if (pathFollow->move(evt.timeSinceLastFrame, currentPos2D, direction2D))
-                {
-
-                    //
-                    Vector3 prevPos = pNode->getPosition();
-
-                    float terH = 0.0f; // Context<Terrains *>::get()->getHeightAtPosition(currentPos2D); // TODO in a common place to translate all .
-
-                    // Vector3 currentPos = Ground::Transfer::to3D(currentPos2D, Global::getTerrainHeightAtPositionWithOffset, heightOffset); //
-                    Vector3 currentPos = this->to3D(currentPos2D);
-                    // position
-                    pNode->translate(currentPos - prevPos); // new position
-                    // high
-
-                    // animation
-                    AnimationStateIterator it = this->aniSet->getAnimationStateIterator();
-                    while (it.hasMoreElements())
-                    {
-                        AnimationState *as = it.getNext();
-                        float aniTimeFactor = this->animateTimeSpeedFactor * (path->getSpeed());
-                        as->addTime(evt.timeSinceLastFrame * aniTimeFactor);
-                    }
-
-                    Quaternion orientation = Ground::getRotationTo(direction2D);
-                    pNode->setOrientation(orientation);
-
-                    actorPosition = pNode->getPosition();
-                    // pNode->lookAt();
-
-                    // pNode->setOrientation(Quaternion(Degree(90), Vector3::UNIT_Y));
-                    //   update direction
-                    //
-                }
-                else
-                {
-                    this->setDone(true);
-                }
+                return false;
             }
-            else
+            PathFollow2 *pathFollow = this->getPath();
+
+            Vector2 currentPos2D;
+            Vector2 direction2D;
+            if (!pathFollow->move(timeSinceLastFrame, currentPos2D, direction2D))
             {
-                // todo add warning here if no scene node found.
+                this->setDone(true);
+                return false;
             }
+
+            //
+            Vector3 prevPos = pNode->getPosition();
+
+            float terH = 0.0f; // Context<Terrains *>::get()->getHeightAtPosition(currentPos2D); // TODO in a common place to translate all .
+
+            // Vector3 currentPos = Ground::Transfer::to3D(currentPos2D, Global::getTerrainHeightAtPositionWithOffset, heightOffset); //
+            Vector3 currentPos = this->to3D(currentPos2D);
+            // position
+            pNode->translate(currentPos - prevPos); // new position
+            // high
+
+            // animation
+            AnimationStateIterator it = this->aniSet->getAnimationStateIterator();
+            while (it.hasMoreElements())
+            {
+                AnimationState *as = it.getNext();
+                float aniTimeFactor = this->animateTimeSpeedFactor * (path->getSpeed());
+                as->addTime(timeSinceLastFrame * aniTimeFactor);
+            }
+
+            Quaternion orientation = Ground::getRotationTo(direction2D);
+            pNode->setOrientation(orientation);
+
+            actorPosition = pNode->getPosition();
+            // pNode->lookAt();
+
+            // pNode->setOrientation(Quaternion(Degree(90), Vector3::UNIT_Y));
+            //   update direction
+            //
+
             return true;
         }
     };

@@ -1,7 +1,5 @@
 #include "fg/Context.h"
 #include "fg/Property.h"
-#include "fg/Master.h"
-#include "fg/demo/DefaultMaster.h"
 
 namespace fog
 {
@@ -42,11 +40,11 @@ namespace fog
     template <>
     Cell::Center *Context<Cell::Center *>::ctxObj = nullptr;
     //
-    template <>
-    Master *Context<Master *>::default_ = nullptr;
+    // template <>
+    // Master *Context<Master *>::default_ = nullptr;
 
-    template <>
-    Master *Context<Master *>::ctxObj = nullptr;
+    // template <>
+    // Master *Context<Master *>::ctxObj = nullptr;
     
     //
     

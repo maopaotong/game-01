@@ -16,6 +16,7 @@
 #include "fg/MeshBuild.h"
 #include "fg/Property.h"
 #include "fg/Options.h"
+#include "fg/Tasks.h"
 
 #define WATCH_PROPERTY(monitor, obj_ptr, member_name) \
     (monitor).add((obj_ptr), &std::remove_pointer_t<decltype(obj_ptr)>::member_name, #member_name)
@@ -63,7 +64,7 @@ namespace fog
         std::vector<State *> *children = nullptr;
         bool active = false;
         Options options;
-        std::stack<std::unique_ptr<Task>> tasks;
+        Tasks::Owner *taskOwner;
 
         template <typename T>
         Property::Ref<T> createProperty(std::string name, T defaultValue)
@@ -78,7 +79,7 @@ namespace fog
         }
 
     public:
-        State()
+        State() : taskOwner(nullptr)
         {
             this->children = new std::vector<State *>();
             std::cout << "new State()" << this << "" << std::endl;
@@ -87,28 +88,9 @@ namespace fog
         {
             std::cout << "~State()" << this << "" << std::endl;
         }
-        virtual Task::Owner * createTaskOwner() {
-            return nullptr;
-        }
-        virtual std::type_index getTaskOwnerType()
+        Tasks::Owner *getTaskOwner()
         {
-            return std::type_index(typeid(nullptr));
-        }
-
-        void push(Task * task){
-
-            this->tasks.push(std::unique_ptr<Task>(task));
-
-        }
-        void pop(){
-            this->tasks.pop();
-        }
-        Task * getTask(){
-            
-            if(tasks.empty()){
-                return nullptr;
-            }
-            return tasks.top().get();
+            return taskOwner;
         }
 
         virtual void init() {
@@ -212,22 +194,25 @@ namespace fog
         }
 
         template <typename F>
-        void forEachChild(F &&func, bool recursive = true)
+        bool forEachChild(F &&func, bool recursive = true)
         {
             std::vector<State *> *tmp = this->children;
+
+            bool goOn = true;
             for (auto it = tmp->begin(); it != tmp->end(); ++it)
             {
                 State *s = *it;
-                bool brk = func(s);
-                if (brk)
+                goOn = func(s);
+                if (goOn && recursive)
+                {
+                    goOn = s->forEachChild(func);
+                }
+                if (!goOn)
                 {
                     break;
                 }
-                if (recursive)
-                {
-                    s->forEachChild(func);
-                }
             }
+            return goOn;
         }
 
         template <typename... Args>

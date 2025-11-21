@@ -7,7 +7,7 @@
 #include <type_traits>
 #include <functional>
 
-#include "Task.h"
+#include "Tasks.h"
 
 namespace fog
 {
@@ -17,7 +17,7 @@ namespace fog
 
     public:
         virtual bool step(long time) = 0;
-        virtual void add(Task *task) = 0;
+        //virtual void add(Task *task) = 0;
 
         template <typename F>
         void forEachTask(F &&func)
@@ -30,9 +30,9 @@ namespace fog
             }
         }
 
-        virtual void getAllTask(std::unordered_map<long, Task *> &map)
-        {
-        }
+        // virtual void getAllTask(std::unordered_map<long, Task *> &map)
+        // {
+        // }
     };
 
 }; //

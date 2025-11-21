@@ -6,7 +6,7 @@
 #include "fg/core/ActorState.h"
 #include "fg/Core.h"
 #include "fg/Terrains.h"
-#include "fg/MoveToCellTask.h"
+#include "fg/MoveToCell.h"
 
 namespace fog
 {
@@ -38,9 +38,5 @@ namespace fog
             ActorState::init();
         }
 
-        std::type_index getTaskOwnerType() override
-        {
-            return std::type_index(typeid(MoveToCellTask::Owner));
-        }
     };
 }; // end of namespace
