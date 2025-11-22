@@ -20,29 +20,29 @@ namespace fog
     //
     class CellStateBase : public State
     {
-        
+
     protected:
         Ogre::ManualObject *obj;
         Ogre::SceneNode *node;
         std::string material = MaterialNames::materialNameInUse;
 
     public:
-    
-        CellStateBase(Core *core)
+        CellStateBase()
         {
-            Ogre::SceneManager *sceneMgr = core->getSceneManager();
+
+            Ogre::SceneManager *sceneMgr = Context<Core *>::get()->getSceneManager();
             obj = sceneMgr->createManualObject();
             node = sceneMgr->getRootSceneNode()->createChildSceneNode();
             node->attachObject(obj);
             //
         }
 
-        virtual void init() override {
+        virtual void init() override
+        {
             rebuildMesh();
         }
-        
-        virtual void rebuildMesh() = 0;
 
+        virtual void rebuildMesh() = 0;
     };
 
 }; // end of namespace

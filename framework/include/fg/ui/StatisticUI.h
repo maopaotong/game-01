@@ -10,22 +10,18 @@ namespace fog
 {
     class StatisticTrayUI : public UIState
     {
-        Core *core;
         State *state = nullptr;
-        CostMap *costMap;
 
     public:
-        StatisticTrayUI(Core *core, CostMap *costMap) : UIState("StatisticTray")
+        StatisticTrayUI() : UIState("StatisticTray")
         {
-            this->core = core;
-            this->costMap = costMap;
             // Context<ActorPropEC *>::get()->addListener(this);
         }
 
         void doOpen() override
         {
 
-            RenderWindow *window = core->getWindow();
+            RenderWindow *window = Context<Core*>::get()->getWindow();
             const Ogre::RenderTarget::FrameStats &fs = window->getStatistics();
             ImGui::Text(fmt::format("FPS:     {:.2f}", fs.lastFPS).c_str());
             ImGui::Text(fmt::format("Tris:    {}", fs.triangleCount).c_str());

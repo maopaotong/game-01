@@ -25,11 +25,9 @@ namespace fog
 
     protected:
         std::vector<ChildInfo> childInfos;
-        Core *core;
-        CostMap *costMap;
 
     public:
-        EntryUI(Core *core, CostMap *costMap) : UIState("EntryUI"), core(core), costMap(costMap)
+        EntryUI() : UIState("EntryUI")
         {
             this->active = true;
         }
@@ -37,14 +35,14 @@ namespace fog
         void init() override
         {
 
-            this->add(new OptionsUI(core));
-            this->add(new PropertyRefsUI(core));
-            this->add(new ActiveTrayUI(core, costMap));
-            this->add(new StatisticTrayUI(core, costMap));
-            this->add(new TasksUI(core));
+            this->add(new OptionsUI());
+            this->add(new PropertyRefsUI());
+            this->add(new ActiveTrayUI());
+            this->add(new StatisticTrayUI());
+            this->add(new TasksUI());
 
             //Quit:
-            this->add(new QuitUI(core, costMap));
+            this->add(new QuitUI());
         }
         void add(UIState *child)
         {

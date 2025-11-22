@@ -21,7 +21,7 @@ namespace fog
     protected:
     public:
         virtual std::string getName() = 0;
-        virtual void active(Core *core) = 0;
+        virtual void active() = 0;
         virtual void disactive() = 0;
     };
 };

@@ -155,7 +155,7 @@ namespace fog
 
             float pathSpeed = Context<Var<float>::Bag *>::get()->getVarVal(".pathSpeed", 1.0f);
             PathFollow2 *path = new PathFollow2(actorPosIn2D, pathByPointIn2D, pathSpeed);
-            pathStateRef = new PathState(core);
+            pathStateRef = new PathState();
             pathStateRef->init();
             pathStateRef->setPath(pathByPoint2DNom, aCellKey, cKey2);
             return path;

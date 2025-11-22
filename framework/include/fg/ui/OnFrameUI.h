@@ -35,9 +35,10 @@ namespace fog
         EntryUI *entryUI;
 
     public:
-        OnFrameUI(Core *core, CostMap *costMap)
+        OnFrameUI()
         {
-            this->core = core;
+            this->core = Context<Core*>::get();
+
             this->window = core->getWindow();
             this->vp = core->getViewport();
             this->sceMgr = core->getSceneManager();
@@ -45,11 +46,11 @@ namespace fog
             //
             //this->activeTrayUI = new ActiveTrayUI(core, costMap);
 
-            this->mainUI = new MainUI(core, costMap);
-            this->sceneNodeUI = new SceneNodeUI(core);
-            this->cmdUI = new CommandUI(core, costMap);
+            // this->mainUI = new MainUI(core);
+            // this->sceneNodeUI = new SceneNodeUI(core);
+            // this->cmdUI = new CommandUI(core);
             
-            this->entryUI = new EntryUI(core,costMap);
+            this->entryUI = new EntryUI();
             this->entryUI->init();
         }
 

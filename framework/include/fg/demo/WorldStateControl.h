@@ -31,21 +31,20 @@ namespace fog
     protected:
         CellStateControl *cells;
 
-        CostMap *costMap;
-
         std::unordered_map<MarkType, CellMarkStateControl *> markStateControls;
 
         SimpleInputState *inputState;
         Core *core;
 
     public:
-        WorldStateControl(CostMap *costMap, Ground *ground, Core *core) : costMap(costMap), core(core), WorldState(ground)
+        WorldStateControl(Ground *ground, Core *core) : core(core), WorldState(ground)
         {
+            CostMap *costMap = Context<CostMap *>::get();
 
             Ogre::Root *root = core->getRoot();
 
             // Create frame listener for main loop
-            this->cells = new CellStateControl(costMap, core);
+            this->cells = new CellStateControl();
             this->cells->init();
             this->addChild(this->cells);
 
@@ -77,9 +76,5 @@ namespace fog
         {
         }
 
-        CostMap *getCostMap()
-        {
-            return costMap;
-        }
     };
 }; // end of namespace

@@ -25,7 +25,6 @@ namespace fog
     class CellStateControl : public CellStateBase
     {
     public:
-        CostMap *costMap;
         boolRef showCost0;
         boolRef showCost1;
         boolRef showCost2;
@@ -33,7 +32,7 @@ namespace fog
         boolRef showOther;
 
     public:
-        CellStateControl(CostMap *costMap, Core *core) : CellStateBase(core), costMap(costMap)
+        CellStateControl() : CellStateBase()
         {
         }
         void init() override
@@ -64,6 +63,7 @@ namespace fog
         // Get color based on cost
         bool getCostColor(Cell::Instance &cell, Ogre::ColourValue &color) const
         {
+            CostMap* costMap = Context<CostMap*>::get();
             const int cost = costMap->getCost(cell.cKey.first, cell.cKey.second);
             switch (cost)
             {

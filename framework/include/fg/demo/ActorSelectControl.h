@@ -22,8 +22,7 @@ namespace fog
     {
     public:
     protected:
-        CostMap *costMap;
-        Core *core;
+        
         Cell::Instance cell;
 
         bool active = false;
@@ -31,7 +30,7 @@ namespace fog
         Vector3 prePosition;
 
     public:
-        ActorSelectControl(CostMap *costMap, Core *core) : CellStateBase(core), costMap(costMap)
+        ActorSelectControl() : CellStateBase()
         {
         }
 

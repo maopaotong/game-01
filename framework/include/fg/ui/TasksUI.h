@@ -13,20 +13,18 @@ namespace fog
     class TasksUI : public UIState
     {
     protected:
-        Core *core;
         Options options;
 
     public:
-        TasksUI(Core *core) : UIState("TasksUI")
+        TasksUI() : UIState("TasksUI")
         {
-            this->core = core;
         }
 
         void doOpen() override
         {
             int id = 0;
             
-            core->getRootState()->forEachChild([](State* state)
+            Context<Core*>::get()->getRootState()->forEachChild([](State* state)
             {
                 Tasks::Runner * owner = state->getTaskRunner();
 

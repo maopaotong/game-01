@@ -21,7 +21,6 @@ namespace fog
 {
     class Game01 : public Module //, public FrameListener
     {
-        Core *core;
         bool breakRenderRequested = false;
         RenderWindow *window;
         Viewport *vp;
@@ -44,18 +43,25 @@ namespace fog
             delete Context<Terrains *>::unset();
         }
 
-        void active(Core *core) override
+        void active() override
         {
-            this->core = core;
+            Core *core = Context<Core *>::get();
             this->window = core->getWindow();
             this->vp = core->getViewport();
             this->sceMgr = core->getSceneManager();
             CostMap *costMap = createCostMap();
-            Context<CostMap *>::set(costMap);
-            
 
-            this->onFrameUI = new OnFrameUI(core, costMap);
-            this->core->getImGuiApp()->addFrameListener(this->onFrameUI);
+            Context<CostMap *>::runWithContext(costMap, [this]()
+                                               { this->activeInContext(); }); //
+        }
+
+        void activeInContext()
+        {
+            CostMap *costMap = Context<CostMap *>::get();
+            Core *core = Context<Core *>::get();
+
+            this->onFrameUI = new OnFrameUI();
+            Context<Core *>::get()->getImGuiApp()->addFrameListener(this->onFrameUI);
             //
             //
 
@@ -75,7 +81,7 @@ namespace fog
 
             Context<Node2D *>::set(root2D);
 
-            Cell::Center *cells = new Cell::Center(root2D, costMap);
+            Cell::Center *cells = new Cell::Center(root2D);
             cells->translateToCenter();
 
             // root2D->position = -cells->getCenterIn2D(); // move center to (0,0)
@@ -83,7 +89,7 @@ namespace fog
 
             //
             Ground *ground = new CostMapGround(costMap);
-            State *world = new WorldStateControl(costMap, ground, core);
+            State *world = new WorldStateControl(ground, core);
             SceneNode *node = sceMgr->getRootSceneNode();
             world->setSceneNode(node);
 

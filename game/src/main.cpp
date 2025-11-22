@@ -32,12 +32,14 @@ int main()
         // Initialize Ogre application context
         Game01 *game01 = new Game01();
         
-
-        auto app = std::make_unique<SimpleApp>();
+        auto app = std::make_unique<SimpleApp>();        
         app->add(game01);
+        //
+        
         app->setup();
         app->startRendering();
         app->close();
+
     }
     catch (const Ogre::Exception &e)
     {

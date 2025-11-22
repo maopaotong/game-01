@@ -14,12 +14,10 @@ namespace fog
     class PropertyRefsUI : public UIState
     {
     protected:
-        Core *core;
 
     public:
-        PropertyRefsUI(Core *core) : UIState("PropertyRefs")
+        PropertyRefsUI() : UIState("PropertyRefs")
         {
-            this->core = core;
         }
 
         void doOpen() override

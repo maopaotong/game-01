@@ -10,16 +10,12 @@ namespace fog
 {
     class ActiveTrayUI : public Listener<State *, std::string &>, public UIState
     {
-        Core *core;
         State *state = nullptr;
-        CostMap *costMap;
         Property::Ref<Vector3> actorPosition;
 
     public:
-        ActiveTrayUI(Core *core, CostMap *costMap) : UIState("ActiveActor")
+        ActiveTrayUI() : UIState("ActiveActor")
         {
-            this->core = core;
-            this->costMap = costMap;
             // Context<ActorPropEC *>::get()->addListener(this);
 
             Context<Event::Bus *>::get()->subscribe<State *, std::string &>([this](State *s, std::string &ss)

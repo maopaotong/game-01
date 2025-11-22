@@ -13,13 +13,11 @@ namespace fog
     class OptionsUI : public UIState
     {
     protected:
-        Core *core;
         Options options;
 
     public:
-        OptionsUI(Core *core) : UIState("Options")
+        OptionsUI() : UIState("Options")
         {
-            this->core = core;
             options.add("Show-plain-cell?", false);
             options.add("Video-Mode", "1024 x 768");
         }

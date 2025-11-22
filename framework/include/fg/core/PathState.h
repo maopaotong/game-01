@@ -24,7 +24,7 @@ namespace fog
         std::unordered_set<std::pair<int, int>, PairHash> pathSet;
 
     public:
-        PathState(Core *core) : CellStateBase(core)
+        PathState() : CellStateBase()
         {
         }
 

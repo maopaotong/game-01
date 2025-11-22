@@ -19,7 +19,6 @@ namespace fog
 {
     class QuitUI : public UIState
     {
-        Core *core;
         bool breakRenderRequested = false;
         RenderWindow *window;
         Viewport *vp;
@@ -27,9 +26,9 @@ namespace fog
         ActiveTrayUI *activeTrayUI = nullptr;
 
     public:
-        QuitUI(Core *core, CostMap *costMap) : UIState("Quit")
+        QuitUI() : UIState("Quit")
         {
-            this->core = core;
+            Core* core = Context<Core*>::get();
             this->window = core->getWindow();
             this->vp = core->getViewport();
             this->sceMgr = core->getSceneManager();
@@ -55,7 +54,7 @@ namespace fog
                 if (ImGui::Button("Yes"))
                 {
                     // 处理“确定”逻辑
-                    core->getImGuiApp()->breakRender();
+                    Context<Core*>::get()->getImGuiApp()->breakRender();
                     ImGui::CloseCurrentPopup(); // 关闭弹窗
                 }
                 ImGui::SameLine();
