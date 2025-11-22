@@ -6,7 +6,6 @@
 #include "fg/core/ActorState.h"
 #include "fg/Core.h"
 #include "fg/Terrains.h"
-#include "fg/core/MoveToCell.h"
 
 namespace fog
 {
@@ -36,6 +35,18 @@ namespace fog
         virtual void init() override
         {
             ActorState::init();
+        }
+        virtual AnimationStateSet *getAllAnimationStates()
+        {
+            return entity->getAllAnimationStates();
+        }
+        virtual std::vector<std::string> getAnimationNames()
+        {
+            return this->aniNames;
+        }
+        virtual float getActorHighOffset()
+        {
+            return this->actorHighOffset;
         }
     };
 }; // end of namespace

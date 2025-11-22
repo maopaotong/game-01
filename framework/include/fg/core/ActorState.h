@@ -11,7 +11,6 @@
 #include "fg/util/CollectionUtil.h"
 #include "fg/Movable.h"
 #include "fg/Actor.h"
-#include "fg/core/MoveToCell.h"
 
 namespace fog
 {
@@ -37,23 +36,6 @@ namespace fog
         Vector3Ref position;
 
         Core *core;
-
-        class MoveToCellTaskOwner : public MoveToCell::Owner
-        {
-            CostMap *costMap;
-            Core *core;
-
-        public:
-            MoveToCellTaskOwner(Global *global, CostMap *costMap, Core *core) : MoveToCell::Owner(1), costMap(costMap), core(core)
-            {
-            }
-            bool tryTakeTarget(Tasks::Target *target) override
-            {
-                this->pushOrWait(new MoveToCell::Task(static_cast<Targets::MoveToCell *>(target), this, costMap, core));
-                //
-                return true;
-            }
-        };
 
         std::string name;
 
@@ -89,14 +71,6 @@ namespace fog
             this->position = this->createProperty(name + ".actor.position", Vector3(0, height + this->actorHighOffset, 0));
             sceNode->translate(this->position);
             // init task owner.
-            MoveToCell::Owner *owner = new MoveToCellTaskOwner(global, costMap, core);
-            owner->actorHighOffset = this->actorHighOffset;
-            owner->aniNames = aniNames;
-            owner->entity = this->entity;
-            owner->sceNode = this->sceNode;
-            owner->state = this;
-
-            this->taskOwner = owner;
         }
 
         virtual void create(SceneManager *sMgr, Entity *&entity, SceneNode *&node) = 0;
@@ -117,5 +91,9 @@ namespace fog
             }
             return true;
         }
+
+        virtual AnimationStateSet *getAllAnimationStates() = 0;
+        virtual std::vector<std::string> getAnimationNames() = 0;
+        virtual float getActorHighOffset() = 0;
     };
 }; // end of namespace

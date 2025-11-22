@@ -63,7 +63,7 @@ namespace fog
         std::vector<State *> *children = nullptr;
         bool active = false;
         Options options;
-        Tasks::Owner *taskOwner;
+        Tasks::Runner *taskRunner;
         std::string name;
 
         template <typename T>
@@ -79,9 +79,8 @@ namespace fog
         }
 
     public:
-        State() : taskOwner(nullptr)
+        State() : taskRunner(new Tasks::Runner()), children(new std::vector<State *>())
         {
-            this->children = new std::vector<State *>();
             std::cout << "new State()" << this << "" << std::endl;
         }
         virtual ~State()
@@ -90,6 +89,11 @@ namespace fog
             // todo remove sceneNode...
 
             std::cout << "~State()" << this << "" << std::endl;
+            this->children->clear();
+            delete this->children;
+            this->children = nullptr;
+            delete this->taskRunner;
+            this->taskRunner = nullptr;
         }
 
         virtual bool pickable()
@@ -97,9 +101,9 @@ namespace fog
             return true;
         }
 
-        Tasks::Owner *getTaskOwner()
+        Tasks::Runner *getTaskRunner()
         {
-            return taskOwner;
+            return taskRunner;
         }
 
         virtual void init() {
@@ -254,6 +258,21 @@ namespace fog
                 return true; }, false);
             return ret;
         }
+
+        virtual AnimationStateSet *getAllAnimationStates()
+        {
+            return nullptr;
+        }
+        virtual std::vector<std::string> getAnimationNames()
+        {
+            return std::vector<std::string>();
+        }
+        virtual float getActorHighOffset()
+        {
+            return 0.0f;
+        }
+
+        
 
     public:
     };

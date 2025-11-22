@@ -42,9 +42,10 @@ namespace fog
         Viewport *viewport;
         Camera *camera;
         SceneManager *sMgr;
+        State *state;
 
     public:
-        MouseClickPicker(Camera *cam, SceneManager *sMgr, Viewport *vp)
+        MouseClickPicker(State *state, Camera *cam, SceneManager *sMgr, Viewport *vp) : state(state)
         {
             this->camera = cam;
             this->sMgr = sMgr;
@@ -66,8 +67,19 @@ namespace fog
 
             if (picked)
             {
-                picked->setActive(true);                
+                picked->setActive(true);
                 return false;
+            }
+            else
+            {
+                this->state->forEach([](State *state)
+                                     {
+                                         if (state->isActive())
+                                         {
+                                             state->setActive(false);
+                                         } //
+                                         return true; //
+                                     });
             }
             return true;
         }

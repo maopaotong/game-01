@@ -21,8 +21,6 @@
 #include "fg/core/MouseClickPicker.h"
 #include "fg/Terrains.h"
 #include "fg/demo/ActorSelectControl.h"
-#include "fg/demo/KeepWorld.h"
-#include "fg/Targets.h"
 
 namespace fog
 {
@@ -41,18 +39,6 @@ namespace fog
         Core *core;
 
     public:
-        class KeepWorldOwner : public KeepWorld::Owner
-        {
-        public:
-            KeepWorldOwner(CostMap *costMap, Core *core, State *state) : KeepWorld::Owner(costMap, core, state)
-            {
-            }
-            bool tryTakeTarget(Tasks::Target *target) override
-            {
-                this->pushOrWait(new KeepWorld::Task(dynamic_cast<Targets::KeepWorld *>(target), this, state));
-                return true;
-            }
-        };
         WorldStateControl(CostMap *costMap, Ground *ground, Core *core) : costMap(costMap), core(core), WorldState(ground)
         {
 
@@ -83,19 +69,12 @@ namespace fog
             MainInputListener *keyHandler = new MainInputListener(costMap, core);
             core->getAppContext()->addInputListener(keyHandler);
             core->getAppContext()->addInputListener(inputState);
-            core->getAppContext()->addInputListener(new MouseClickPicker(core->getCamera(), core->getSceneManager(), core->getViewport()));
-
-            // task owner
-            KeepWorld::Owner *owner = new KeepWorldOwner(costMap, core, this);
-
-            this->taskOwner = owner;
+            
+            core->getAppContext()->addInputListener(new MouseClickPicker(this, core->getCamera(), core->getSceneManager(), core->getViewport()));
         }
 
         virtual void init() override
         {
-            Targets::KeepWorld *target = new Targets::KeepWorld();
-
-            this->taskOwner->tryTakeTarget(target);
         }
 
         CostMap *getCostMap()

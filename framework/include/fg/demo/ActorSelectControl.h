@@ -21,22 +21,6 @@ namespace fog
     class ActorSelectControl : public CellStateBase
     {
     public:
-        class TrackActorByCellOwner : public TrackActorByCell::Owner
-        {
-            CostMap *costMap;
-            Core *core;
-
-        public:
-            TrackActorByCellOwner(CostMap *costMap, Core *core, ManualObject *obj, std::string material) : costMap(costMap), core(core), TrackActorByCell::Owner(obj, material)
-            {
-            }
-            bool tryTakeTarget(Tasks::Target *target) override
-            {
-                this->pushOrWait(new TrackActorByCell::Task(static_cast<Targets::TrackActorByCell *>(target), this, costMap, core));
-                return true;
-            }
-        };
-
     protected:
         CostMap *costMap;
         Core *core;
@@ -54,11 +38,9 @@ namespace fog
         void init() override
         {
             CellStateBase::init();
-            TrackActorByCellOwner *owner = new TrackActorByCellOwner(costMap, core, this->obj, this->material);
-            this->taskOwner = owner;
         }
-        void rebuildMesh()override{
-            
+        void rebuildMesh() override
+        {
         }
     };
 }; // end of namespace

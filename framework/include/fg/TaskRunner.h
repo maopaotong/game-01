@@ -30,18 +30,7 @@ namespace fog
         {
             state->forEach([&evt](State *state)
                                 {
-                                    Tasks::Owner *owner = state->getTaskOwner();
-                                    if (owner)
-                                    {
-                                        Tasks::Task *task = owner->top();
-
-                                        bool goOn = task->step(evt.timeSinceLastFrame);
-                                        if (!goOn)
-                                        {
-                                            task->destroy();
-                                            owner->pop();
-                                        }
-                                    }
+                                    state->getTaskRunner()->step(evt.timeSinceLastFrame);
                                     return true; //
                                 });
             return true;

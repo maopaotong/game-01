@@ -28,7 +28,7 @@ namespace fog
             
             core->getRootState()->forEachChild([](State* state)
             {
-                Tasks::Owner * owner = state->getTaskOwner();
+                Tasks::Runner * owner = state->getTaskRunner();
 
                 if(owner){
                     ImGui::Text(("owner.stackSize:" + std::to_string(owner->stackSize())).c_str()); //

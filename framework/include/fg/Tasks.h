@@ -18,29 +18,11 @@ namespace fog
     {
 
     public:
-        class Target
-        {
-        protected:
-            long typeMask;
-
-        public:
-            virtual ~Target() {};
-            long getTypeMask()
-            {
-                return typeMask;
-            }
-        };
-
-        class Owner;
-
         class Task : public Stairs
         {
-        protected:
-            Owner *owner;
-            Target *target;
 
         public:
-            Task(Target *target, Owner *owner) : owner(owner), target(target)
+            Task()
             {
             }
             virtual bool step(float time) override = 0;
@@ -57,14 +39,12 @@ namespace fog
             virtual bool wait(Task *toWait) = 0;
         };
 
-        class Owner
+        class Runner
         {
 
         protected:
             std::stack<std::unique_ptr<Task>> stack;
             std::vector<Task *> queue;
-
-            long targetTypeMask;
 
             long popCounter = 0;
 
@@ -86,7 +66,7 @@ namespace fog
 
             bool tryPush(Task *task)
             {
-                if (this->top()->pause())
+                if (this->stack.empty() || this->top()->pause())
                 {
                     this->doPush(task);
 
@@ -97,10 +77,10 @@ namespace fog
             }
 
         public:
-            Owner(long targetTypeMask) : targetTypeMask(targetTypeMask)
+            Runner()
             {
             }
-            virtual ~Owner()
+            virtual ~Runner()
             {
             }
 
@@ -108,13 +88,6 @@ namespace fog
             {
                 return stack.size();
             }
-
-            long getTargetTypeMask()
-            {
-                return targetTypeMask;
-            }
-
-            virtual bool tryTakeTarget(Target *target) = 0;
 
             void pushOrWait(Task *task)
             {
@@ -170,14 +143,21 @@ namespace fog
             {
                 return this->queue.size();
             }
-        };
 
-        class Runner : public FrameListener
-        {
-
-            virtual bool frameStarted(const FrameEvent &evt)
+            bool step(float time)
             {
+                if (this->stack.empty())
+                {
+                    return true;
+                }
+                Tasks::Task *task = this->stack.top().get();
 
+                bool goOn = task->step(time);
+                if (!goOn)
+                {
+                    task->destroy();
+                    this->stack.pop();
+                }
                 return true;
             }
         };
