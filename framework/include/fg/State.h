@@ -59,12 +59,12 @@ namespace fog
     protected:
         State *parent = nullptr;
         FrameListener *frameListener = nullptr;
-        Pickable *pickable = nullptr;
         SceneNode *sceNode = nullptr;
         std::vector<State *> *children = nullptr;
         bool active = false;
         Options options;
         Tasks::Owner *taskOwner;
+        std::string name;
 
         template <typename T>
         Property::Ref<T> createProperty(std::string name, T defaultValue)
@@ -86,11 +86,17 @@ namespace fog
         }
         virtual ~State()
         {
-            //todo delete child.
-            //todo remove sceneNode...
-            
+            // todo delete child.
+            // todo remove sceneNode...
+
             std::cout << "~State()" << this << "" << std::endl;
         }
+
+        virtual bool pickable()
+        {
+            return true;
+        }
+
         Tasks::Owner *getTaskOwner()
         {
             return taskOwner;
@@ -111,7 +117,7 @@ namespace fog
 
         bool findCell(Vector3 aPos3, Cell::Instance &cell)
         {
-            return Context<Cell::Center *>::get()->findCellByWorldPosiion(aPos3, cell);
+            return Context<Cell::Center *>::get()->findCellByWorldPosition(aPos3, cell);
         }
 
         SceneNode *getSceneNode()
@@ -153,16 +159,6 @@ namespace fog
             this->children->erase(std::remove(this->children->begin(), this->children->end(), cs), this->children->end());
         }
 
-        Pickable *getPickable()
-        {
-            return this->pickable;
-        }
-
-        void setPickable(Pickable *pick)
-        {
-            this->pickable = pick;
-        }
-
         FrameListener *getFrameListener()
         {
             return this->frameListener;
@@ -188,6 +184,16 @@ namespace fog
         bool isActive()
         {
             return this->active;
+        }
+        template <typename F>
+        bool forEach(F &&func)
+        {
+            bool goOn = func(this);
+            if (goOn)
+            {
+                return forEachChild(func);
+            }
+            return false;
         }
 
         template <typename... Args>
@@ -231,6 +237,22 @@ namespace fog
                     s->forEachChild<Args...>(true, func, args...);
                 }
             }
+        }
+        void setName(std::string name)
+        {
+            this->name = name;
+        }
+        State *getChildByName(std::string name)
+        {
+            State *ret = nullptr;
+            forEachChild([&name, &ret](State *s)
+                         {
+                if(s->name == name){
+                    ret = s;
+                    return false;
+                }
+                return true; }, false);
+            return ret;
         }
 
     public:

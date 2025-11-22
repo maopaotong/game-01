@@ -143,7 +143,7 @@ namespace fog
                 return Cell::Instance(CellKey(static_cast<int>(nom.x), static_cast<int>(nom.y)), root);
             }
 
-            bool findCellByWorldPosiion(Vector3 positionIn3D, Cell::Instance &cell)
+            bool findCellByWorldPosition(Vector3 positionIn3D, Cell::Instance &cell)
             {
                 return forCellByPoint(positionIn3D, [&cell](Cell::Instance &cell2)
                                       { cell = cell2; });

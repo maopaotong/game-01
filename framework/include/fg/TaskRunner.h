@@ -28,7 +28,7 @@ namespace fog
 
         virtual bool frameStarted(const FrameEvent &evt)
         {
-            state->forEachChild([&evt](State *state)
+            state->forEach([&evt](State *state)
                                 {
                                     Tasks::Owner *owner = state->getTaskOwner();
                                     if (owner)

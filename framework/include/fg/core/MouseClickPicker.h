@@ -44,7 +44,7 @@ namespace fog
         SceneManager *sMgr;
 
     public:
-        MouseClickPicker( Camera *cam, SceneManager *sMgr, Viewport *vp)
+        MouseClickPicker(Camera *cam, SceneManager *sMgr, Viewport *vp)
         {
             this->camera = cam;
             this->sMgr = sMgr;
@@ -62,19 +62,17 @@ namespace fog
             float ndcX = evt.x / (float)viewport->getActualWidth();
             float ndcY = evt.y / (float)viewport->getActualHeight();
             Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
-            Pickable *picked = pick(ray);
-            Actor *actor = nullptr;
+            State *picked = this->pick(ray);
+
             if (picked)
             {
-                actor = dynamic_cast<Actor *>(picked);
-                if(actor){
-                    Context<Var<Actor *>::Bag*>::get()->setVar(".activeActor", actor);
-                }                
+                picked->setActive(true);                
+                return false;
             }
-            return actor;
+            return true;
         }
 
-        Pickable *pick(Ray &ray)
+        State *pick(Ray &ray)
         {
             // 创建射线查询对象
             Ogre::RaySceneQuery *rayQuery = sMgr->createRayQuery(ray);
@@ -84,37 +82,21 @@ namespace fog
             // 执行查询
             Ogre::RaySceneQueryResult &result = rayQuery->execute();
 
-            Pickable *picked = nullptr;
-            MovableObject *actorMo = nullptr;
+            State *state = nullptr;
             // 遍历结果
             for (auto &it : result)
             {
                 Node *node = it.movable->getParentNode();
                 State *s = State::get(node);
-                if (s)
+                if (s && s->pickable())
                 {
-
-                    Pickable *p = s->getPickable();
-
-                    if (p)
-                    {
-                        picked = p;
-                        actorMo = it.movable;
-                        break;
-                    }
+                    state = s;
+                    break;
                 }
             }
+
             sMgr->destroyQuery(rayQuery);
-            if (!picked)
-            {
-                return nullptr;
-            }
-            //
-            if (picked->pickUp(actorMo))
-            {
-                return picked;
-            }
-            return nullptr;
+            return state;
             // high light the cell in which the actor stand.
         }
     };

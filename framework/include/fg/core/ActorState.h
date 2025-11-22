@@ -70,7 +70,6 @@ namespace fog
 
             this->actorHighOffset = *this->actorHighVptr / 2.0f * *actorScaleVptr;
 
-            this->setPickable(this);
             // this->setFrameListener(this);
         }
 
@@ -110,34 +109,13 @@ namespace fog
         {
             return this->entity;
         }
-
-        bool pickUp(MovableObject *actorMo) override
+        bool pickable() override
         {
-            // cout << "ActorState::afterPick" << endl;
-
-            SceneNode *node = actorMo->getParentSceneNode();
-            const Vector3 &actorPosition = node->getPosition();
-            std::cout << "actor.pos:" << actorPosition << "" << std::endl;
-            // CellKey cKey;
-
-            // bool hitActorCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(actorPosition), cKey);
-            Cell::Instance cell;
-            bool hitActorCell = this->findCell(actorPosition, cell);
-
-            ActorState *actor = this;
-            if (hitActorCell)
+            if (this->active)
             {
-                bool active = this->isActive();
-                if (!active)
-                {
-                    actor->setActive(true);
-                }
-                else
-                {
-                    actor->setActive(false);
-                }
+                return false;
             }
-            return this->active;
+            return true;
         }
     };
 }; // end of namespace

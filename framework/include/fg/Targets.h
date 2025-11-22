@@ -32,5 +32,16 @@ namespace fog
             {
             }
         };
+        struct TrackActorByCell : public Tasks::Target
+        {
+            State* state;
+            TrackActorByCell(State* state) : state(state)
+            {
+            }
+        };
+
+        struct KeepWorld: public Tasks::Target{
+
+        };
     }; //
 };

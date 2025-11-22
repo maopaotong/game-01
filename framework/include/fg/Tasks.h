@@ -24,6 +24,7 @@ namespace fog
             long typeMask;
 
         public:
+            virtual ~Target() {};
             long getTypeMask()
             {
                 return typeMask;
@@ -53,7 +54,7 @@ namespace fog
             virtual bool pause() = 0;
             virtual bool resume() = 0;
             virtual void destroy() = 0;
-            virtual bool wait(Task* toWait) = 0;
+            virtual bool wait(Task *toWait) = 0;
         };
 
         class Owner
@@ -69,9 +70,10 @@ namespace fog
 
             void append(Task *task)
             {
-                Task* toWait = this->top();
-                if(!queue.empty()){
-                    toWait = queue.at(queue.size()-1);
+                Task *toWait = this->top();
+                if (!queue.empty())
+                {
+                    toWait = queue.at(queue.size() - 1);
                 }
                 queue.push_back(task);
                 task->wait(toWait);
@@ -90,7 +92,7 @@ namespace fog
 
                     return true;
                 }
-                
+
                 return false;
             }
 
@@ -123,7 +125,6 @@ namespace fog
                     return;
                 }
                 this->append(task);
-
             }
 
             Task *top()
@@ -136,13 +137,13 @@ namespace fog
                 this->stack.pop();
                 this->popCounter++;
                 //
-                //trying to push the task from queue,until there is any top of task cannot de paused.
+                // trying to push the task from queue,until there is any top of task cannot de paused.
                 //
                 for (auto it = this->queue.begin(); it != this->queue.end();)
                 {
                     Task *task = *it;
                     if (this->tryPush(task))
-                    {                        
+                    {
                         it = queue.erase(it);
                         continue;
                     }
@@ -151,7 +152,7 @@ namespace fog
                         break;
                     }
                 }
-                //resume one from the top.
+                // resume one from the top.
 
                 this->top()->resume();
             }
@@ -165,10 +166,12 @@ namespace fog
             {
                 return popCounter;
             }
-            long queueSize(){
+            long queueSize()
+            {
                 return this->queue.size();
             }
         };
+
         class Runner : public FrameListener
         {
 

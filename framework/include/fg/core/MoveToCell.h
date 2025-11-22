@@ -21,14 +21,16 @@
 #include "fg/Cell.h"
 namespace fog
 {
+    using BaseTask = Tasks::Task;
+    using BaseOwner = Tasks::Owner;
     class MoveToCell
     {
     public:
         
-        class Owner : public Tasks::Owner, public Tasks::Task
+        class Owner : public BaseOwner, public BaseTask
         {
         public:
-            Owner(long mask) : Tasks::Owner(mask), Tasks::Task(nullptr, nullptr)
+            Owner(long mask) : BaseOwner(mask), BaseTask(nullptr, nullptr)
             {
                 this->doPush(this);
             }
@@ -63,7 +65,7 @@ namespace fog
             }
         };
 
-        class Task : public Tasks::Task
+        class Task : public BaseTask
         {
 
             Owner *owner;
@@ -81,7 +83,7 @@ namespace fog
 
         public:
             Task(Targets::MoveToCell *target, Owner *owner, CostMap *costMap, Core *core) : core(core), costMap(costMap), cKey2(target->cKey),
-                                                                                               target(target), owner(owner), Tasks::Task(target, owner)
+                                                                                               target(target), owner(owner), BaseTask(target, owner)
             {
             }
 
@@ -118,7 +120,7 @@ namespace fog
                 return this->tryBuildMission(nullptr);
             }
 
-            bool wait(Tasks::Task *toWait) override
+            bool wait(BaseTask *toWait) override
             {
                 this->deleteMission();
                 auto preTask = dynamic_cast<MoveToCell::Task *>(toWait);
@@ -152,7 +154,7 @@ namespace fog
                 actorPosIn2D = root2D->to2D(aPos3);
                 Cell::Instance cell;
                 // bool hitCell = CellUtil::findCellByPoint(costMap, aPos2, aCellKey);
-                bool hitCell = Context<Cell::Center *>::get()->findCellByWorldPosiion(aPos3, cell);
+                bool hitCell = Context<Cell::Center *>::get()->findCellByWorldPosition(aPos3, cell);
                 if (!hitCell)
                 {
                     return false;

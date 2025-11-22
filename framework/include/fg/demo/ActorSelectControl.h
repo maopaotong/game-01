@@ -6,14 +6,40 @@
 #include "fg/core/ActorState.h"
 #include "fg/Core.h"
 #include "fg/Terrains.h"
+#include "fg/core/TrackActorByCell.h"
 
 namespace fog
 {
     using namespace Ogre;
     using Vector3Ref = Property::Ref<Vector3>;
-
-    class ActorSelectControl : public CellStateBase, public Ogre::FrameListener
+    /**
+     *
+     * Tracking the active actor?
+     * High light the cell if any actor is active on the cell.
+     *
+     */
+    class ActorSelectControl : public CellStateBase
     {
+    public:
+        class TrackActorByCellOwner : public TrackActorByCell::Owner
+        {
+            CostMap *costMap;
+            Core *core;
+
+        public:
+            TrackActorByCellOwner(CostMap *costMap, Core *core, ManualObject *obj, std::string material) : costMap(costMap), core(core), TrackActorByCell::Owner(obj, material)
+            {
+            }
+            bool tryTakeTarget(Tasks::Target *target) override
+            {
+                this->pushOrWait(new TrackActorByCell::Task(static_cast<Targets::TrackActorByCell *>(target), this, costMap, core));
+                return true;
+            }
+        };
+
+    protected:
+        CostMap *costMap;
+        Core *core;
         Cell::Instance cell;
 
         bool active = false;
@@ -21,80 +47,18 @@ namespace fog
         Vector3 prePosition;
 
     public:
-        ActorSelectControl(CostMap *costMap, Core *core) : CellStateBase(core)
+        ActorSelectControl(CostMap *costMap, Core *core) : CellStateBase(core), costMap(costMap)
         {
         }
 
         void init() override
         {
-            Cell::Center *cc = Context<Cell::Center *>::get();
-            cell = cc->getAnyCell();
-            actorPosition = this->getProperty<Vector3>("actor1"".actor.position");
-            //prePosition = actorPosition;
             CellStateBase::init();
+            TrackActorByCellOwner *owner = new TrackActorByCellOwner(costMap, core, this->obj, this->material);
+            this->taskOwner = owner;
         }
-
-        void rebuildMesh() override
-        {
-            if (!this->parent)
-            {
-                return;
-            }
-            MeshBuild::SpiderNet buildMesh(obj);
-            buildMesh.begin(this->material);
-            if (parent->isActive())
-            {
-                buildMesh(cell, ColourValue::White); //
-                this->active = true;
-            }
-            else
-            {
-                Cell::Center *cc = Context<Cell::Center *>::get();
-                cell = cc->getAnyCell();
-                this->active = false;
-            }
-
-            buildMesh.end();
-        }
-
-        bool frameStarted(const FrameEvent &evt) override
-        {
-
-            if (!this->active && !this->parent->isActive())
-            {
-                return true;
-            }
-
-            if (this->active && !this->parent->isActive())
-            {
-                this->rebuildMesh();
-                return true;
-            }
-
-            if (this->parent->isActive())
-            {
-
-                Cell::Center *cc = Context<Cell::Center *>::get();
-                Cell::Instance cell2;
-                //Vector3 position = this->parent->getSceneNode()->getPosition();
-                
-                if (prePosition.distance(actorPosition) > CostMap::hexSize)
-                {
-
-                    if (cc->findCellByWorldPosiion(actorPosition, cell2))
-                    {
-                    }
-
-                    if (this->cell.cKey != cell2.cKey)
-                    {
-                        this->cell = cell2;
-                        this->rebuildMesh(); // todo move the medh build to input event stage, not in frame event?
-                    }
-                    prePosition = actorPosition;
-                }
-            }
-
-            return true;
+        void rebuildMesh()override{
+            
         }
     };
 }; // end of namespace
