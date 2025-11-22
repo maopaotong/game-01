@@ -26,15 +26,6 @@ namespace fog
         {
         }
 
-        virtual bool frameStarted(const FrameEvent &evt)
-        {
-            state->forEach([&evt](State *state)
-                                {
-                                    state->getTaskRunner()->step(evt.timeSinceLastFrame);
-                                    return true; //
-                                });
-            return true;
-        }
     };
 };
 //

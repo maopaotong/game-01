@@ -6,16 +6,18 @@
 #include "Global.h"
 #include "State.h"
 #include "fg/Event.h"
+#include "fg/Module.h"
 
 using namespace Ogre;
 using namespace OgreBites;
 namespace fog
 {
-    class Core
+  
+    class Core : public Module
     {
-
     public:
-        Core() 
+    public:
+        Core()
         {
         }
         virtual ~Core() {}
@@ -27,6 +29,8 @@ namespace fog
         virtual Root *getRoot() = 0;
         virtual RenderWindow *getWindow() = 0;
         virtual void addInputListener(InputListener *listener) = 0;
+
+        
         virtual void addFrameListener(Ogre::FrameListener *listener) = 0;
         virtual MaterialManager *getMaterialManager() = 0;
 
@@ -34,7 +38,7 @@ namespace fog
         virtual bool getUserObject(const std::string key, std::any &value) = 0;
         virtual State *getRootState() = 0;
         virtual Light *getLight() = 0;
-        
+
         template <typename T>
         void setUserObject(const std::string key, T *obj)
         {

@@ -27,6 +27,11 @@ namespace fog
             default_ = obj;
         }
 
+        static T exchange(T obj)
+        {
+            return std::exchange<T>(ctxObj, obj);
+        }
+
         static void set(T obj)
         {
             ctxObj = obj;
@@ -50,8 +55,7 @@ namespace fog
         template <typename... Args, typename F>
         static void runWithContext(T ctxObj, F &&func, Args... args)
         {
-            T previousCtxObj = get();
-            set(ctxObj);
+            T previousCtxObj = exchange(ctxObj);
             func(args...);
             set(previousCtxObj);
         }

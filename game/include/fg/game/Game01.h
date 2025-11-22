@@ -19,7 +19,7 @@
 #include "fg/TaskRunner.h"
 namespace fog
 {
-    class Game01 : public Module //, public FrameListener
+    class Game01 : public Module, public FrameListener
     {
         bool breakRenderRequested = false;
         RenderWindow *window;
@@ -40,7 +40,10 @@ namespace fog
         }
         void disactive() override
         {
+
             delete Context<Terrains *>::unset();
+            delete Context<CostMap *>::unset();
+            delete this->onFrameUI;
         }
 
         void active() override
@@ -50,15 +53,7 @@ namespace fog
             this->vp = core->getViewport();
             this->sceMgr = core->getSceneManager();
             CostMap *costMap = createCostMap();
-
-            Context<CostMap *>::runWithContext(costMap, [this]()
-                                               { this->activeInContext(); }); //
-        }
-
-        void activeInContext()
-        {
-            CostMap *costMap = Context<CostMap *>::get();
-            Core *core = Context<Core *>::get();
+            Context<CostMap *>::set(costMap);
 
             this->onFrameUI = new OnFrameUI();
             Context<Core *>::get()->getImGuiApp()->addFrameListener(this->onFrameUI);
@@ -89,14 +84,25 @@ namespace fog
 
             //
             Ground *ground = new CostMapGround(costMap);
-            State *world = new WorldStateControl(ground, core);
+            State *world = new WorldStateControl(ground);
             SceneNode *node = sceMgr->getRootSceneNode();
             world->setSceneNode(node);
+            Context<State *>::set(world);
 
             world->init();
-            core->addFrameListener(new TaskRunner(world));
+            core->addFrameListener(this);
         }
 
+        virtual bool frameStarted(const FrameEvent &evt)
+        {
+            Context<State *>::get()->forEach([&evt](State *state)
+                                             {
+                                                 state->getTaskRunner()->step(evt.timeSinceLastFrame);
+
+                                                 return true; //
+                                             });              //
+            return true;
+        }
         CostMap *createCostMap()
         {
             int width = 30;

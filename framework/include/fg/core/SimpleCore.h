@@ -100,7 +100,7 @@ namespace fog
         Viewport *getViewport() override { return this->vp; }
         Camera *getCamera() override { return this->camera; }
         Root *getRoot() override { return this->root; };
-        
+
         Light *getLight()
         {
             return this->light;
@@ -147,6 +147,19 @@ namespace fog
         State *getRootState() override
         {
             return State::get(this->sceMgr->getRootSceneNode());
+        }
+
+        std::string getName()
+        {
+            return "core";
+        }
+        void active()
+        {
+            Context<Core *>::set(this);
+        }
+        void disactive()
+        {
+            Context<Core *>::set(nullptr);
         }
     };
 }; // end of namespace

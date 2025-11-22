@@ -29,7 +29,6 @@ namespace fog
         float actorHighOffset;
 
     protected:
-        Core *core;
         CostMap *costMap;
         CellKey cKey2;
         State *state;
@@ -40,7 +39,7 @@ namespace fog
         PathFollow2 *pathFollow2;
 
     public:
-        MoveToCellTask(CostMap *costMap, Core *core, State *state, CellKey cKey2) : core(core), costMap(costMap), state(state), cKey2(cKey2), BaseTask()
+        MoveToCellTask(CostMap *costMap, State *state, CellKey cKey2) : costMap(costMap), state(state), cKey2(cKey2), BaseTask()
         {
         }
 

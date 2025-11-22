@@ -57,18 +57,23 @@ namespace fog
     Cell::Center *Context<Cell::Center *>::default_ = nullptr;
     template <>
     Cell::Center *Context<Cell::Center *>::ctxObj = nullptr;
-    //
+    
+
+    //Core context used during the setup stage,no need to provide the core for event handling.
     template <>
     Core *Context<Core *>::default_ = nullptr;
     template <>
     Core *Context<Core *>::ctxObj = nullptr;
 
-    //
-
-    //
+    // TODO remove this app level contex.
     template <>
     CostMap *Context<CostMap *>::default_ = nullptr;
     template <>
     CostMap *Context<CostMap *>::ctxObj = nullptr;
+    //
+    template <>
+    State *Context<State *>::default_ = nullptr;
+    template <>
+    State *Context<State *>::ctxObj = nullptr;
     
 };

@@ -34,13 +34,13 @@ namespace fog
         std::unordered_map<MarkType, CellMarkStateControl *> markStateControls;
 
         SimpleInputState *inputState;
-        Core *core;
+        
 
     public:
-        WorldStateControl(Ground *ground, Core *core) : core(core), WorldState(ground)
+        WorldStateControl(Ground *ground) : WorldState(ground)
         {
             CostMap *costMap = Context<CostMap *>::get();
-
+            Core* core = Context<Core*>::get();
             Ogre::Root *root = core->getRoot();
 
             // Create frame listener for main loop
@@ -65,7 +65,7 @@ namespace fog
 
             //
 
-            MainInputListener *keyHandler = new MainInputListener(costMap, core);
+            MainInputListener *keyHandler = new MainInputListener(costMap);
             core->getAppContext()->addInputListener(keyHandler);
             core->getAppContext()->addInputListener(inputState);
             

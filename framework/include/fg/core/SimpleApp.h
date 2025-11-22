@@ -15,14 +15,13 @@ namespace fog
     class SimpleApp : public App
     {
     private:
-        Core *core;
         std::vector<Module *> list;
         std::unordered_map<std::string, Module *> map;
 
     public:
         SimpleApp()
         {
-            this->core = new SimpleCore();
+            this->add(new SimpleCore());
         }
         virtual ~SimpleApp()
         {
@@ -42,40 +41,31 @@ namespace fog
 
         void setup() override
         {
-
-            Context<Core *>::runWithContext(core, [this]()
-                                            {
-                                                for (auto it = list.begin(); it != list.end(); it++)
-                                                {
-                                                    Module *mod = *it;
-                                                    mod->active();
-                                                } //
-                                            });
+            for (auto it = list.begin(); it != list.end(); it++)
+            {
+                Module *mod = *it;
+                mod->active();
+            } //
         }
 
         void startRendering() override
         {
 
-            Context<Core *>::runWithContext(core, []()
-                                            {
-                                                Ogre::Root *root = Context<Core *>::get()->getRoot();
-                                                root->startRendering(); //
-                                            });
+            Ogre::Root *root = Context<Core *>::get()->getRoot();
+            root->startRendering(); //
         }
 
         void close() override
         {
-            Context<Core *>::runWithContext(core, [this]()
-                                            {
-                                                std::cout << "Closing application.\n";
-                                                for (auto it = list.rbegin(); it != list.rend(); it++)
-                                                {
-                                                    Module *mod = *it;
-                                                    std::cout << "Disactive module:" << mod->getName() << "" << std::endl;
-                                                    mod->disactive();
-                                                    std::cout << "Done of disactive module." << std::endl;
-                                                }
-                                            });
+            std::cout << "Closing application.\n";
+            for (auto it = list.rbegin(); it != list.rend(); it++)
+            {
+                Module *mod = *it;
+                std::cout << "Disactive module:" << mod->getName() << "" << std::endl;
+                mod->disactive();
+                std::cout << "Done of disactive module." << std::endl;
+            }
+
             ////TODO: context->close() at present time will crash the process.
             // Cause:
             //  After add the terrain code by module of GameTerrain.h.

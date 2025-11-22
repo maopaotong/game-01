@@ -47,7 +47,6 @@ namespace fog
         static constexpr float DEFAULT_CAMERA_ROLL_SPEED = (DEFAULT_CAMERA_HITH_MAX - DEFAULT_CAMERA_HIGH_MIN) / 10.0f;
 
     private:
-        Core *core;
         float *cameraTopDistanceVptr;
         float *cameraHighMinVptr;
         float *cameraHighMaxVptr;
@@ -55,9 +54,8 @@ namespace fog
         CostMap *costMap;
 
     public:
-        MainInputListener(CostMap *costMap, Core *core) : costMap(costMap)
+        MainInputListener(CostMap *costMap) : costMap(costMap)
         {
-            this->core = core;
             this->cameraTopDistanceVptr = Context<Var<float>::Bag *>::get()->createBindVptr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
             this->cameraHighMinVptr = Context<Var<float>::Bag *>::get()->createBindVptr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
             this->cameraHighMaxVptr = Context<Var<float>::Bag *>::get()->createBindVptr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
@@ -82,9 +80,10 @@ namespace fog
         }
         void setTargetByMouse(int mx, int my)
         {
+            
             // normalized (0,1)
-            Viewport *viewport = core->getViewport();
-            Camera *camera = core->getCamera();
+            Viewport *viewport = Context<Core*>::get()->getViewport();
+            Camera *camera = Context<Core*>::get()->getCamera();
 
             float ndcX = mx / (float)viewport->getActualWidth();
             float ndcY = my / (float)viewport->getActualHeight();
@@ -109,11 +108,11 @@ namespace fog
 
                     // find all active state
                     // Move to cell task.
-                    core->getRootState()->forEach([this, &cKey](State *state)
+                    Context<Core*>::get()->getRootState()->forEach([this, &cKey](State *state)
                                                   {
                                                       if (state->isActive())
                                                       {
-                                                          MoveToCellTask *task = new MoveToCellTask(this->costMap, this->core, state, cKey);
+                                                          MoveToCellTask *task = new MoveToCellTask(this->costMap, state, cKey);
                                                           state->getTaskRunner()->pushOrWait(task);
                                                       }
                                                       return true; //
@@ -134,7 +133,7 @@ namespace fog
 
         bool mouseWheelRolled(const MouseWheelEvent &evt) override
         {
-            Camera *cam = core->getCamera();
+            Camera *cam = Context<Core*>::get()->getCamera();
             Ogre::SceneNode *node = cam->getParentSceneNode();
             Vector3 translate = Ogre::Vector3::NEGATIVE_UNIT_Y * evt.y * *cameraRollSpeedVptr;
             Vector3 posTarget = node->getPosition() + translate;
