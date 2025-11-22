@@ -69,7 +69,7 @@ namespace fog
         void onApply()
         {
             //
-            core->getGame()->apply(&this->options);
+           // core->getGame()->apply(&this->options);
         }
     };
 

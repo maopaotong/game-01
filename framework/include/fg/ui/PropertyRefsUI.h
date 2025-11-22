@@ -80,7 +80,7 @@ namespace fog
         void onApply()
         {
             //
-            core->getGame()->apply(nullptr);
+           //core->getGame()->apply(nullptr);
         }
     };
 

@@ -14,13 +14,12 @@
 #include <OgreRenderWindow.h>
 #include "fg/demo/GameTerrain.h"
 #include "fg/ui/OnFrameUI.h"
-#include "fg/Game.h"
 #include "fg/State.h"
 #include "fg/Options.h"
 #include "fg/TaskRunner.h"
 namespace fog
 {
-    class Game01 : public Module, Game//, public FrameListener
+    class Game01 : public Module //, public FrameListener
     {
         Core *core;
         bool breakRenderRequested = false;
@@ -52,6 +51,8 @@ namespace fog
             this->vp = core->getViewport();
             this->sceMgr = core->getSceneManager();
             CostMap *costMap = createCostMap();
+            Context<CostMap *>::set(costMap);
+            
 
             this->onFrameUI = new OnFrameUI(core, costMap);
             this->core->getImGuiApp()->addFrameListener(this->onFrameUI);
@@ -85,15 +86,8 @@ namespace fog
             State *world = new WorldStateControl(costMap, ground, core);
             SceneNode *node = sceMgr->getRootSceneNode();
             world->setSceneNode(node);
-            //
-            std::function<void(Options *)> func = [](Options *) {
 
-            };
-            Context<Event::Bus *>::get()->subscribe<Options *>([](Options *) {
-
-            });
             world->init();
-
             core->addFrameListener(new TaskRunner(world));
         }
 
@@ -116,44 +110,5 @@ namespace fog
 
             return cm;
         }
-
-        void apply(Options *options) override
-        {
-
-            // rebuild cells
-            void (*func)(State *, Options *) = [](State *state, Options *options)
-            {
-                CellStateControl *csc = dynamic_cast<CellStateControl *>(state);
-
-                if (csc)
-                {
-                    if (options)
-                    {
-
-                        bool &showPlainCellPtr = options->getOption("Show-plain-cell?")->getValueRef<bool>();
-                        csc->showCost1 = showPlainCellPtr;
-                        std::cout << "" << "" << std::endl;
-                    }
-                    csc->rebuildMesh();
-                }
-            };
-
-            core->getRootState()->forEachChild<Options *>(true, func, options);
-        }
-        /*
-        bool frameStarted(const FrameEvent &evt) override
-        {
-            core->getRootState()->forEachChild([&evt](State *state)
-            {
-                Tasks::Owner *owner = state->getTaskOwner();
-                if (owner)
-                {
-                    owner->top()->step(evt.timeSinceLastFrame);
-                }
-                return true; });
-                return true;
-            }
-            */
-
     };
 };

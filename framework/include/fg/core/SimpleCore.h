@@ -31,10 +31,9 @@ namespace fog
         MaterialManager *matMgr;
         Global *global;
         Ogre::Light *light;
-        Game *game;
 
     public:
-        SimpleCore(Game*game) : Core(game)
+        SimpleCore() : Core()
         {
             appCtx = new ImGuiAppContext("HexagonalGridVisualizer");
 

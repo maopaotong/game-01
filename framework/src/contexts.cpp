@@ -1,6 +1,6 @@
 #include "fg/Context.h"
 #include "fg/Property.h"
-
+#include "fg/Core.h"
 namespace fog
 {
     // If the var here not initialised, app must provide the value.
@@ -11,7 +11,7 @@ namespace fog
 
     template <>
     Var<float>::Bag *Context<Var<float>::Bag *>::ctxObj = new Var<float>::Bag();
-    
+
     template <>
     Var<Vector3>::Bag *Context<Var<Vector3>::Bag *>::default_ = nullptr;
 
@@ -19,10 +19,10 @@ namespace fog
     Var<Vector3>::Bag *Context<Var<Vector3>::Bag *>::ctxObj = new Var<Vector3>::Bag();
 
     template <>
-    Var<Actor*>::Bag *Context<Var<Actor*>::Bag *>::default_ = nullptr;
+    Var<Actor *>::Bag *Context<Var<Actor *>::Bag *>::default_ = nullptr;
 
     template <>
-    Var<Actor*>::Bag *Context<Var<Actor*>::Bag *>::ctxObj = new Var<Actor*>::Bag();
+    Var<Actor *>::Bag *Context<Var<Actor *>::Bag *>::ctxObj = new Var<Actor *>::Bag();
 
     template <>
     Property::Bag *Context<Property::Bag *>::default_ = nullptr;
@@ -40,7 +40,7 @@ namespace fog
     ActorPropEC *Context<ActorPropEC *>::default_ = nullptr;
     template <>
     ActorPropEC *Context<ActorPropEC *>::ctxObj = new ActorPropEC();
-//
+    //
     template <>
     Event::Bus *Context<Event::Bus *>::default_ = nullptr;
     template <>
@@ -58,12 +58,17 @@ namespace fog
     template <>
     Cell::Center *Context<Cell::Center *>::ctxObj = nullptr;
     //
-    // template <>
-    // Master *Context<Master *>::default_ = nullptr;
+    template <>
+    Core *Context<Core *>::default_ = nullptr;
+    template <>
+    Core *Context<Core *>::ctxObj = nullptr;
 
-    // template <>
-    // Master *Context<Master *>::ctxObj = nullptr;
-    
     //
+
+    //
+    template <>
+    CostMap *Context<CostMap *>::default_ = nullptr;
+    template <>
+    CostMap *Context<CostMap *>::ctxObj = nullptr;
     
 };

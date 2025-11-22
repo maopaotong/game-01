@@ -7,7 +7,6 @@
 #include "fg/App.h"
 #include "fg/core/SimpleCore.h"
 #include "fg/Global.h"
-#include "fg/Game.h"
 namespace fog{
 
 using namespace OgreBites;
@@ -19,11 +18,11 @@ private:
     std::vector<Module *> list;
     std::unordered_map<std::string, Module *> map;
 
-
 public:
-    SimpleApp(Game* game)
+    SimpleApp()
     {
-        this->core = new SimpleCore(game);
+        this->core = new SimpleCore();
+        Context<Core*>::set(core);
     }
 
     void add(Module *mod) override

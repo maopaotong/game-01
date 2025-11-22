@@ -6,7 +6,6 @@
 #include "Global.h"
 #include "State.h"
 #include "fg/Event.h"
-#include "fg/Game.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -14,10 +13,9 @@ namespace fog
 {
     class Core
     {
-        Game *game;
 
     public:
-        Core(Game* game) : game(game)
+        Core() 
         {
         }
         virtual ~Core() {}
@@ -36,11 +34,7 @@ namespace fog
         virtual bool getUserObject(const std::string key, std::any &value) = 0;
         virtual State *getRootState() = 0;
         virtual Light *getLight() = 0;
-        Game *getGame()
-        {
-            return game;
-        };
-
+        
         template <typename T>
         void setUserObject(const std::string key, T *obj)
         {
