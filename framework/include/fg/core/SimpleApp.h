@@ -62,7 +62,7 @@ namespace fog
             {
                 Mod *mod = *it;
                 std::cout << "Disactive module:" << mod->getName() << "" << std::endl;
-                mod->disactive();
+                mod->deactive();
                 std::cout << "Done of disactive module." << std::endl;
             }
 

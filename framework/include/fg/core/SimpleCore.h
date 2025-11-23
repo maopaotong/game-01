@@ -144,16 +144,17 @@ namespace fog
             }
             return false;
         }
-        
+
         std::string getName()
         {
             return "core";
         }
-        void active()
+
+        void active() override
         {
             Context<CoreMod *>::set(this);
         }
-        void disactive()
+        void deactive() override
         {
             Context<CoreMod *>::set(nullptr);
         }

@@ -21,6 +21,6 @@ namespace fog
     public:
         virtual std::string getName() = 0;
         virtual void active() = 0;
-        virtual void disactive() = 0;
+        virtual void deactive() = 0;
     };
 };

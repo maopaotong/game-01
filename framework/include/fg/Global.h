@@ -5,7 +5,6 @@
 #include <functional>
 #include "VarBag.h"
 #include "fg/Terrains.h"
-#include "fg/Actor.h"
 #include "fg/Event.h"
 #include "fg/Context.h"
 #include "fg/Cell.h"
@@ -13,12 +12,11 @@
 #include <string>
 namespace fog
 {
-    typedef Event::Center<Actor *, std::string &> ActorPropEC;
 
     class Global : public Var<float>::Bag,          //
                    public Var<long>::Bag,           //
-                   public Var<Vector3>::Bag,        //
-                   public Var<Actor *>::Bag        //
+                   public Var<Vector3>::Bag        //
+
                   
     {
 

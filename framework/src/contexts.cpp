@@ -19,12 +19,6 @@ namespace fog
     Var<Vector3>::Bag *Context<Var<Vector3>::Bag *>::ctxObj = new Var<Vector3>::Bag();
 
     template <>
-    Var<Actor *>::Bag *Context<Var<Actor *>::Bag *>::default_ = nullptr;
-
-    template <>
-    Var<Actor *>::Bag *Context<Var<Actor *>::Bag *>::ctxObj = new Var<Actor *>::Bag();
-
-    template <>
     Property::Bag *Context<Property::Bag *>::default_ = nullptr;
 
     template <>
@@ -35,12 +29,6 @@ namespace fog
     template <>
     Terrains *Context<Terrains *>::ctxObj = nullptr;
 
-    //
-    template <>
-    ActorPropEC *Context<ActorPropEC *>::default_ = nullptr;
-    template <>
-    ActorPropEC *Context<ActorPropEC *>::ctxObj = new ActorPropEC();
-    //
     template <>
     Event::Bus *Context<Event::Bus *>::default_ = nullptr;
     template <>

@@ -10,7 +10,6 @@
 #include "fg/core/PathFollow2MissionState.h"
 #include "fg/util/CollectionUtil.h"
 #include "fg/Movable.h"
-#include "fg/Actor.h"
 
 namespace fog
 {

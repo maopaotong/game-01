@@ -1,9 +1,7 @@
 
 #pragma once
-#include "Actor.h"
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
+#include "fg/defines.h"
+
 
 namespace fog
 {

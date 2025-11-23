@@ -5,7 +5,6 @@
 #include <functional>
 #include "VarBag.h"
 #include "fg/Terrains.h"
-#include "fg/Actor.h"
 #include "fg/Event.h"
 #include <string>
 namespace fog

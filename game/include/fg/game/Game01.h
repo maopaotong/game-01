@@ -36,7 +36,7 @@ namespace fog
         {
             return "example.costMapMod";
         }
-        void disactive() override
+        void deactive() override
         {
 
             delete Context<Terrains *>::unset();

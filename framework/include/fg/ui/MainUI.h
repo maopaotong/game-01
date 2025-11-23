@@ -35,14 +35,13 @@ public:
 
         //
     }
-    static void forEachVarPtr(const std::string name, Actor **vPtr, Var<Actor*>::Range *range, int &actors)
-    {
-        Actor *a = *vPtr;
-        if (a)
-        {
-            actors++;
-            ImGui::Text(fmt::format("Actor:{}", name).c_str());
-        }
+    static void forEachVarPtr(const std::string name, int &actors)
+    {        
+        // if (a)
+        // {
+        //     actors++;
+        //     ImGui::Text(fmt::format("Actor:{}", name).c_str());
+        // }
     };
     void Open()
     {
@@ -54,7 +53,7 @@ public:
         ImGui::Indent(15.0f);
         int actors = 0;
 
-        Context<Var<Actor*>::Bag*>::get()->forEachVarPtr<int &>(MainUI::forEachVarPtr, actors);
+        //Context<Var<Actor*>::Bag*>::get()->forEachVarPtr<int &>(MainUI::forEachVarPtr, actors);
         ImGui::Unindent(15.0f);
 
         vp = core->getViewport();
