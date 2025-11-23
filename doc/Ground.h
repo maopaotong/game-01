@@ -136,7 +136,7 @@ namespace fog
     class TerrainedGround_TODO
     {
     public:
-        static TerrainedVertices3 calculateVertices3D(int cellX, int cellY, CostMap *costMap, float rad, float heightOffset = 0.0f)
+        static TerrainedVertices3 calculateVertices3D_De(int cellX, int cellY, CostMap *costMap, float rad, float heightOffset = 0.0f)
         {
             // center in world 2D
             Vector2 cellCenterIn2DWld = CellUtil::calculateCenter(cellX, cellY, costMap, rad); //

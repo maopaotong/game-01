@@ -3,7 +3,6 @@
 #include <vector>
 #include <Ogre.h>
 #include <OgreColourValue.h>
-#include "fg/util/DrawerUtil.h"
 #include "fg/State.h"
 #include "fg/Core.h"
 #include "fg/util/CostMap.h"

@@ -3,7 +3,6 @@
 #include <string>
 #include "fg/Core.h"
 #include "fg/State.h"
-#include "fg/Ground.h"
 #include "fmt/format.h"
 #include "fg/util/ImGuiUtil.h"
 
@@ -16,7 +15,6 @@ namespace fog
         int cellX = 0;
         int cellY = 0;
         float heightOffset = 10.0f;
-        TerrainedVertices3 vertices;
 
     public:
         CommandUI(Core *core, CostMap *costMap)
@@ -39,7 +37,7 @@ namespace fog
 
             if (ImGui::Button("Test:TerrainGround"))
             {
-                vertices ={};// TerrainedGround::calculateVertices3D(cellX, cellY, costMap, CostMap::hexSize, heightOffset);
+               // vertices ={};// TerrainedGround::calculateVertices3D(cellX, cellY, costMap, CostMap::hexSize, heightOffset);
             }
             if (ImGui::Button("Test:Ground"))
             {
@@ -49,21 +47,21 @@ namespace fog
 
             if (ImGui::Button("Clear"))
             {
-                vertices = {};
+               // vertices = {};
             }
 
-            int rows = vertices.size();
+            int rows = 0;//vertices.size();
             for (int i = 0; i < rows; i++)
             {
-                std::vector<Vector3> &row = vertices[i];
-                int cols = row.size();
-                ImGui::Text(fmt::format("{}@{}/{}:", i, rows, cols).c_str());
-                for (int j = 0; j < cols; j++)
-                {
-                    ImGui::SameLine();
-                    Vector3 val = row[j];
-                    ImGuiUtil::Text(val);
-                }
+                // std::vector<Vector3> &row = {};//vertices[i];
+                // int cols = row.size();
+                // ImGui::Text(fmt::format("{}@{}/{}:", i, rows, cols).c_str());
+                // for (int j = 0; j < cols; j++)
+                // {
+                //     ImGui::SameLine();
+                //     Vector3 val = row[j];
+                //     ImGuiUtil::Text(val);
+                // }
             }
 
             ImGui::End();

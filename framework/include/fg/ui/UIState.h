@@ -3,7 +3,6 @@
 #include <string>
 #include "fg/Core.h"
 #include "fg/State.h"
-#include "fg/Ground.h"
 #include "fmt/format.h"
 #include "fg/util/ImGuiUtil.h"
 

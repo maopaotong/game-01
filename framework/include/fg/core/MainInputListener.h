@@ -27,7 +27,6 @@
 #include <iostream>
 #include "fg/util/CellMark.h"
 #include "fg/util/CellUtil.h"
-#include "fg/Ground.h"
 #include "fg/Core.h"
 #include "fg/Master.h"
 #include "fg/core/MoveToCellTask.h"

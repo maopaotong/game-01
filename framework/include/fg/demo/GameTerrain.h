@@ -10,7 +10,6 @@
 #include <OgreShaderSubRenderState.h>
 #include <OgreShaderRenderState.h>
 #include <OgreShaderGenerator.h>
-#include "fg/Ground.h"
 #include "fg/Terrains.h"
 #include "fg/util/OgreCode.h"
 namespace fog

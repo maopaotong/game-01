@@ -27,7 +27,6 @@
 #include "fg/util/CameraUtil.h"
 #include "fg/util/Polygon2.h"
 #include "fg/State.h"
-#include "fg/Ground.h"
 
 namespace fog
 {
