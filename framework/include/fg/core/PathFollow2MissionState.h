@@ -100,7 +100,9 @@ namespace fog
                 as->addTime(timeSinceLastFrame * aniTimeFactor);
             }
 
-            Quaternion orientation = Ground::getRotationTo(direction2D);
+            Vector3 d3 = Vector3(direction2D.x, 0, -direction2D.y);
+            Quaternion orientation = Vector3::UNIT_Z.getRotationTo(d3);
+            
             pNode->setOrientation(orientation);
 
             actorPosition = pNode->getPosition();

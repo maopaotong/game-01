@@ -69,6 +69,7 @@ namespace fog
             Context<Terrains *>::set(terrains);
             //
             fog::Plane *p = new fog::Plane(terrains);
+            Context<Plane*>::set(p);
 
             float scale = 30.0f;
             Node2D *root2D = new Node2D(p, scale); //

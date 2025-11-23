@@ -75,5 +75,12 @@ namespace fog
     State *Context<State *>::default_ = nullptr;
     template <>
     State *Context<State *>::ctxObj = nullptr;
+
+    template <>
+    Plane *Context<Plane *>::default_ = nullptr;
+    template <>
+    Plane *Context<Plane *>::ctxObj = nullptr;
+
+    
     
 };

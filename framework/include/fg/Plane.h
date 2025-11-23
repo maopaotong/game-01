@@ -20,9 +20,12 @@ namespace fog
 
     class Plane
     {
+
         Height height;
 
         Vector3 origin;
+
+        Vector3 forwardDirection = Vector3::UNIT_Z;
 
     public:
         Plane(Terrains *terrains) : height(Height(terrains)), origin(Vector3(0, 0, 0))
@@ -59,6 +62,11 @@ namespace fog
             Vector2 ret = Vector2(position.x - origin.x, -(position.z - origin.z));
             return ret;
         };
+        Quaternion getRotationTo(Vector2 direction2D)
+        {
+            Vector3 v3 = to3D(direction2D, nullptr);
+            return forwardDirection.getRotationTo(v3);
+        }
     };
 
     struct Node2D
@@ -91,7 +99,6 @@ namespace fog
         {
             return this->plane->to3D(p2D, norm);
         }
-
     };
 
     struct Object2D
