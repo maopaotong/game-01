@@ -29,7 +29,6 @@ namespace fog
         float actorHighOffset;
 
     protected:
-        CostMap *costMap;
         CellKey cKey2;
         State *state;
         //
@@ -39,7 +38,7 @@ namespace fog
         PathFollow2 *pathFollow2;
 
     public:
-        MoveToCellTask(CostMap *costMap, State *state, CellKey cKey2) : costMap(costMap), state(state), cKey2(cKey2), BaseTask()
+        MoveToCellTask(State *state, CellKey cKey2) : state(state), cKey2(cKey2), BaseTask()
         {
         }
 
@@ -141,7 +140,7 @@ namespace fog
                 }
             }
 
-            std::vector<Vector2> pathByPoint2DNom = costMap->findPath(aCellKey, cKey2);
+            std::vector<Vector2> pathByPoint2DNom = Context<CostMap*>::get()->findPath(aCellKey, cKey2);
 
             std::vector<Vector2> pathByCellCenterIn2D;
 

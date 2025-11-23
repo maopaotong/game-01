@@ -27,7 +27,7 @@
 #include <iostream>
 #include "fg/util/CellMark.h"
 #include "fg/util/CellUtil.h"
-#include "fg/Core.h"
+#include "fg/CoreMod.h"
 #include "fg/Master.h"
 #include "fg/core/MoveToCellTask.h"
 
@@ -60,67 +60,7 @@ namespace fog
             this->cameraHighMaxVptr = Context<Var<float>::Bag *>::get()->createBindVptr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
             this->cameraRollSpeedVptr = Context<Var<float>::Bag *>::get()->createBindVptr(".cameraRollSpeed", DEFAULT_CAMERA_ROLL_SPEED, 0.0f, DEFAULT_CAMERA_ROLL_SPEED * 3);           //
         }
-
-        bool mousePressed(const MouseButtonEvent &evt) override
-        {
-
-            if (evt.button == ButtonType::BUTTON_RIGHT)
-            {
-
-                setTargetByMouse(evt.x, evt.y);
-            }
-
-            return false;
-        }
-
-        bool findCell(Vector3 aPos3, Cell::Instance &cell)
-        {
-            return Context<Cell::Center *>::get()->findCellByWorldPosition(aPos3, cell);
-        }
-        void setTargetByMouse(int mx, int my)
-        {
-            
-            // normalized (0,1)
-            Viewport *viewport = Context<Core*>::get()->getViewport();
-            Camera *camera = Context<Core*>::get()->getCamera();
-
-            float ndcX = mx / (float)viewport->getActualWidth();
-            float ndcY = my / (float)viewport->getActualHeight();
-
-            Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
-
-            Ogre::Plane ground(Ogre::Vector3::UNIT_Y, 0); // Y = 0
-            auto hitGrd = ray.intersects(ground);
-            std::cout << "ndc:(" << ndcX << "," << ndcY << ")" << "hit:" << hitGrd.first << std::endl;
-            if (hitGrd.first)
-            {
-                Ogre::Vector3 pos = ray.getPoint(hitGrd.second);
-
-                // bool hitCell = CellUtil::findCellByPoint(costMap, Vector2(pos.x, pos.z), cKey);
-                // bool hitCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(pos), cKey);
-                Cell::Instance cell;
-                bool hitCell = this->findCell(pos, cell);
-
-                if (hitCell)
-                {
-                    CellKey cKey = cell.cKey;
-
-                    // find all active state
-                    // Move to cell task.
-                    Context<State*>::get()->forEach([this, &cKey](State *state)
-                                                  {
-                                                      if (state->isActive())
-                                                      {
-                                                          MoveToCellTask *task = new MoveToCellTask(this->costMap, state, cKey);
-                                                          state->getTaskRunner()->pushOrWait(task);
-                                                      }
-                                                      return true; //
-                                                  });
-                    //
-                }
-                // cout << "worldPoint(" << pickX << ",0," << pickZ << "),cellIdx:[" << cx << "," << cy << "]" << endl;
-            }
-        }
+       
 
         bool mouseReleased(const MouseButtonEvent &evt) override
         {
@@ -132,7 +72,7 @@ namespace fog
 
         bool mouseWheelRolled(const MouseWheelEvent &evt) override
         {
-            Camera *cam = Context<Core*>::get()->getCamera();
+            Camera *cam = Context<CoreMod*>::get()->getCamera();
             Ogre::SceneNode *node = cam->getParentSceneNode();
             Vector3 translate = Ogre::Vector3::NEGATIVE_UNIT_Y * evt.y * *cameraRollSpeedVptr;
             Vector3 posTarget = node->getPosition() + translate;

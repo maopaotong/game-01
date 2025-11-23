@@ -1,6 +1,6 @@
 #include "fg/Context.h"
 #include "fg/Property.h"
-#include "fg/Core.h"
+#include "fg/CoreMod.h"
 namespace fog
 {
     // If the var here not initialised, app must provide the value.
@@ -61,9 +61,9 @@ namespace fog
 
     //Core context used during the setup stage,no need to provide the core for event handling.
     template <>
-    Core *Context<Core *>::default_ = nullptr;
+    CoreMod *Context<CoreMod *>::default_ = nullptr;
     template <>
-    Core *Context<Core *>::ctxObj = nullptr;
+    CoreMod *Context<CoreMod *>::ctxObj = nullptr;
 
     // TODO remove this app level contex.
     template <>

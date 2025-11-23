@@ -1,5 +1,5 @@
 #pragma once
-#include "fg/Module.h"
+#include "fg/Mod.h"
 #include "fg/demo/WorldStateControl.h"
 #include "fg/core/CostMapGround.h"
 #include "imgui.h"

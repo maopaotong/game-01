@@ -1,7 +1,7 @@
 #pragma once
 #include "imgui.h"
 #include <string>
-#include "fg/Core.h"
+#include "fg/CoreMod.h"
 #include "fg/State.h"
 #include "fg/Event.h"
 #include <fmt/format.h>
@@ -10,13 +10,13 @@ namespace fog
 {
     class PolicyUI : public UIState
     {
-        Core *core;
+        CoreMod *core;
         State *state = nullptr;
         CostMap *costMap;
         Property::Ref<Vector3> actorPosition;
 
     public:
-        PolicyUI(Core *core, CostMap *costMap) : UIState("ActiveActor")
+        PolicyUI(CoreMod *core, CostMap *costMap) : UIState("ActiveActor")
         {
             this->core = core;
             this->costMap = costMap;            

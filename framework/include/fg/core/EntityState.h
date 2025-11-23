@@ -54,7 +54,7 @@ namespace fog
         virtual void init() override
         {
 
-            SceneManager *sMgr = Context<Core *>::get()->getSceneManager();
+            SceneManager *sMgr = Context<CoreMod *>::get()->getSceneManager();
            
             entity = sMgr->createEntity("Sinbad.mesh");
             entity->setQueryFlags(0x00000001);

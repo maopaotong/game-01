@@ -1,7 +1,7 @@
 #pragma once
 #include "fg/Global.h"
-#include "fg/Core.h"
-#include "fg/Module.h"
+#include "fg/CoreMod.h"
+#include "fg/Mod.h"
 #include "fg/util/CostMap.h"
 #include "fg/core/MaterialFactory.h"
 #include "fg/demo/WorldState.h"
@@ -21,7 +21,7 @@ namespace fog
 {
     class OnFrameUI : public ImGuiApp::FrameListener
     {
-        Core *core;
+        CoreMod *core;
         bool breakRenderRequested = false;
         RenderWindow *window;
         Viewport *vp;
@@ -35,7 +35,7 @@ namespace fog
     public:
         OnFrameUI()
         {
-            this->core = Context<Core*>::get();
+            this->core = Context<CoreMod*>::get();
 
             this->window = core->getWindow();
             this->vp = core->getViewport();

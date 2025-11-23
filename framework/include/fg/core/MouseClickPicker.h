@@ -54,10 +54,18 @@ namespace fog
 
         bool mousePressed(const MouseButtonEvent &evt) override
         {
-            if (evt.button != ButtonType::BUTTON_LEFT)
+            if (evt.button == ButtonType::BUTTON_LEFT)
             {
-                return false;
+                return mouseButtonLeftPressed(evt);
             }
+            else if (evt.button == ButtonType::BUTTON_RIGHT)
+            {
+                return mouseButtonRightPressed(evt.x, evt.y);
+            }
+            return true;
+        }
+        bool mouseButtonLeftPressed(const MouseButtonEvent &evt)
+        {
             // normalized (0,1)
 
             float ndcX = evt.x / (float)viewport->getActualWidth();
@@ -80,6 +88,51 @@ namespace fog
                                          } //
                                          return true; //
                                      });
+            }
+            return true;
+        }
+
+        bool mouseButtonRightPressed(int mx, int my)
+        {
+
+            // normalized (0,1)
+            Viewport *viewport = Context<CoreMod *>::get()->getViewport();
+            Camera *camera = Context<CoreMod *>::get()->getCamera();
+
+            float ndcX = mx / (float)viewport->getActualWidth();
+            float ndcY = my / (float)viewport->getActualHeight();
+
+            Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
+
+            Ogre::Plane ground(Ogre::Vector3::UNIT_Y, 0); // Y = 0
+            auto hitGrd = ray.intersects(ground);
+            std::cout << "ndc:(" << ndcX << "," << ndcY << ")" << "hit:" << hitGrd.first << std::endl;
+            if (hitGrd.first)
+            {
+                Ogre::Vector3 pos = ray.getPoint(hitGrd.second);
+
+                // bool hitCell = CellUtil::findCellByPoint(costMap, Vector2(pos.x, pos.z), cKey);
+                // bool hitCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(pos), cKey);
+                Cell::Instance cell;
+                bool hitCell = Context<Cell::Center *>::get()->findCellByWorldPosition(pos, cell);
+                if (hitCell)
+                {
+                    CellKey cKey = cell.cKey;
+
+                    // find all active state
+                    // Move to cell task.
+                    Context<State *>::get()->forEach([this, &cKey](State *state)
+                                                     {
+                                                         if (state->isActive())
+                                                         {
+                                                             MoveToCellTask *task = new MoveToCellTask(state, cKey);
+                                                             state->getTaskRunner()->pushOrWait(task);
+                                                         }
+                                                         return true; //
+                                                     });
+                    //
+                }
+                // cout << "worldPoint(" << pickX << ",0," << pickZ << "),cellIdx:[" << cx << "," << cy << "]" << endl;
             }
             return true;
         }

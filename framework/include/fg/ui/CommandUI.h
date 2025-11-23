@@ -1,7 +1,7 @@
 #pragma once
 #include "imgui.h"
 #include <string>
-#include "fg/Core.h"
+#include "fg/CoreMod.h"
 #include "fg/State.h"
 #include "fmt/format.h"
 #include "fg/util/ImGuiUtil.h"
@@ -10,14 +10,14 @@ namespace fog
 {
     class CommandUI
     {
-        Core *core;
+        CoreMod *core;
         CostMap *costMap;
         int cellX = 0;
         int cellY = 0;
         float heightOffset = 10.0f;
 
     public:
-        CommandUI(Core *core, CostMap *costMap)
+        CommandUI(CoreMod *core, CostMap *costMap)
         {
             this->core = core;
             this->costMap = costMap;

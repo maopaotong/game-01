@@ -4,7 +4,7 @@
 #include <Ogre.h>
 #include <OgreColourValue.h>
 #include "fg/State.h"
-#include "fg/Core.h"
+#include "fg/CoreMod.h"
 #include "fg/util/CostMap.h"
 #include "fg/Cell.h"
 #include "fg/Global.h"
@@ -29,7 +29,7 @@ namespace fog
         CellStateBase()
         {
 
-            Ogre::SceneManager *sceneMgr = Context<Core *>::get()->getSceneManager();
+            Ogre::SceneManager *sceneMgr = Context<CoreMod *>::get()->getSceneManager();
             obj = sceneMgr->createManualObject();
             node = sceneMgr->getRootSceneNode()->createChildSceneNode();
             node->attachObject(obj);

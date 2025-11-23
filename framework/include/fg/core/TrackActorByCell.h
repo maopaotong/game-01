@@ -28,7 +28,7 @@ namespace fog
     {
 
     protected:
-        Core *core;
+        CoreMod *core;
         CostMap *costMap;
         State *actor;
         //
@@ -40,7 +40,7 @@ namespace fog
         State *state;
 
     public:
-        TrackActorByCellTask(CostMap *costMap, Core *core, State *state, ManualObject *obj, std::string material) : state(state), material(material), obj(obj), core(core), costMap(costMap)
+        TrackActorByCellTask(CostMap *costMap, CoreMod *core, State *state, ManualObject *obj, std::string material) : state(state), material(material), obj(obj), core(core), costMap(costMap)
         {
         }
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "fg/Global.h"
-#include "fg/Core.h"
-#include "fg/Module.h"
+#include "fg/CoreMod.h"
+#include "fg/Mod.h"
 #include "fg/util/CostMap.h"
 #include "fg/core/MaterialFactory.h"
 #include "fg/demo/WorldState.h"
@@ -22,7 +22,7 @@ class SceneNodeUI
     template <typename... Args>
     using SceneNodeVistFunc = bool (*)(int depth, SceneNode *cNode, Args... args);
 
-    Core *core;
+    CoreMod *core;
     bool breakRenderRequested = false;
     RenderWindow *window;
     Viewport *vp;
@@ -30,7 +30,7 @@ class SceneNodeUI
     ActiveTrayUI *activeTrayUI = nullptr;
 
 public:
-    SceneNodeUI(Core *core)
+    SceneNodeUI(CoreMod *core)
     {
         this->core = core;
         this->window = core->getWindow();

@@ -1,14 +1,13 @@
 #pragma once
 #include <Ogre.h>
 #include <OgreInput.h>
-#include "Core.h"
 
 namespace fog
 {
 
     using namespace Ogre;
     using namespace OgreBites;
-    class Module
+    class Mod
     {
     public:
         class Active

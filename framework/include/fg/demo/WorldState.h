@@ -4,7 +4,7 @@
 #include "fg/core/SimpleInputState.h"
 #include "fg/core/CameraState.h"
 #include "fg/core/EntityState.h"
-#include "fg/core/MainInputListener.h"
+#include "fg/core/MouseCameraController.h"
 #include "fg/core/MouseClickPicker.h"
 namespace fog
 {
@@ -19,7 +19,7 @@ namespace fog
         WorldState()
         {
             CostMap *costMap = Context<CostMap *>::get();
-            Core *core = Context<Core *>::get();
+            CoreMod *core = Context<CoreMod *>::get();
             Ogre::Root *root = core->getRoot();
 
             // Create frame listener for main loop

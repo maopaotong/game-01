@@ -3,7 +3,7 @@
 #include <OgreLogManager.h>
 
 #include "fg/util/HexGridPrinter.h"
-#include "fg/Module.h"
+#include "fg/Mod.h"
 #include "fg/App.h"
 #include "fg/core/SimpleCore.h"
 #include "fg/Global.h"
@@ -15,8 +15,8 @@ namespace fog
     class SimpleApp : public App
     {
     private:
-        std::vector<Module *> list;
-        std::unordered_map<std::string, Module *> map;
+        std::vector<Mod *> list;
+        std::unordered_map<std::string, Mod *> map;
 
     public:
         SimpleApp()
@@ -27,7 +27,7 @@ namespace fog
         {
         }
 
-        void add(Module *mod) override
+        void add(Mod *mod) override
         {
 
             std::string name = mod->getName();
@@ -43,7 +43,7 @@ namespace fog
         {
             for (auto it = list.begin(); it != list.end(); it++)
             {
-                Module *mod = *it;
+                Mod *mod = *it;
                 mod->active();
             } //
         }
@@ -51,7 +51,7 @@ namespace fog
         void startRendering() override
         {
 
-            Ogre::Root *root = Context<Core *>::get()->getRoot();
+            Ogre::Root *root = Context<CoreMod *>::get()->getRoot();
             root->startRendering(); //
         }
 
@@ -60,7 +60,7 @@ namespace fog
             std::cout << "Closing application.\n";
             for (auto it = list.rbegin(); it != list.rend(); it++)
             {
-                Module *mod = *it;
+                Mod *mod = *it;
                 std::cout << "Disactive module:" << mod->getName() << "" << std::endl;
                 mod->disactive();
                 std::cout << "Done of disactive module." << std::endl;

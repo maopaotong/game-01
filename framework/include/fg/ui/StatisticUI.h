@@ -1,7 +1,7 @@
 #pragma once
 #include "imgui.h"
 #include <string>
-#include "fg/Core.h"
+#include "fg/CoreMod.h"
 #include "fg/State.h"
 #include "fg/Event.h"
 #include <fmt/format.h>
@@ -21,7 +21,7 @@ namespace fog
         void doOpen() override
         {
 
-            RenderWindow *window = Context<Core*>::get()->getWindow();
+            RenderWindow *window = Context<CoreMod*>::get()->getWindow();
             const Ogre::RenderTarget::FrameStats &fs = window->getStatistics();
             ImGui::Text(fmt::format("FPS:     {:.2f}", fs.lastFPS).c_str());
             ImGui::Text(fmt::format("Tris:    {}", fs.triangleCount).c_str());

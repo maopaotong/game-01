@@ -7,7 +7,7 @@
 // #include "imgui_impl_opengl3.h"
 #include "ImGuiAppContext.h"
 #include "fg/util/HexGridPrinter.h"
-#include "fg/Module.h"
+#include "fg/Mod.h"
 #include <unordered_map>
 #define FG_LIGHT_DIRECTION_X 300
 #define FG_LIGHT_DIRECTION_Y 500
@@ -18,7 +18,7 @@ namespace fog
     using namespace OgreBites;
     using namespace Ogre;
 
-    class SimpleCore : public Core
+    class SimpleCore : public CoreMod
     {
     private:
         Ogre::Camera *camera;
@@ -33,7 +33,7 @@ namespace fog
         Ogre::Light *light;
 
     public:
-        SimpleCore() : Core()
+        SimpleCore() : CoreMod()
         {
             appCtx = new ImGuiAppContext("HexagonalGridVisualizer");
 
@@ -151,11 +151,11 @@ namespace fog
         }
         void active()
         {
-            Context<Core *>::set(this);
+            Context<CoreMod *>::set(this);
         }
         void disactive()
         {
-            Context<Core *>::set(nullptr);
+            Context<CoreMod *>::set(nullptr);
         }
     };
 }; // end of namespace

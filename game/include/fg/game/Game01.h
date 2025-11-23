@@ -1,7 +1,7 @@
 #pragma once
 #include "fg/Global.h"
-#include "fg/Core.h"
-#include "fg/Module.h"
+#include "fg/CoreMod.h"
+#include "fg/Mod.h"
 #include "fg/util/CostMap.h"
 #include "fg/core/MaterialFactory.h"
 #include "fg/demo/WorldState.h"
@@ -17,7 +17,7 @@
 #include "fg/TaskRunner.h"
 namespace fog
 {
-    class Game01 : public Module, public FrameListener
+    class Game01 : public Mod, public FrameListener
     {
         bool breakRenderRequested = false;
         RenderWindow *window;
@@ -46,7 +46,7 @@ namespace fog
 
         void active() override
         {
-            Core *core = Context<Core *>::get();
+            CoreMod *core = Context<CoreMod *>::get();
             this->window = core->getWindow();
             this->vp = core->getViewport();
             this->sceMgr = core->getSceneManager();
@@ -54,7 +54,7 @@ namespace fog
             Context<CostMap *>::set(costMap);
 
             this->onFrameUI = new OnFrameUI();
-            Context<Core *>::get()->getImGuiApp()->addFrameListener(this->onFrameUI);
+            Context<CoreMod *>::get()->getImGuiApp()->addFrameListener(this->onFrameUI);
             //
             //
 

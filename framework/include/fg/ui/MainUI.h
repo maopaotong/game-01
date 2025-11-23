@@ -1,7 +1,7 @@
 #pragma once
 #include "fg/Global.h"
-#include "fg/Core.h"
-#include "fg/Module.h"
+#include "fg/CoreMod.h"
+#include "fg/Mod.h"
 #include "fg/util/CostMap.h"
 #include "fg/core/MaterialFactory.h"
 #include "fg/demo/WorldState.h"
@@ -16,7 +16,7 @@
 namespace fog{
 class MainUI
 {
-    Core *core;
+    CoreMod *core;
     bool breakRenderRequested = false;
     RenderWindow *window;
     Viewport *vp;
@@ -24,7 +24,7 @@ class MainUI
     ActiveTrayUI *activeTrayUI = nullptr;
 
 public:
-    MainUI(Core *core,CostMap* costMap)
+    MainUI(CoreMod *core,CostMap* costMap)
     {
         this->core = core;
         this->window = core->getWindow();

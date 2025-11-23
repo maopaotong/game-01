@@ -6,21 +6,21 @@
 #include "Global.h"
 #include "State.h"
 #include "fg/Event.h"
-#include "fg/Module.h"
+#include "fg/Mod.h"
 
 using namespace Ogre;
 using namespace OgreBites;
 namespace fog
 {
   
-    class Core : public Module
+    class CoreMod : public Mod
     {
     public:
     public:
-        Core()
+        CoreMod()
         {
         }
-        virtual ~Core() {}
+        virtual ~CoreMod() {}
         virtual ApplicationContext *getAppContext() = 0;
         virtual ImGuiApp *getImGuiApp() = 0;
         virtual SceneManager *getSceneManager() = 0;

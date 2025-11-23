@@ -4,7 +4,7 @@
 #include <Ogre.h>
 #include <OgreColourValue.h>
 #include "fg/State.h"
-#include "fg/Core.h"
+#include "fg/CoreMod.h"
 #include "fg/util/CostMap.h"
 #include "fg/Cell.h"
 #include "fg/Global.h"

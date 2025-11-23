@@ -85,7 +85,6 @@ namespace fog
 
             float terH = 0.0f; // Context<Terrains *>::get()->getHeightAtPosition(currentPos2D); // TODO in a common place to translate all .
 
-            // Vector3 currentPos = Ground::Transfer::to3D(currentPos2D, Global::getTerrainHeightAtPositionWithOffset, heightOffset); //
             Vector3 currentPos = this->to3D(currentPos2D);
             // position
             pNode->translate(currentPos - prevPos); // new position

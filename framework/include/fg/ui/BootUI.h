@@ -1,7 +1,7 @@
 #pragma once
 #include "imgui.h"
 #include <string>
-#include "fg/Core.h"
+#include "fg/CoreMod.h"
 #include "fg/State.h"
 #include "fg/Ground.h"
 #include "fmt/format.h"
@@ -17,7 +17,7 @@ namespace fog
     {
         
     public:
-        BootUI(Core *core, CostMap *costMap) : UIState("Boot")
+        BootUI(CoreMod *core, CostMap *costMap) : UIState("Boot")
         {
             this->active = true;
         }
