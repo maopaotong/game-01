@@ -22,7 +22,7 @@ public:
         this->position = position;
         this->path = path;
     }
-
+    
     float getSpeed()
     {
         return speed;

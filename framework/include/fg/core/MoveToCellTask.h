@@ -1,12 +1,10 @@
 #pragma once
-#include <string>
-#include <vector>
+#include "fg/defines.h"
+
 #include <typeindex>
 
-#include <vector>
 #include <memory>
 #include <type_traits>
-#include <functional>
 #include <utility>
 #include <Ogre.h>
 #include <fg/Cell.h>
@@ -34,30 +32,13 @@ namespace fog
         PathFollow2MissionState *mission = nullptr;
         bool failed = false;
         PathState *pathState;
-        PathFollow2 *pathFollow2;
 
     public:
-        MoveToCellTask(State *state, CellKey cKey2) : state(state), cKey2(cKey2), BaseTask()
+        MoveToCellTask(State *state, CellKey cKey2) : state(state), cKey2(cKey2)
         {
         }
-
-        void destroy() override
+        virtual ~MoveToCellTask()
         {
-            this->deleteMission();
-        }
-
-        void deleteMission()
-        {
-            if (this->mission)
-            {
-                state->removeChild(this->mission);
-                delete this->mission;
-                this->mission = nullptr;
-                delete this->pathFollow2;
-                this->pathFollow2 = nullptr;
-                delete this->pathState;
-                this->pathState = nullptr;
-            }
         }
 
         bool pause() override
@@ -65,25 +46,14 @@ namespace fog
             return false;
         }
 
-        bool resume() override
+        bool cancel() override
         {
-            if (this->mission)
-            {
-                return true;
-            }
-            return this->tryBuildMission(nullptr);
+
+            return true;
         }
 
-        bool wait(BaseTask *toWait) override
+        bool resume() override
         {
-            this->deleteMission();
-            auto preTask = dynamic_cast<MoveToCellTask *>(toWait);
-            if (!preTask)
-            {
-                // only wait the same task type.
-                return false;
-            }
-            this->tryBuildMission(preTask);
             return true;
         }
 
@@ -91,55 +61,32 @@ namespace fog
         {
             if (!this->mission)
             {
-                if (!this->tryBuildMission(nullptr))
-                {
-                    return false;
-                }
+                buildMission(nullptr);
             }
             return mission->step(time);
         }
 
-        bool tryResolveOwnerCell(CellKey &cKey, Vector2 &actorPosIn2D)
+        std::tuple<CellKey, Vector2> resolveOwnerCell()
         {
             Cell::Center *cells = Context<Cell::Center *>::get();
 
             // check if this state's position on the target cell
             Vector3 aPos3 = this->state->getSceneNode()->getPosition();
             Node2D *root2D = cells->getRoot2D();
-            actorPosIn2D = root2D->to2D(aPos3);
+            Vector2 actorPosIn2D = root2D->to2D(aPos3);
             Cell::Instance cell;
             // bool hitCell = CellUtil::findCellByPoint(costMap, aPos2, aCellKey);
             bool hitCell = Context<Cell::Center *>::get()->findCellByWorldPosition(aPos3, cell);
-            if (!hitCell)
-            {
-                return false;
-            }
-            cKey = cell.cKey;
-            return true;
+            // todo: not hit?
+            return {cell.cKey, actorPosIn2D};
         }
 
-        PathFollow2 *tryBuildPath(MoveToCellTask *preTask, PathState *&pathStateRef)
+        PathFollow2 buildPath()
         {
 
-            CellKey aCellKey;
-            Vector2 actorPosIn2D;
+            std::tuple<CellKey, Vector2> keyAndPosition = this->resolveOwnerCell();
 
-            if (preTask)
-            {
-                aCellKey = preTask->cKey2;
-                Cell::Center *cells = Context<Cell::Center *>::get();
-                actorPosIn2D = cells->getCell(aCellKey).getOrigin2D();
-            }
-            else
-            {
-
-                if (!this->tryResolveOwnerCell(aCellKey, actorPosIn2D))
-                {
-                    return nullptr;
-                }
-            }
-
-            std::vector<Vector2> pathByPoint2DNom = Context<CostMap*>::get()->findPath(aCellKey, cKey2);
+            std::vector<Vector2> pathByPoint2DNom = Context<CostMap *>::get()->findPath(std::get<CellKey>(keyAndPosition), cKey2);
 
             std::vector<Vector2> pathByCellCenterIn2D;
 
@@ -151,22 +98,21 @@ namespace fog
             // float pathSpeed = this->Context<Var<float>::Bag*>::get()->getVarVal(".pathSpeed", 1.0f);
 
             float pathSpeed = Context<Var<float>::Bag *>::get()->getVarVal(".pathSpeed", 1.0f);
-            PathFollow2 *path = new PathFollow2(actorPosIn2D, pathByPointIn2D, pathSpeed);
-            pathStateRef = new PathState();
-            pathStateRef->init();
-            pathStateRef->setPath(pathByPoint2DNom, aCellKey, cKey2);
+            PathFollow2 path(std::get<Vector2>(keyAndPosition), pathByPointIn2D, pathSpeed);
+            PathState *pathState = new PathState();
+            pathState->init();
+            pathState->setPath(pathByPoint2DNom, std::get<CellKey>(keyAndPosition), cKey2);
+
+            // TODO add pathState to another common state.
+            this->addChild(pathState); //
+
             return path;
         }
 
-        bool tryBuildMission(MoveToCellTask *preTask)
+        void buildMission(MoveToCellTask *preTask)
         {
 
-            PathState *pathStateRef;
-            PathFollow2 *path2D = tryBuildPath(preTask, pathStateRef);
-            if (!path2D)
-            {
-                return false;
-            }
+            PathFollow2 path2D = buildPath();
 
             AnimationStateSet *anisSet = state->getAllAnimationStates();
             if (!anisSet)
@@ -177,15 +123,11 @@ namespace fog
             float aniSpeed = Context<Var<float>::Bag *>::get()->getVarVal(".aniSpeed", 1.0f);
 
             // new child state.
-            PathFollow2MissionState *mission = new PathFollow2MissionState(path2D, anisSet, state->getAnimationNames(), aniSpeed, state->getActorHighOffset()); //
+            mission = new PathFollow2MissionState(this->state, path2D, anisSet, state->getAnimationNames(), aniSpeed, state->getActorHighOffset()); //
             mission->init();
             // delete missionState;
             // this->addChild(missionState);
-            this->state->addChild(mission);
-            this->mission = mission;
-            this->pathState = pathStateRef;
-            this->pathFollow2 = path2D;
-            return true;
+            this->addChild(mission);
         }
 
     }; //

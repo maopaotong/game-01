@@ -14,17 +14,29 @@ namespace fog
 {
 
     using namespace Ogre;
+    class State;
     class Tasks
     {
 
     public:
         class Task : public Stairs
         {
+        protected:
+            List<UniquePtr<State>> states; // child states.
+            void addChild(State *state)
+            {
+                this->states.push_back(UniquePtr<State>(state));
+            }
 
         public:
             Task()
             {
             }
+            virtual ~Task()
+            {
+                states.clear();
+            }
+
             virtual bool step(float time) override = 0;
             /**
              * if the task is pauseable , new task will push to the top of the stack.
@@ -35,8 +47,7 @@ namespace fog
              */
             virtual bool pause() = 0;
             virtual bool resume() = 0;
-            virtual void destroy() = 0;
-            virtual bool wait(Task *toWait) = 0;
+            virtual bool cancel() = 0;
         };
 
         class Runner
@@ -44,20 +55,8 @@ namespace fog
 
         protected:
             std::stack<std::unique_ptr<Task>> stack;
-            std::vector<Task *> queue;
 
             long popCounter = 0;
-
-            void append(Task *task)
-            {
-                Task *toWait = this->top();
-                if (!queue.empty())
-                {
-                    toWait = queue.at(queue.size() - 1);
-                }
-                queue.push_back(task);
-                task->wait(toWait);
-            }
 
             void doPush(Task *task)
             {
@@ -89,15 +88,33 @@ namespace fog
                 return stack.size();
             }
 
-            void pushOrWait(Task *task)
+            template <typename F>
+            bool tryCancelAndPush(F &&newTask)
             {
-
-                if (this->tryPush(task))
+                Task *preTask = this->tryGetTop();
+                if (preTask)
                 {
-
-                    return;
+                    if (preTask->cancel())
+                    {
+                        this->pop();
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
-                this->append(task);
+                Task *task = newTask();
+                this->doPush(task);
+                return true;
+            }
+
+            Task *tryGetTop()
+            {
+                if (this->stack.empty())
+                {
+                    return nullptr;
+                }
+                return stack.top().get();
             }
 
             Task *top()
@@ -109,25 +126,12 @@ namespace fog
             {
                 this->stack.pop();
                 this->popCounter++;
-                //
-                // trying to push the task from queue,until there is any top of task cannot de paused.
-                //
-                for (auto it = this->queue.begin(); it != this->queue.end();)
+                Task *top = this->tryGetTop();
+                if (top)
                 {
-                    Task *task = *it;
-                    if (this->tryPush(task))
-                    {
-                        it = queue.erase(it);
-                        continue;
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    top->resume();
                 }
                 // resume one from the top.
-
-                this->top()->resume();
             }
 
             void done()
@@ -139,11 +143,7 @@ namespace fog
             {
                 return popCounter;
             }
-            long queueSize()
-            {
-                return this->queue.size();
-            }
-
+            
             bool step(float time)
             {
                 if (this->stack.empty())
@@ -155,7 +155,6 @@ namespace fog
                 bool goOn = task->step(time);
                 if (!goOn)
                 {
-                    task->destroy();
                     this->stack.pop();
                 }
                 return true;

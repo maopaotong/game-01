@@ -1,5 +1,5 @@
 #pragma once
-
+#include "fg/defines.h"
 #include <Ogre.h>
 #include <OgreNode.h>
 #include <type_traits>
@@ -59,10 +59,11 @@ namespace fog
         State *parent = nullptr;
         FrameListener *frameListener = nullptr;
         SceneNode *sceNode = nullptr;
-        std::vector<State *> *children = nullptr;
+        //
+        List<UniquePtr<State>> children;
         bool active = false;
         Options options;
-        Tasks::Runner *taskRunner;
+        Tasks::Runner taskRunner;
         std::string name;
 
         template <typename T>
@@ -78,21 +79,17 @@ namespace fog
         }
 
     public:
-        State() : taskRunner(new Tasks::Runner()), children(new std::vector<State *>())
+        State()
         {
-            std::cout << "new State()" << this << "" << std::endl;
+            //std::cout << "new State()" << this << "" << std::endl;
         }
         virtual ~State()
         {
             // todo delete child.
             // todo remove sceneNode...
 
-            std::cout << "~State()" << this << "" << std::endl;
-            this->children->clear();
-            delete this->children;
-            this->children = nullptr;
-            delete this->taskRunner;
-            this->taskRunner = nullptr;
+            //std::cout << "~State()" << this << "" << std::endl;
+            //this->children.clear();
         }
 
         bool pickable()
@@ -106,7 +103,7 @@ namespace fog
 
         Tasks::Runner *getTaskRunner()
         {
-            return taskRunner;
+            return &taskRunner;
         }
 
         virtual void init() {
@@ -157,13 +154,16 @@ namespace fog
             {
                 throw std::runtime_error("Already has a parent state.");
             }
-            this->children->push_back(s);
+            children.push_back(UniquePtr<State>(s));
             s->parent = this;
         }
 
         void removeChild(State *cs)
         {
-            this->children->erase(std::remove(this->children->begin(), this->children->end(), cs), this->children->end());
+            children.erase(
+                std::remove_if(children.begin(), children.end(), [cs](const UniquePtr<State> &state)
+                               { return cs == state.get(); }),
+                children.end());
         }
 
         FrameListener *getFrameListener()
@@ -212,12 +212,11 @@ namespace fog
         template <typename F>
         bool forEachChild(F &&func, bool recursive = true)
         {
-            std::vector<State *> *tmp = this->children;
 
             bool goOn = true;
-            for (auto it = tmp->begin(); it != tmp->end(); ++it)
+            for (auto &it = children.begin(); it != children.end(); ++it)
             {
-                State *s = *it;
+                State *s = it->get();
                 goOn = func(s);
                 if (goOn && recursive)
                 {

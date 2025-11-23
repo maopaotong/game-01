@@ -75,19 +75,17 @@ namespace fog
             if (picked)
             {
                 picked->setActive(true);
-                return false;
             }
-            else
-            {
-                this->state->forEach([](State *state)
+            //unselect all other active state.
+            this->state->forEach([picked](State *state)
+                                 {
+                                     if (state->isActive() && state != picked)
                                      {
-                                         if (state->isActive())
-                                         {
-                                             state->setActive(false);
-                                         } //
-                                         return true; //
-                                     });
-            }
+                                         state->setActive(false);
+                                     } //
+                                     return true; //
+                                 });
+
             return true;
         }
 
@@ -124,8 +122,11 @@ namespace fog
                                                      {
                                                          if (state->isActive())
                                                          {
-                                                             MoveToCellTask *task = new MoveToCellTask(state, cKey);
-                                                             state->getTaskRunner()->pushOrWait(task);
+                                                             // state->getTaskRunner()->pushOrWait(task);
+                                                             state->getTaskRunner()->tryCancelAndPush([state, &cKey]()
+                                                                                                      {
+                                                                                                          return new MoveToCellTask(state, cKey); //
+                                                                                                      });
                                                          }
                                                          return true; //
                                                      });

@@ -34,6 +34,12 @@ namespace fog
             node->attachObject(obj);
             //
         }
+        virtual ~CellStateBase()
+        {
+            Ogre::SceneManager *sceneMgr = Context<CoreMod *>::get()->getSceneManager();
+            sceneMgr->getRootSceneNode()->removeChild(node);
+            delete node;
+        }
 
         virtual void init() override
         {
