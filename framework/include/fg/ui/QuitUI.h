@@ -1,5 +1,4 @@
 #pragma once
-#include "fg/Global.h"
 #include "fg/CoreMod.h"
 #include "fg/Mod.h"
 #include "fg/util/CostMap.h"
@@ -26,43 +25,46 @@ namespace fog
     public:
         QuitUI() : UIState("Quit")
         {
-            CoreMod* core = Context<CoreMod*>::get();
+            CoreMod *core = Context<CoreMod *>::get();
             this->window = core->getWindow();
             this->vp = core->getViewport();
             this->sceMgr = core->getSceneManager();
 
             //
         }
-
-        void doOpen()
+        virtual bool open() override
         {
-
-            // quit confirm popup
-            char *confirmPopupId = "Confirm";
-            if (ImGui::Button("Quit"))
+            if (!this->active)
             {
-                ImGui::OpenPopup(confirmPopupId);
+                return false;
             }
 
-            if (ImGui::BeginPopupModal(confirmPopupId, nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+            std::string fName = this->getFullName();
+            ImGui::OpenPopup(fName.c_str());
+
+            if (!ImGui::BeginPopupModal(fName.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
-                ImGui::Text("Quit? Are you sure?");
-                ImGui::Separator();
+                return false;
+            }
+            this->doOpen();
+            ImGui::EndPopup();
+            return true;
+        };
+        void doOpen()
+        {
+            ImGui::Text("Quit confirm?");
+            ImGui::Separator();
 
-                if (ImGui::Button("Yes"))
-                {
-                    // 处理“确定”逻辑
-                    Context<CoreMod*>::get()->getImGuiApp()->breakRender();
-                    ImGui::CloseCurrentPopup(); // 关闭弹窗
-                }
-                ImGui::SameLine();
-                if (ImGui::Button("Cancel"))
-                {
-                    // 可选：处理“取消”逻辑
-                    ImGui::CloseCurrentPopup();
-                }
-
-                ImGui::EndPopup();
+            if (ImGui::Button("Yes"))
+            {
+                // 处理“确定”逻辑
+                Context<CoreMod *>::get()->getImGuiApp()->breakRender();
+                ImGui::CloseCurrentPopup(); // 关闭弹窗
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel"))
+            {
+                this->active = false;
             }
         }
     };

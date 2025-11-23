@@ -3,7 +3,6 @@
 #include <vector>
 #include <typeindex>
 #include "fg/VarBag.h"
-#include "fg/Global.h"
 #include <memory>
 
 namespace fog

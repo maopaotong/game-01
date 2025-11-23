@@ -12,7 +12,6 @@
 #include "Movable.h"
 #include "fg/Event.h"
 #include "fg/Context.h"
-#include "fg/Global.h"
 #include "fg/MeshBuild.h"
 #include "fg/Property.h"
 #include "fg/Options.h"

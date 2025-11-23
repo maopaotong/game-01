@@ -13,7 +13,6 @@
 #include <fg/Context.h>
 #include "OgreSceneNode.h"
 #include "fg/util/CostMap.h"
-#include <fg/Global.h>
 #include "fg/PathFollow2.h"
 #include "fg/core/PathState.h"
 #include "fg/core/PathFollow2MissionState.h"

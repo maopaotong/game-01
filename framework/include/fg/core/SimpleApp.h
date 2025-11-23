@@ -6,7 +6,6 @@
 #include "fg/Mod.h"
 #include "fg/App.h"
 #include "fg/core/SimpleCore.h"
-#include "fg/Global.h"
 namespace fog
 {
 

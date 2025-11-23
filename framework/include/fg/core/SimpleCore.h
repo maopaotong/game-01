@@ -29,7 +29,6 @@ namespace fog
         Ogre::Root *root;
         std::unordered_map<std::string, std::any> userObjs;
         MaterialManager *matMgr;
-        Global *global;
         Ogre::Light *light;
 
     public:

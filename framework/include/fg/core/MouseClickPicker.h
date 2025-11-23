@@ -28,7 +28,6 @@
 #include "fg/util/CellMark.h"
 #include "fg/util/CellUtil.h"
 #include "fg/Pickable.h"
-#include "fg/Global.h"
 namespace fog
 {
     using namespace OgreBites;

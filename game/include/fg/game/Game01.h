@@ -1,5 +1,4 @@
 #pragma once
-#include "fg/Global.h"
 #include "fg/CoreMod.h"
 #include "fg/Mod.h"
 #include "fg/util/CostMap.h"

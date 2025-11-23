@@ -84,6 +84,7 @@ namespace fog
                 return name;
             }
         }
+        
         virtual bool open()
         {
             if (!this->active)

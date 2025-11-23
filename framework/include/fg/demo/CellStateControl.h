@@ -7,7 +7,6 @@
 #include "fg/CoreMod.h"
 #include "fg/util/CostMap.h"
 #include "fg/Cell.h"
-#include "fg/Global.h"
 #include "fg/core/CellStateBase.h"
 #include "fg/util/CostMap.h"
 #include "fg/MeshBuild.h"

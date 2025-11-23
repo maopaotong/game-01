@@ -3,7 +3,6 @@
 #include <OgreApplicationContext.h>
 #include <any>
 #include "ImGuiApp.h"
-#include "Global.h"
 #include "State.h"
 #include "fg/Event.h"
 #include "fg/Mod.h"

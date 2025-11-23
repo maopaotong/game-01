@@ -7,7 +7,6 @@
 #include "fg/CoreMod.h"
 #include "fg/util/CostMap.h"
 #include "fg/Cell.h"
-#include "fg/Global.h"
 #include "fg/MaterialNames.h"
 #include "fg/MeshBuild.h"
 #define DEFAULT_CELL_HIGH_OFFSET .08f
