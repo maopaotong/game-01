@@ -36,7 +36,6 @@ namespace fog
 
         virtual void setUserObject(const std::string key, std::any value) = 0;
         virtual bool getUserObject(const std::string key, std::any &value) = 0;
-        virtual State *getRootState() = 0;
         virtual Light *getLight() = 0;
 
         template <typename T>

@@ -144,11 +144,7 @@ namespace fog
             }
             return false;
         }
-        State *getRootState() override
-        {
-            return State::get(this->sceMgr->getRootSceneNode());
-        }
-
+        
         std::string getName()
         {
             return "core";

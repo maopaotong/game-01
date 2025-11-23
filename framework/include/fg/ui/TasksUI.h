@@ -24,7 +24,7 @@ namespace fog
         {
             int id = 0;
             
-            Context<Core*>::get()->getRootState()->forEachChild([](State* state)
+            Context<State*>::get()->forEachChild([](State* state)
             {
                 Tasks::Runner * owner = state->getTaskRunner();
 

@@ -96,8 +96,12 @@ namespace fog
             this->taskRunner = nullptr;
         }
 
-        virtual bool pickable()
+        bool pickable()
         {
+            if (this->active)
+            {
+                return false;
+            }
             return true;
         }
 
@@ -271,8 +275,6 @@ namespace fog
         {
             return 0.0f;
         }
-
-        
 
     public:
     };

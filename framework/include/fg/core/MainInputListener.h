@@ -108,7 +108,7 @@ namespace fog
 
                     // find all active state
                     // Move to cell task.
-                    Context<Core*>::get()->getRootState()->forEach([this, &cKey](State *state)
+                    Context<State*>::get()->forEach([this, &cKey](State *state)
                                                   {
                                                       if (state->isActive())
                                                       {

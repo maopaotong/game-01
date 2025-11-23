@@ -5,8 +5,7 @@
 #include "fg/util/CostMap.h"
 #include "fg/Ground.h"
 #include "fg/core/MaterialFactory.h"
-#include "fg/core/CostMapGround.h"
-#include "fg/demo/WorldStateControl.h"
+#include "fg/demo/WorldState.h"
 
 #include "imgui.h"
 #include <fmt/format.h>
@@ -81,10 +80,10 @@ namespace fog
 
             // root2D->position = -cells->getCenterIn2D(); // move center to (0,0)
             Context<Cell::Center *>::set(cells);
+            // Ground *ground = new CostMapGround(costMap);
 
             //
-            Ground *ground = new CostMapGround(costMap);
-            State *world = new WorldStateControl(ground);
+            State *world = new WorldState();
             SceneNode *node = sceMgr->getRootSceneNode();
             world->setSceneNode(node);
             Context<State *>::set(world);

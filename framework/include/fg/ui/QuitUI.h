@@ -3,10 +3,8 @@
 #include "fg/Core.h"
 #include "fg/Module.h"
 #include "fg/util/CostMap.h"
-#include "fg/Ground.h"
 #include "fg/core/MaterialFactory.h"
-#include "fg/core/CostMapGround.h"
-#include "fg/demo/WorldStateControl.h"
+#include "fg/demo/WorldState.h"
 
 #include "imgui.h"
 #include <fmt/format.h>

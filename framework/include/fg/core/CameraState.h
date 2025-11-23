@@ -29,105 +29,100 @@
 #include "fg/State.h"
 #include "fg/Ground.h"
 
-namespace fog{
-
-using namespace Ogre;
-
-// === Frame Listener class for main loop ===
-class CameraState : public Ogre::FrameListener, public State
+namespace fog
 {
-private:
-    bool quit;
 
-    InputState *inputState;
-    Ogre::Camera *camera;
-    ViewPoint *viewport;
-    Ground *ground;
+    using namespace Ogre;
 
-public:
-    CameraState(Ogre::Camera *camera, InputState *inputState) : quit(false)
+    // === Frame Listener class for main loop ===
+    class CameraState : public Ogre::FrameListener, public State
     {
+    private:
+        bool quit;
 
-        this->camera = camera;
-        this->inputState = inputState;
-        this->ground = nullptr;
-    }
+        InputState *inputState;
+        Ogre::Camera *camera;
+        ViewPoint *viewport;
 
-    void setGround(Ground *bog)
-    {
-        this->ground = bog;
-    }
-
-    // position and orientation of the camera
-    bool isViewportInsideGround(Vector3 &position, Quaternion &orientation)
-    {
-        if (!this->ground)
+    public:
+        CameraState(Ogre::Camera *camera, InputState *inputState) : quit(false)
         {
-            return true;
+
+            this->camera = camera;
+            this->inputState = inputState;
+
         }
 
-        Ogre::Plane gPlane(Ogre::Vector3::UNIT_Y, 0);
-        // Ray ray = state->camera->getCameraToViewportRay(0.5f, 0.5f);
-
-        Ogre::Vector3 direction = orientation * Ogre::Vector3::NEGATIVE_UNIT_Z;
-        Ogre::Ray ray(position, direction);
-        //
-        auto hitGrd = ray.intersects(gPlane);
-        if (!hitGrd.first)
+        // position and orientation of the camera
+        bool isViewportInsideGround(Vector3 &position, Quaternion &orientation)
         {
+           
+            Ogre::Plane gPlane(Ogre::Vector3::UNIT_Y, 0);
+            // Ray ray = state->camera->getCameraToViewportRay(0.5f, 0.5f);
+
+            Ogre::Vector3 direction = orientation * Ogre::Vector3::NEGATIVE_UNIT_Z;
+            Ogre::Ray ray(position, direction);
+            //
+            auto hitGrd = ray.intersects(gPlane);
+            if (!hitGrd.first)
+            {
+                return false;
+            }
+            Vector3 viewCenterOnGround = ray.getPoint(hitGrd.second);
+            Cell::Instance cell;
+            if(Context<Cell::Center*>::get()->findCellByWorldPosition(viewCenterOnGround, cell)){
+                return true;
+            }
+
             return false;
         }
-        Vector3 viewCenterOnGround = ray.getPoint(hitGrd.second);
 
-        return this->ground->isPointInside(Ground::Transfer::to2D(viewCenterOnGround));
-    }
-
-    bool frameStarted(const Ogre::FrameEvent &evt) override
-    {
-        // std::cout << "Frame started!\n";
-
-        // Move camera
-        Ogre::SceneNode *node = camera->getParentSceneNode();
-        // 获取当前朝向（四元数）
-        // Ogre::Quaternion orientation = node->getOrientation();
-
-        // 计算右向量（X轴）
-        Ogre::Vector3 right = Ogre::Vector3::UNIT_X;
-        Ogre::Vector3 back = Ogre::Vector3::UNIT_Z;
-
-        float speed = 1000.0f;
-        Vector3 position = node->getPosition();
-        Vector3 step = Ogre::Vector3::ZERO;
-        if (inputState->isFront())
+        bool frameStarted(const Ogre::FrameEvent &evt) override
         {
-            // node->translate(-back * speed * evt.timeSinceLastFrame);
-            step += -back * speed * evt.timeSinceLastFrame;
-        }
-        if (inputState->isBack())
-        {
-            step += (back * speed * evt.timeSinceLastFrame);
-        }
-        if (inputState->isLeft())
-        {
-            step += (-right * speed * evt.timeSinceLastFrame);
-        }
-        if (inputState->isRight())
-        {
-            step += (right * speed * evt.timeSinceLastFrame);
-        }
+            // std::cout << "Frame started!\n";
 
-        Vector3 position2 = position + step;
-        bool validTranlate = true;
+            // Move camera
+            Ogre::SceneNode *node = camera->getParentSceneNode();
+            // 获取当前朝向（四元数）
+            // Ogre::Quaternion orientation = node->getOrientation();
 
-        Quaternion orientation = node->getOrientation();
-        validTranlate = this->isViewportInsideGround(position2, orientation);
+            // 计算右向量（X轴）
+            Ogre::Vector3 right = Ogre::Vector3::UNIT_X;
+            Ogre::Vector3 back = Ogre::Vector3::UNIT_Z;
 
-        if (validTranlate)
-        {
-            node->translate(step);
+            float speed = 1000.0f;
+            Vector3 position = node->getPosition();
+            Vector3 step = Ogre::Vector3::ZERO;
+            if (inputState->isFront())
+            {
+                // node->translate(-back * speed * evt.timeSinceLastFrame);
+                step += -back * speed * evt.timeSinceLastFrame;
+            }
+            if (inputState->isBack())
+            {
+                step += (back * speed * evt.timeSinceLastFrame);
+            }
+            if (inputState->isLeft())
+            {
+                step += (-right * speed * evt.timeSinceLastFrame);
+            }
+            if (inputState->isRight())
+            {
+                step += (right * speed * evt.timeSinceLastFrame);
+            }
+
+            Vector3 position2 = position + step;
+            bool validTranlate = true;
+
+            Quaternion orientation = node->getOrientation();
+            validTranlate = this->isViewportInsideGround(position2, orientation);
+
+            if (validTranlate)
+            {
+                node->translate(step);
+            }
+
+            return true; // Continue rendering
         }
-
-        return true; // Continue rendering
-    }
-};
-};//end of namespace
+    };
+}; // end of namespace

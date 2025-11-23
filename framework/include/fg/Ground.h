@@ -156,24 +156,24 @@ namespace fog
         //     return ret;
         // }
 
-        static std::vector<Vector2> calculateCirclePoints(Vector2 center, float rad, float size, float offsetAngle = 0.0f)
-        {
+        // static std::vector<Vector2> calculateCirclePoints(Vector2 center, float rad, float size, float offsetAngle = 0.0f)
+        // {
 
-            std::vector<Vector2> ret(size);
-            float angle = 360.0f / size;
+        //     std::vector<Vector2> ret(size);
+        //     float angle = 360.0f / size;
 
-            for (int i = 0; i < size; i++)
-            {
+        //     for (int i = 0; i < size; i++)
+        //     {
 
-                float angle_rad = (angle * i + offsetAngle) * Ogre::Math::PI / 180.0f;
+        //         float angle_rad = (angle * i + offsetAngle) * Ogre::Math::PI / 180.0f;
 
-                float dx = rad * std::cos(angle_rad);
-                float dy = rad * std::sin(angle_rad);
+        //         float dx = rad * std::cos(angle_rad);
+        //         float dy = rad * std::sin(angle_rad);
 
-                ret[i] = Ogre::Vector2(center.x + dx, center.y + dy);
-            }
-            return ret;
-        };
+        //         ret[i] = Ogre::Vector2(center.x + dx, center.y + dy);
+        //     }
+        //     return ret;
+        // };
 
 
 

@@ -10,7 +10,6 @@ namespace fog
     {
     private:
         CostMap *costMap;
-        Polygon2 polygon;
 
     public:
         CostMapGround(CostMap *costMap);
