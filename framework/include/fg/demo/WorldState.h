@@ -1,11 +1,12 @@
 #pragma once
 #include "fg/State.h"
 #include "CellStateControl.h"
-#include "fg/core/SimpleInputState.h"
+#include "fg/core/InputStateController.h"
 #include "fg/core/CameraState.h"
 #include "fg/core/EntityState.h"
 #include "fg/core/MouseCameraController.h"
 #include "fg/core/MouseClickPicker.h"
+#include "fg/core/HoverCellController.h"
 namespace fog
 {
     class WorldState : public State
@@ -13,7 +14,7 @@ namespace fog
     protected:
         CellStateControl *cells;
 
-        SimpleInputState *inputState;
+        InputStateController *inputState;
 
     public:
         WorldState()
@@ -27,8 +28,7 @@ namespace fog
             this->cells->init();
             this->addChild(this->cells);
 
-            this->inputState = new SimpleInputState(core->getCamera(), core->getWindow());
-
+            this->inputState = new InputStateController(core->getCamera(), core->getWindow());
             CameraState *cameraState = new CameraState(core->getCamera(), inputState);
             root->addFrameListener(cameraState);
 
@@ -45,6 +45,9 @@ namespace fog
             MainInputListener *keyHandler = new MainInputListener(costMap);
             core->getAppContext()->addInputListener(keyHandler);
             core->getAppContext()->addInputListener(inputState);
+
+            core->getAppContext()->addInputListener(new HoverCellController());
+
 
             core->getAppContext()->addInputListener(new MouseClickPicker(this, core->getCamera(), core->getSceneManager(), core->getViewport()));
         }

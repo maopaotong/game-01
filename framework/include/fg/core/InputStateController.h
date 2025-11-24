@@ -35,7 +35,7 @@ using namespace Ogre;
 // === Custom hash function ===
 //
 // === Input handler for closing application ===
-class SimpleInputState : public OgreBites::InputListener, public InputState
+class InputStateController : public OgreBites::InputListener, public InputState
 {
 private:
     bool left = false;
@@ -47,7 +47,7 @@ private:
     RenderWindow *window;
 
 public:
-    SimpleInputState(Camera *cam, RenderWindow *window)
+    InputStateController(Camera *cam, RenderWindow *window)
     {
         this->camera = cam;
         this->window = window;
@@ -74,7 +74,7 @@ public:
         else
         {
         }
-        return true;
+        return false;
     }
 
     bool keyPressed(const OgreBites::KeyboardEvent &evt) override

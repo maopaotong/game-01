@@ -27,6 +27,13 @@ namespace fog
             {
                 this->states.push_back(UniquePtr<State>(state));
             }
+            void removeChild(State *state)
+            {
+                this->states.erase(
+                    std::remove_if(this->states.begin(), this->states.end(), [state](const UniquePtr<State> &s)
+                                   { return state == s.get(); }),
+                    this->states.end());
+            }
 
         public:
             Task()
@@ -80,6 +87,11 @@ namespace fog
                 return stack.size();
             }
 
+            bool empty()
+            {
+                return stack.empty();
+            }
+
             template <typename F>
             bool tryCancelAndPush(F &&newTask)
             {
@@ -95,9 +107,17 @@ namespace fog
                         return false;
                     }
                 }
+
                 Task *task = newTask();
                 this->doPush(task);
                 return true;
+            }
+
+            template <typename F>
+            void push(F &&newTask)
+            {                                
+                Task *task = newTask();
+                this->doPush(task);                
             }
 
             Task *tryGetTop()
@@ -159,7 +179,7 @@ namespace fog
         public:
             Slot *slot(int idx)
             {
-                while (slots.size() <= idx )
+                while (slots.size() <= idx)
                 {
                     slots.push_back(UniquePtr<Slot>(new Slot()));
                 }
@@ -167,7 +187,7 @@ namespace fog
             };
             Slot *tryGetSlot(int idx)
             {
-                if (idx  < slots.size())
+                if (idx < slots.size())
                 {
                     return slots.at(idx).get();
                 }

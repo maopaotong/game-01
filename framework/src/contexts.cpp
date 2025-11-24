@@ -1,6 +1,7 @@
 #include "fg/Context.h"
 #include "fg/Property.h"
 #include "fg/CoreMod.h"
+#include "fg/HoverCellState.h"
 namespace fog
 {
     // If the var here not initialised, app must provide the value.
@@ -68,6 +69,11 @@ namespace fog
     Plane *Context<Plane *>::default_ = nullptr;
     template <>
     Plane *Context<Plane *>::ctxObj = nullptr;
+
+    template <>
+    HoverCellState *Context<HoverCellState *>::default_ = nullptr;
+    template <>
+    HoverCellState *Context<HoverCellState *>::ctxObj = nullptr;
 
     
     
