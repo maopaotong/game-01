@@ -29,19 +29,21 @@ namespace fog
         CellKey cKey2;
         CellKey preCKey2;
         State *state;
-        PathState * pathState;
+        PathState *pathState = nullptr;
 
     public:
         PathFindTask(State *state) : state(state)
         {
+            std::cout << "PathFindTask created." << std::endl;
         }
         virtual ~PathFindTask()
         {
+              std::cout << "~PathFindTask destroyed." << std::endl;
         }
 
         bool pause() override
         {
-            return false;
+            return true;
         }
 
         bool cancel() override
@@ -52,16 +54,16 @@ namespace fog
 
         bool resume() override
         {
-            return false;
+            return true;
         }
 
-        bool step(float time) override
+        GOON step(float time) override
         {
             CellKey cKey2 = Context<HoverCellState *>::get()->getCellKey();
 
             if (this->cKey2 == cKey2)
             { // do nothing.
-                return false;
+                return true;//GOON
             }
 
             this->preCKey2 = this->cKey2;
@@ -74,11 +76,13 @@ namespace fog
 
             std::vector<Vector2> pathByPoint2DNom = Context<CostMap *>::get()->findPath(cKey1, cKey2);
 
-            PathState* pathState2 = new PathState();
+            PathState *pathState2 = new PathState();
             pathState2->init();
             pathState2->setPath(pathByPoint2DNom, cKey1, cKey2);
-
-            this->removeChild(pathState);
+            if (pathState)
+            {
+                this->removeChild(pathState);
+            }
             pathState = pathState2;
             this->addChild(pathState);
 

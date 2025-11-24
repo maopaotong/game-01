@@ -12,7 +12,8 @@
 
 namespace fog
 {
-        
+    using GOON = bool;
+            
     using Vector2 = Ogre::Vector2;
 
     using Vector3 = Ogre::Vector3;
