@@ -63,7 +63,7 @@ namespace fog
         List<UniquePtr<State>> children;
         bool active = false;
         Options options;
-        Tasks::Runner taskRunner;
+        Tasks::Slots slots;
         std::string name;
 
         template <typename T>
@@ -81,15 +81,15 @@ namespace fog
     public:
         State()
         {
-            //std::cout << "new State()" << this << "" << std::endl;
+            // std::cout << "new State()" << this << "" << std::endl;
         }
         virtual ~State()
         {
             // todo delete child.
             // todo remove sceneNode...
 
-            //std::cout << "~State()" << this << "" << std::endl;
-            //this->children.clear();
+            // std::cout << "~State()" << this << "" << std::endl;
+            // this->children.clear();
         }
 
         bool pickable()
@@ -100,10 +100,15 @@ namespace fog
             }
             return true;
         }
-
-        Tasks::Runner *getTaskRunner()
+        Tasks::Slots & getSlots(){
+            return this->slots;
+        }
+        Tasks::Slot * tryGetSlot(int idx){
+            return this->slots.tryGetSlot(idx);
+        }
+        Tasks::Slot *slot(int idx)
         {
-            return &taskRunner;
+            return this->slots.slot(idx);
         }
 
         virtual void init() {
@@ -178,14 +183,14 @@ namespace fog
 
         void setActive(bool active)
         {
-            bool changed = (this->active != active);
+            // bool changed = (this->active != active);
             this->active = active;
-            if (changed)
-            {
+            // if (changed)
+            // {
 
-                // Context<ActorPropEC *>::get()->emit(this, std::string("active"));
-                Context<Event::Bus *>::get()->emit<State *, std::string &>(this, std::string("active"));
-            }
+            //     // Context<ActorPropEC *>::get()->emit(this, std::string("active"));
+            //     Context<Event::Bus *>::get()->emit<State *, std::string &>(this, std::string("active"));
+            // }
         }
 
         bool isActive()

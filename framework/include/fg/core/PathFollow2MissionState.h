@@ -3,7 +3,6 @@
 #include <OgreFrameListener.h>
 #include <OgreAnimationState.h>
 #include <vector>
-#include "fg/core/MissionState.h"
 #include "fg/PathFollow2.h"
 
 namespace fog
@@ -12,7 +11,7 @@ namespace fog
     /**
      * Move a node to a destination.
      */
-    class PathFollow2MissionState : public MissionState, public Stairs
+    class PathFollow2MissionState : public State, public Stairs
     {
         PathFollow2 path;
 
@@ -21,8 +20,9 @@ namespace fog
         Vector3 offset;
 
         float animateTimeSpeedFactor;
-        Vector3Ref actorPosition;
+        //Vector3Ref actorPosition;
         State *state;
+        bool done;
 
     public:
         PathFollow2MissionState(State *state, PathFollow2 path,                     //
@@ -31,7 +31,9 @@ namespace fog
                                 float heightOffset = 0.0f)                          //
             : state(state),                                                         //
               path(path),                                                           //
-              animateTimeSpeedFactor(aniSpeed)
+              aniSet(aniSet),                                                       //
+              animateTimeSpeedFactor(aniSpeed),                                     //
+              done(false)                                                           //
         {
             this->aniSet = aniSet;
             this->offset = Vector3(0, heightOffset, 0);
@@ -47,8 +49,8 @@ namespace fog
         }
         void init() override
         {
-            actorPosition = this->getProperty<Vector3>("actor1"
-                                                       ".actor.position");
+           // actorPosition = this->getProperty<Vector3>("actor1"
+                                     //                  ".actor.position");
         }
 
         PathFollow2 &getPath()
@@ -65,7 +67,7 @@ namespace fog
         // bool frameStarted(const Ogre::FrameEvent &evt) override
         bool step(float timeSinceLastFrame)
         {
-            if (this->isDone())
+            if (this->done)
             {
                 return false;
             }
@@ -76,7 +78,7 @@ namespace fog
             Vector2 direction2D;
             if (!pathFollow.move(timeSinceLastFrame, currentPos2D, direction2D))
             {
-                this->setDone(true);
+                this->done = true;
                 return false;
             }
 
@@ -105,7 +107,7 @@ namespace fog
 
             target->setOrientation(orientation);
 
-            actorPosition = target->getPosition();
+            //actorPosition = target->getPosition();
             // pNode->lookAt();
 
             // pNode->setOrientation(Quaternion(Degree(90), Vector3::UNIT_Y));

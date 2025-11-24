@@ -31,7 +31,6 @@ namespace fog
         //
         PathFollow2MissionState *mission = nullptr;
         bool failed = false;
-        PathState *pathState;
 
     public:
         MoveToCellTask(State *state, CellKey cKey2) : state(state), cKey2(cKey2)

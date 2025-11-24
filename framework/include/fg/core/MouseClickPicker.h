@@ -28,6 +28,7 @@
 #include "fg/util/CellMark.h"
 #include "fg/util/CellUtil.h"
 #include "fg/Pickable.h"
+#include "fg/core/TrackActorTask.h"
 namespace fog
 {
     using namespace OgreBites;
@@ -75,8 +76,14 @@ namespace fog
             if (picked)
             {
                 picked->setActive(true);
+                picked->slot(1)->tryCancelAndPush([picked]()
+                                                  {
+                                                      TrackActorTask *task = new TrackActorTask(picked);
+                                                      task->init();
+                                                      return task; //
+                                                  });
             }
-            //unselect all other active state.
+            // unselect all other active state.
             this->state->forEach([picked](State *state)
                                  {
                                      if (state->isActive() && state != picked)
@@ -123,10 +130,10 @@ namespace fog
                                                          if (state->isActive())
                                                          {
                                                              // state->getTaskRunner()->pushOrWait(task);
-                                                             state->getTaskRunner()->tryCancelAndPush([state, &cKey]()
-                                                                                                      {
-                                                                                                          return new MoveToCellTask(state, cKey); //
-                                                                                                      });
+                                                             state->slot(0)->tryCancelAndPush([state, &cKey]()
+                                                                                              {
+                                                                                                  return new MoveToCellTask(state, cKey); //
+                                                                                              });
                                                          }
                                                          return true; //
                                                      });

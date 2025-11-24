@@ -66,7 +66,7 @@ namespace fog
 
             float height = Context<Terrains *>::get()->getHeightWithNormalAtWorldPosition(Vector3(0, 0, 0), nullptr);
 
-            this->position = this->createProperty(name + ".actor.position", Vector3(0, height + this->actorHighOffset, 0));
+            this->position = this->createProperty(name + ".position", Vector3(0, height + this->actorHighOffset, 0));
             sceNode->translate(this->position);
             // init task owner.
         }

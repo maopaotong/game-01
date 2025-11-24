@@ -13,7 +13,6 @@
 #include <fg/Context.h>
 #include "OgreSceneNode.h"
 #include "fg/util/CostMap.h"
-#include <fg/Global.h>
 #include "fg/PathFollow2.h"
 #include "fg/core/PathState.h"
 #include "fg/core/PathFollow2MissionState.h"
@@ -24,27 +23,22 @@
 namespace fog
 {
     using BaseTask = Tasks::Task;
-    class TrackActorByCellTask : public BaseTask
+    class TrackActorTask : public BaseTask, public CellStateBase
     {
 
     protected:
-        CoreMod *core;
-        CostMap *costMap;
-        State *actor;
         //
 
         CellKey cKey;
         Vector3 prePosition;
-        ManualObject *obj;
-        std::string material;
         State *state;
 
     public:
-        TrackActorByCellTask(CostMap *costMap, CoreMod *core, State *state, ManualObject *obj, std::string material) : state(state), material(material), obj(obj), core(core), costMap(costMap)
+        TrackActorTask(State *state) : state(state)
         {
         }
 
-        void rebuildMesh()
+        void rebuildMesh() override
         {
 
             MeshBuild::SpiderNet buildMesh(this->obj);
@@ -52,10 +46,6 @@ namespace fog
             Cell::Instance cell = Context<Cell::Center *>::get()->getCell(cKey);
             buildMesh(cell, ColourValue::White); //
             buildMesh.end();
-        }
-
-        void destroy() override
-        {
         }
 
         bool pause() override
@@ -67,8 +57,7 @@ namespace fog
         {
             return false;
         }
-
-        bool wait(Tasks::Task *toWait) override
+        bool cancel() override
         {
             return false;
         }
@@ -93,6 +82,7 @@ namespace fog
                 }
                 else
                 { // cannot found the actor cell,what to do?
+                    std::cout<<"Cannot found actor cell."<<std::endl;
                 }
                 prePosition = actorPosition;
             }

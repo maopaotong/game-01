@@ -34,7 +34,6 @@ namespace fog
             }
             virtual ~Task()
             {
-                states.clear();
             }
 
             virtual bool step(float time) override = 0;
@@ -50,7 +49,7 @@ namespace fog
             virtual bool cancel() = 0;
         };
 
-        class Runner
+        class Slot
         {
 
         protected:
@@ -76,13 +75,6 @@ namespace fog
             }
 
         public:
-            Runner()
-            {
-            }
-            virtual ~Runner()
-            {
-            }
-
             long stackSize()
             {
                 return stack.size();
@@ -143,7 +135,7 @@ namespace fog
             {
                 return popCounter;
             }
-            
+
             bool step(float time)
             {
                 if (this->stack.empty())
@@ -156,6 +148,36 @@ namespace fog
                 if (!goOn)
                 {
                     this->stack.pop();
+                }
+                return true;
+            }
+        };
+        class Slots : public Stairs
+        {
+            List<UniquePtr<Slot>> slots;
+
+        public:
+            Slot *slot(int idx)
+            {
+                while (slots.size() <= idx )
+                {
+                    slots.push_back(UniquePtr<Slot>(new Slot()));
+                }
+                return slots.at(idx).get();
+            };
+            Slot *tryGetSlot(int idx)
+            {
+                if (idx  < slots.size())
+                {
+                    return slots.at(idx).get();
+                }
+                return nullptr;
+            }
+            bool step(float time)
+            {
+                for (auto &slot : slots)
+                {
+                    slot->step(time);
                 }
                 return true;
             }

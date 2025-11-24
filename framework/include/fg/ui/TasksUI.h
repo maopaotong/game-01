@@ -25,7 +25,7 @@ namespace fog
             
             Context<State*>::get()->forEachChild([](State* state)
             {
-                Tasks::Runner * owner = state->getTaskRunner();
+                Tasks::Slot * owner = state->tryGetSlot(0);
 
                 if(owner){
                     ImGui::Text(("owner.stackSize:" + std::to_string(owner->stackSize())).c_str()); //

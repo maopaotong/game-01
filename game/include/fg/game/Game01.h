@@ -67,7 +67,7 @@ namespace fog
             Context<Terrains *>::set(terrains);
             //
             fog::Plane *p = new fog::Plane(terrains);
-            Context<Plane*>::set(p);
+            Context<Plane *>::set(p);
 
             float scale = 30.0f;
             Node2D *root2D = new Node2D(p, scale); //
@@ -95,7 +95,7 @@ namespace fog
         {
             Context<State *>::get()->forEach([&evt](State *state)
                                              {
-                                                 state->getTaskRunner()->step(evt.timeSinceLastFrame);
+                                                 state->getSlots().step(evt.timeSinceLastFrame);
 
                                                  return true; //
                                              });              //
