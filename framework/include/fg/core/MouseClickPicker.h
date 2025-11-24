@@ -29,6 +29,8 @@
 #include "fg/util/CellUtil.h"
 #include "fg/Pickable.h"
 #include "fg/core/TrackActorTask.h"
+#include "fg/MovingStateManager.h"
+#include "fg/CellInstanceManager.h"
 namespace fog
 {
     using namespace OgreBites;
@@ -84,14 +86,15 @@ namespace fog
                                                   });
             }
             // unselect all other active state.
-            this->state->forEach([picked](State *state)
-                                 {
-                                     if (state->isActive() && state != picked)
-                                     {
-                                         state->setActive(false);
-                                     } //
-                                     return true; //
-                                 });
+            // this->state->forEach([picked](State *state)
+            //                      {
+            //                          if (state->isActive() && state != picked)
+            //                          {
+            //                              state->setActive(false);
+            //                          } //
+            //                          return true; //
+            //                      });
+
 
             return true;
         }
@@ -117,26 +120,28 @@ namespace fog
 
                 // bool hitCell = CellUtil::findCellByPoint(costMap, Vector2(pos.x, pos.z), cKey);
                 // bool hitCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(pos), cKey);
-                Cell::Instance cell;
-                bool hitCell = Context<Cell::Center *>::get()->findCellByWorldPosition(pos, cell);
+                Cell::Instance cell2;
+                bool hitCell = Context<Cell::Center *>::get()->findCellByWorldPosition(pos, cell2);
                 if (hitCell)
                 {
-                    CellKey cKey = cell.cKey;
-
+                    CellKey cKey2 = cell2.cKey;
+                    MovingStateManager *msm = Context<MovingStateManager *>::get();
+                    //state 
+                    msm->movingActiveStateToCell(cKey2);
                     // find all active state
                     // Move to cell task.
-                    Context<State *>::get()->forEach([this, &cKey](State *state)
-                                                     {
-                                                         if (state->isActive())
-                                                         {
-                                                             // state->getTaskRunner()->pushOrWait(task);
-                                                             state->slot(0)->tryCancelAndPush([state, &cKey]()
-                                                                                              {
-                                                                                                  return new MoveToCellTask(state, cKey); //
-                                                                                              });
-                                                         }
-                                                         return true; //
-                                                     });
+                    // Context<State *>::get()->forEach([this, &cKey](State *state)
+                    //                                  {
+                    //                                      if (state->isActive())
+                    //                                      {
+                    //                                          // state->getTaskRunner()->pushOrWait(task);
+                    //                                          state->slot(0)->tryCancelAndPush([state, &cKey]()
+                    //                                                                           {
+                    //                                                                               return new MoveToCellTask(state, cKey); //
+                    //                                                                           });
+                    //                                      }
+                    //                                      return true; //
+                    //                                  });
                     //
                 }
                 // cout << "worldPoint(" << pickX << ",0," << pickZ << "),cellIdx:[" << cx << "," << cy << "]" << endl;

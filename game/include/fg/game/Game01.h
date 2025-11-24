@@ -14,7 +14,6 @@
 #include "fg/State.h"
 #include "fg/Options.h"
 #include "fg/TaskRunner.h"
-#include "fg/HoverCellState.h"
 namespace fog
 {
     class Game01 : public Mod, public FrameListener
@@ -88,10 +87,19 @@ namespace fog
             world->setSceneNode(node);
             Context<State *>::set(world);
 
+           
+            //
+            CellInstanceManager *cellInstances = Context<CellInstanceManager*>::get();
+            cellInstances->init();
+
+            //moving state manager.
+            MovingStateManager *movingStateManager = Context<MovingStateManager*>::get();
+            movingStateManager->init();
+            //
+            Context<CoreMod *>::get()->addStepListener(movingStateManager);
+
             world->init();
             core->addFrameListener(this);
-            Context<HoverCellState*>::set(new HoverCellState());
-
         }
 
         virtual bool frameStarted(const FrameEvent &evt)

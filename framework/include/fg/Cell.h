@@ -70,9 +70,15 @@ namespace fog
             }
 
             // center of the cell.
-            Ogre::Vector2 getOrigin2D()
+            Vector2 getOrigin2D()
             {
                 return Cell::getOrigin2D(cKey.first, cKey.second, node->scale);
+            }
+
+            Vector3 getOrigin3D()
+            {
+                Vector2 origin2D = getOrigin2D();
+                return node->to3D(origin2D);
             }
 
         };

@@ -24,17 +24,9 @@
 #include <OgreRTShaderSystem.h>
 #include <OgreTechnique.h>
 #include "CellMark.h"
+#include "fg/defines.h"
 namespace fog{
-struct PairHash
-{
-    template <typename T, typename U>
-    std::size_t operator()(const std::pair<T, U> &p) const
-    {
-        auto h1 = std::hash<T>{}(p.first);
-        auto h2 = std::hash<U>{}(p.second);
-        return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
-    }
-};
+
 
 // === NavNode structure ===
 struct NavNode

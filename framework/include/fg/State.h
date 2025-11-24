@@ -65,6 +65,7 @@ namespace fog
         Options options;
         Tasks::Slots slots;
         std::string name;
+        CellKey cKey;
 
         template <typename T>
         Property::Ref<T> createProperty(std::string name, T defaultValue)
@@ -92,6 +93,14 @@ namespace fog
             // this->children.clear();
         }
 
+        CellKey getCellKey()
+        {
+            return this->cKey;
+        }
+        void setCellKey(CellKey ckey)
+        {
+            this->cKey = ckey;
+        }   
         bool pickable()
         {
             if (this->active)

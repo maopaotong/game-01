@@ -27,6 +27,9 @@ namespace fog
         virtual Camera *getCamera() = 0;
         virtual Root *getRoot() = 0;
         virtual RenderWindow *getWindow() = 0;
+        
+        virtual void addStepListener(Stairs *listener) = 0;
+
         virtual void addInputListener(InputListener *listener) = 0;
 
         

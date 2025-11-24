@@ -21,7 +21,7 @@ namespace fog
 
     protected:
         Ogre::ManualObject *obj;
-        Ogre::SceneNode *node;
+        
         std::string material = MaterialNames::materialNameInUse;
 
     public:
@@ -30,15 +30,15 @@ namespace fog
 
             Ogre::SceneManager *sceneMgr = Context<CoreMod *>::get()->getSceneManager();
             obj = sceneMgr->createManualObject();
-            node = sceneMgr->getRootSceneNode()->createChildSceneNode();
-            node->attachObject(obj);
+            this->sceNode = sceneMgr->getRootSceneNode()->createChildSceneNode();
+            sceNode->attachObject(obj);
             //
         }
         virtual ~CellStateBase()
         {
             Ogre::SceneManager *sceneMgr = Context<CoreMod *>::get()->getSceneManager();
-            sceneMgr->getRootSceneNode()->removeChild(node);
-            delete node;
+            sceneMgr->getRootSceneNode()->removeChild(this->sceNode);
+            sceneMgr->destroyManualObject(this->obj);
         }
 
         virtual void init() override

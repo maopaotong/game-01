@@ -6,6 +6,8 @@
 #include "fg/core/EntityState.h"
 #include "fg/core/MouseCameraController.h"
 #include "fg/core/MouseClickPicker.h"
+#include "fg/MovingStateManager.h"
+#include "fg/CellInstanceManager.h"
 #include "fg/core/HoverCellController.h"
 namespace fog
 {
@@ -39,15 +41,13 @@ namespace fog
             EntityState *actor2 = new EntityState("actor2");
             actor2->init();
             this->addChild(actor2);
-
-            //
+            //           
 
             MainInputListener *keyHandler = new MainInputListener(costMap);
             core->getAppContext()->addInputListener(keyHandler);
             core->getAppContext()->addInputListener(inputState);
 
             core->getAppContext()->addInputListener(new HoverCellController());
-
 
             core->getAppContext()->addInputListener(new MouseClickPicker(this, core->getCamera(), core->getSceneManager(), core->getViewport()));
         }

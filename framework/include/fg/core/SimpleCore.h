@@ -18,7 +18,7 @@ namespace fog
     using namespace OgreBites;
     using namespace Ogre;
 
-    class SimpleCore : public CoreMod
+    class SimpleCore : public CoreMod, public FrameListener
     {
     private:
         Ogre::Camera *camera;
@@ -30,6 +30,7 @@ namespace fog
         std::unordered_map<std::string, std::any> userObjs;
         MaterialManager *matMgr;
         Ogre::Light *light;
+        std::vector<Stairs *> stepListeners;
 
     public:
         SimpleCore() : CoreMod()
@@ -92,6 +93,7 @@ namespace fog
             // Create viewport
             vp = window->addViewport(camera);
             vp->setBackgroundColour(Ogre::ColourValue(0.2f, 0.2f, 0.2f));
+            this->root->addFrameListener(this);
         }
 
         ApplicationContext *getAppContext() override { return this->appCtx; }
@@ -116,7 +118,10 @@ namespace fog
         {
             return this->matMgr;
         }
-
+        void addStepListener(Stairs *listener) override
+        {
+            this->stepListeners.push_back(listener);
+        }
         void addInputListener(InputListener *listener) override
         {
             this->appCtx->getImGuiApp()->addInputListener(listener);
@@ -156,6 +161,15 @@ namespace fog
         void deactive() override
         {
             Context<CoreMod *>::set(nullptr);
+        }
+
+        bool frameStarted(const FrameEvent &evt)
+        {
+            for (Stairs *listener : this->stepListeners)
+            {
+                listener->step(evt.timeSinceLastFrame);
+            }
+            return true;
         }
     };
 }; // end of namespace

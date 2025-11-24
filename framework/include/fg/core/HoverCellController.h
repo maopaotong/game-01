@@ -30,8 +30,7 @@
 #include "fg/CoreMod.h"
 #include "fg/Master.h"
 #include "fg/core/MoveToCellTask.h"
-#include "fg/HoverCellState.h"
-#include "fg/core/PathFindTask.h"
+#include "fg/CellInstanceManager.h"
 
 namespace fog
 {
@@ -44,30 +43,57 @@ namespace fog
     {
 
     private:
+        CellKey cKey;
+        CellInstanceState *preCis;
+
     public:
-        HoverCellController()
+        HoverCellController() : preCis(nullptr)
         {
         }
 
-        bool mouseMoved(const MouseMotionEvent &evt) override
+        CONSUMED mouseMoved(const MouseMotionEvent &evt) override
         {
-            int mx = evt.x;
-            int my = evt.y;
-            Context<HoverCellState *>::get()->onMouseMoving(mx,my);
+            int x = evt.x;
+            int y = evt.y;
 
-            Context<State *>::get()->forEach([](State *state)
-                                             {
-                                                 if (state->isActive() && state->slot(2)->empty())
-                                                 {
-                                                    state->slot(2)->push([state]( )
-                                                     {
-                                                         return new PathFindTask(state); //
-                                                     });                                                    
-                                                 }
-                                                 return true; //
-                                             });
+            Viewport *viewport = Context<CoreMod *>::get()->getViewport();
+            Camera *camera = Context<CoreMod *>::get()->getCamera();
+
+            float ndcX = x / (float)viewport->getActualWidth();
+            float ndcY = y / (float)viewport->getActualHeight();
+
+            Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
+
+            Ogre::Plane ground(Ogre::Vector3::UNIT_Y, 0); // Y = 0
+
+            auto hitGrd = ray.intersects(ground);
+
+            Ogre::Vector3 pos2;
+
+            if (!hitGrd.first)
+            {
+                return false;
+            }
+
+            pos2 = ray.getPoint(hitGrd.second);
+            CellInstanceManager *cellInstMgrState = Context<CellInstanceManager *>::get();
+            CellInstanceState *cis = cellInstMgrState->getCellInstanceStateByPosition(pos2);
+            if (!cis)
+            {
+                return false;
+            }
+            if (cis == preCis)
+            {
+                return false;
+            }
+            if (preCis)
+            {
+                preCis->unsetColour();
+            }
+            cis->setColour(ColourValue::Red);
+            preCis = cis;
 
             return false;
-        };
+        }
     };
 }; // end of namespace

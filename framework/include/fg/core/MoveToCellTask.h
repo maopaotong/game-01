@@ -39,7 +39,14 @@ namespace fog
         virtual ~MoveToCellTask()
         {
         }
-
+        State *getState()
+        {
+            return this->state;
+        }
+        CellKey getTargetCellKey()
+        {
+            return this->cKey2;
+        }
         bool pause() override
         {
             return false;
