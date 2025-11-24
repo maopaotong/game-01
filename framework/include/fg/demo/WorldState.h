@@ -9,6 +9,8 @@
 #include "fg/MovingStateManager.h"
 #include "fg/CellInstanceManager.h"
 #include "fg/core/HoverCellController.h"
+#include "fg/MovableStateManager.h"
+
 namespace fog
 {
     class WorldState : public State
@@ -34,13 +36,10 @@ namespace fog
             CameraState *cameraState = new CameraState(core->getCamera(), inputState);
             root->addFrameListener(cameraState);
 
-            EntityState *actor1 = new EntityState("actor1");
-            actor1->init();
-            this->addChild(actor1);
-
-            EntityState *actor2 = new EntityState("actor2");
-            actor2->init();
-            this->addChild(actor2);
+            MovableStateManager *movableStateMgr = new MovableStateManager();
+            movableStateMgr->init();
+            this->addChild(movableStateMgr);
+            Context<MovableStateManager *>::set(movableStateMgr);
             //           
 
             MainInputListener *keyHandler = new MainInputListener(costMap);

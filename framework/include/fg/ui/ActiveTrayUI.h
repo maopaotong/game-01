@@ -49,7 +49,7 @@ namespace fog
         void doOpen() override
         {
             int counter = 0;
-            Context<State *>::get()->forEach([&counter](State *state)
+            Context<MovableStateManager *>::get()->forEach([&counter](State *state)
                                              {
                                                  if (state->isActive())
                                                  {

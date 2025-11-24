@@ -23,19 +23,33 @@ namespace fog
         {
             int id = 0;
             
-            Context<State*>::get()->forEachChild([](State* state)
+            //
+            Context<MovingStateManager*>::get()->forEachTask([this, &id](MoveToCellTask* task)
             {
-                Tasks::Slot * owner = state->tryGetSlot(0);
-
-                if(owner){
-                    ImGui::Text(("owner.stackSize:" + std::to_string(owner->stackSize())).c_str()); //
-                    ImGui::SameLine();                                 //
-                    ImGui::Text(("owner.popCounter:" + std::to_string(owner->getPopCounter())).c_str());
-                    
+                std::string label = fmt::format("Task##{}", id);
+                if (ImGui::TreeNode(label.c_str()))
+                {
+                    ImGui::Text(("Target CellKey: " + CellKeyUtil::toString(task->getTargetCellKey())).c_str());
+                    ImGui::Text(("State Active: " + std::to_string(task->getState()->isActive())).c_str());
+                    ImGui::TreePop();
                 }
+                id++;
                 return true;
-                //
             });
+
+            // Context<State*>::get()->forEachChild([](State* state)
+            // {
+            //     Tasks::Slot * owner = state->tryGetSlot(0);
+
+            //     if(owner){
+            //         ImGui::Text(("owner.stackSize:" + std::to_string(owner->stackSize())).c_str()); //
+            //         ImGui::SameLine();                                 //
+            //         ImGui::Text(("owner.popCounter:" + std::to_string(owner->getPopCounter())).c_str());
+                    
+            //     }
+            //     return true;
+            //     //
+            // });
             
             if (ImGui::Button("Return"))
             {

@@ -3,6 +3,7 @@
 #include "fg/CoreMod.h"
 #include "fg/CellInstanceManager.h"
 #include "fg/MovingStateManager.h"
+#include "fg/MovableStateManager.h"
 namespace fog
 {
     // If the var here not initialised, app must provide the value.
@@ -82,6 +83,12 @@ namespace fog
     template <>
     CellInstanceManager *Context<CellInstanceManager *>::ctxObj = new CellInstanceManager();
 
+    
+        template <>
+    MovableStateManager *Context<MovableStateManager *>::default_ = nullptr;
+    template <>
+    MovableStateManager *Context<MovableStateManager *>::ctxObj = new MovableStateManager();
 
+    
     
 };

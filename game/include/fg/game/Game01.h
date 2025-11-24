@@ -104,12 +104,12 @@ namespace fog
 
         virtual bool frameStarted(const FrameEvent &evt)
         {
-            Context<State *>::get()->forEach([&evt](State *state)
-                                             {
-                                                 state->getSlots().step(evt.timeSinceLastFrame);
+            // Context<State *>::get()->forEach([&evt](State *state)
+            //                                  {
+            //                                      state->getSlots().step(evt.timeSinceLastFrame);
 
-                                                 return true; //
-                                             });              //
+            //                                      return true; //
+            //                                  });              //
             return true;
         }
         CostMap *createCostMap()
