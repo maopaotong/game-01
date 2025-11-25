@@ -20,7 +20,6 @@
 
 namespace fog
 {
-    using BaseTask = Tasks::Task;
     /**
      * PathingStateManager find a path from current state position to mouse position.
      */
