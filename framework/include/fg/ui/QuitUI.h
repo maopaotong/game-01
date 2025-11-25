@@ -42,13 +42,9 @@ namespace fog
             std::string fName = this->getFullName();
             ImGui::OpenPopup(fName.c_str());
 
-            if (!ImGui::BeginPopupModal(fName.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-            {
-                return false;
-            }
-            this->doOpen();
-            ImGui::EndPopup();
-            return true;
+            return ImGuiUtil::BeginPopupModalIfEnd(fName,[this](){
+                this->doOpen();
+            });        
         };
         void doOpen()
         {

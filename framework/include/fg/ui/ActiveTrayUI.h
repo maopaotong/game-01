@@ -10,61 +10,44 @@ namespace fog
 {
     class ActiveTrayUI : /* public Listener<State *, std::string &>,*/ public UIState
     {
-        // State *state = nullptr;
-        // Property::Ref<Vector3> actorPosition;
+        State *state;
 
     public:
-        ActiveTrayUI() : UIState("ActiveActor")
+        ActiveTrayUI() : UIState("ActiveActor"), state(nullptr)
         {
-            // Context<ActorPropEC>::get()->addListener(this);
-
-            // Context<Event::Bus>::get()->subscribe<State *, std::string &>([this](State *s, std::string &ss)
-            //                                                                 { this->onEvent(s, ss); });
+            
         }
         void init() override
         {
             // actorPosition = this->getProperty<Vector3>("actor1.position", false);
             UIState::init();
+            Context<Event::Bus>::get()-> //
+                subscribe<EventType, State *>([this](EventType et, State *s)
+                                              {
+                    if (et == EventType::MovableStatePicked)
+                    {
+                        this->state = s;
+                        this->setActive(true);
+                    }
+                    else if (et == EventType::MovableStateUnpicked)
+                    {
+                        this->state = nullptr;
+                        this->setActive(false);
+                    } });
         }
-
-        // bool onEvent(State *a, std::string &pName) override
-        // {
-        //     if (pName == "active")
-        //     {
-        //         State *s = dynamic_cast<State *>(a);
-
-        //         if (s && s->isActive())
-        //         {
-        //             this->state = s;
-        //         }
-        //         else
-        //         {
-        //             this->state = nullptr;
-        //         }
-        //         // do something with s
-        //     }
-        //     return true;
-        // }
 
         void doOpen() override
         {
             int counter = 0;
-            Context<MovableStateManager>::get()->forEach([&counter](State *state)
-                                             {
-                                                 if (state->isActive())
-                                                 {
-                                                     SceneNode *sNode = state->findSceneNode();
-                                                     if (sNode)
-                                                     {
+            if (state)
+            {
 
-                                                         ImGui::Text(("Active State: " + std::to_string((uintptr_t)state)).c_str());
-                                                         ImGui::SameLine();
-                                                         ImGuiUtil::Text(sNode->getPosition());
-                                                         counter++;
-                                                     }
-                                                 }
-                                                 return true; //
-                                             });
+                SceneNode *sNode = state->findSceneNode();
+                ImGui::Text(("Active State: " + std::to_string((uintptr_t)state)).c_str());
+                ImGui::SameLine();
+                ImGuiUtil::Text(sNode->getPosition());
+                counter++;
+            }
 
             if (!counter)
             {

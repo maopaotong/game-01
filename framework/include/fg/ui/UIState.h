@@ -33,7 +33,7 @@ namespace fog
         {
             return Context<Property::Bag>::get()->getProperty<T>(name, now);
         }
-        
+
     public:
         UIState(std::string name) : name(name)
         {
@@ -84,7 +84,7 @@ namespace fog
                 return name;
             }
         }
-        
+
         virtual bool open()
         {
             if (!this->active)
@@ -92,14 +92,11 @@ namespace fog
                 return false;
             }
             std::string fName = this->getFullName();
-            if (!ImGui::Begin(fName.c_str(), &this->active))
-            {
-                return false;
-            }
-            doOpen();
-            this->openChildren();
-            ImGui::End();
-            return true;
+            return ImGuiUtil::BeginIfEnd(fName, &this->active, [this]()
+                                         {
+                                             this->doOpen();
+                                             this->openChildren(); //
+                                         });
         };
         virtual void doOpen()
         {

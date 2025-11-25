@@ -32,6 +32,7 @@
 #include "fg/core/MoveToCellTask.h"
 #include "fg/CellInstanceManager.h"
 #include "fg/PathingStateManager.h"
+#include "fg/demo/InputStateController.h"
 namespace fog
 {
     using namespace OgreBites;
@@ -42,16 +43,51 @@ namespace fog
     class EntryController : public OgreBites::InputListener, public FrameListener
     {
 
-    private:
     public:
         EntryController()
         {
+        }
+        bool mousePressed(const MouseButtonEvent &evt) override
+        {
+            if (evt.button == ButtonType::BUTTON_LEFT)
+            {
+                mouseButtonLeftPressed(evt);
+            }
+            else if (evt.button == ButtonType::BUTTON_RIGHT)
+            {
+                Context<MovingStateManager>::get()->movingActiveStateToCellByMousePosition(evt.x, evt.y);
+            }
+            return false;
+        }
+
+        bool mouseButtonLeftPressed(const MouseButtonEvent &evt)
+        {
+            // normalized (0,1)
+            Viewport *viewport = Context<CoreMod>::get()->getViewport();
+            Camera *camera = Context<CoreMod>::get()->getCamera();
+            float ndcX = evt.x / (float)viewport->getActualWidth();
+            float ndcY = evt.y / (float)viewport->getActualHeight();
+            Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
+            Context<MovableStateManager>::get()->pick(ray);
+            return true;
         }
 
         CONSUMED mouseMoved(const MouseMotionEvent &evt) override
         {
             Context<PathingStateManager>::get()->onMouseMoved(evt.x, evt.y);
+            Context<InputStateController>::get()->mouseMoved(evt);
             return false;
+        }
+
+        bool keyPressed(const OgreBites::KeyboardEvent &evt) override
+        {
+            Context<InputStateController>::get()->keyPressed(evt);
+            return true;
+        }
+        bool keyReleased(const OgreBites::KeyboardEvent &evt) override
+        {
+            Context<InputStateController>::get()->keyReleased(evt);
+            return true;
         }
         GOON frameStarted(const FrameEvent &evt) override
         {

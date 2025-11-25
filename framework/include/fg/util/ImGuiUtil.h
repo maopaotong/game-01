@@ -58,5 +58,25 @@ namespace fog
             }
             return clicked;
         }
+
+        template<typename F>
+        static bool BeginIfEnd(std::string name, bool * open, F&& func){
+            bool ret = ImGui::Begin(name.c_str(), open);
+            if(ret){
+                func();
+            }
+            ImGui::End();
+            return ret;
+        }
+
+        template<typename F>
+        static bool BeginPopupModalIfEnd(std::string name, F&& func){
+            bool ret = ImGui::BeginPopupModal(name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+            if(ret){
+                func();
+            }
+            ImGui::EndPopup();
+            return ret;
+        }
     };
 }; // end of namespace

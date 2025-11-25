@@ -27,6 +27,7 @@
 #include "fg/util/CameraUtil.h"
 #include "fg/util/Polygon2.h"
 #include "fg/State.h"
+#include "fg/demo/InputStateController.h"
 
 namespace fog
 {
@@ -39,16 +40,9 @@ namespace fog
     private:
         bool quit;
 
-        InputState *inputState;
-        Ogre::Camera *camera;
-        ViewPoint *viewport;
-
     public:
-        CameraState(Ogre::Camera *camera, InputState *inputState) : quit(false)
+        CameraState() : quit(false)
         {
-
-            this->camera = camera;
-            this->inputState = inputState;
 
         }
 
@@ -80,6 +74,7 @@ namespace fog
         {
             // std::cout << "Frame started!\n";
 
+            Camera *camera = Context<CoreMod>::get()->getCamera();
             // Move camera
             Ogre::SceneNode *node = camera->getParentSceneNode();
             // 获取当前朝向（四元数）
@@ -92,6 +87,9 @@ namespace fog
             float speed = 1000.0f;
             Vector3 position = node->getPosition();
             Vector3 step = Ogre::Vector3::ZERO;
+
+            InputStateController * inputState = Context<InputStateController>::get();
+
             if (inputState->isFront())
             {
                 // node->translate(-back * speed * evt.timeSinceLastFrame);

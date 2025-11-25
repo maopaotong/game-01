@@ -55,14 +55,7 @@ namespace fog
             bool ret = UIState::open();
             if (!ret)
             {
-                if (ImGui::Begin("Boot"))
-                {
-                    if (ImGui::Button("EntryUI"))
-                    {
-                        this->active = true;
-                    }
-                }
-                ImGui::End();
+               return false;
             }
 
             return true;

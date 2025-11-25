@@ -141,6 +141,42 @@ namespace fog
         void init() override
         {
         }
+
+        bool movingActiveStateToCellByMousePosition(int mx, int my)
+        {
+            // normalized (0,1)
+            Viewport *viewport = Context<CoreMod>::get()->getViewport();
+            Camera *camera = Context<CoreMod>::get()->getCamera();
+
+            float ndcX = mx / (float)viewport->getActualWidth();
+            float ndcY = my / (float)viewport->getActualHeight();
+
+            Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
+
+            Ogre::Plane ground(Ogre::Vector3::UNIT_Y, 0); // Y = 0
+            auto hitGrd = ray.intersects(ground);
+            std::cout << "ndc:(" << ndcX << "," << ndcY << ")" << "hit:" << hitGrd.first << std::endl;
+            if (!hitGrd.first)
+            {
+                return false;
+            }
+            Ogre::Vector3 pos = ray.getPoint(hitGrd.second);
+
+            // bool hitCell = CellUtil::findCellByPoint(costMap, Vector2(pos.x, pos.z), cKey);
+            // bool hitCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(pos), cKey);
+            Cell::Instance cell2;
+            bool hitCell = Context<Cell::Center>::get()->findCellByWorldPosition(pos, cell2);
+            if (!hitCell)
+            {
+                return false;
+            }
+            CellKey cKey2 = cell2.cKey;
+            // state
+            this->movingActiveStateToCell(cKey2);
+            // cout << "worldPoint(" << pickX << ",0," << pickZ << "),cellIdx:[" << cx << "," << cy << "]" << endl;
+            return true;
+        }
+
         void movingActiveStateToCell(CellKey cKey2)
         {
             if (this->state == nullptr)

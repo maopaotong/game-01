@@ -28,14 +28,14 @@
 #include "fg/util/CellMark.h"
 #include "fg/util/CellUtil.h"
 #include "fg/InputState.h"
-
+#include "fg/CoreMod.h"
 namespace fog{
 using namespace OgreBites;
 using namespace Ogre;
 // === Custom hash function ===
 //
 // === Input handler for closing application ===
-class InputStateController : public OgreBites::InputListener, public InputState
+class InputStateController : public InputState
 {
 private:
     bool left = false;
@@ -43,18 +43,14 @@ private:
     bool front = false;
     bool back = false;
 
-    Camera *camera;
-    RenderWindow *window;
-
 public:
-    InputStateController(Camera *cam, RenderWindow *window)
+    InputStateController()
     {
-        this->camera = cam;
-        this->window = window;
     }
 
-    bool mouseMoved(const MouseMotionEvent &evt) override
+    bool mouseMoved(const MouseMotionEvent &evt) 
     {
+        RenderWindow *window = Context<CoreMod>::get()->getWindow();
 
         int width = window->getWidth();
         int height = window->getHeight();
@@ -77,7 +73,7 @@ public:
         return false;
     }
 
-    bool keyPressed(const OgreBites::KeyboardEvent &evt) override
+    bool keyPressed(const OgreBites::KeyboardEvent &evt) 
     {
         if (evt.keysym.sym == OgreBites::SDLK_ESCAPE)
         {
@@ -101,7 +97,7 @@ public:
         }
         return true;
     }
-    bool keyReleased(const OgreBites::KeyboardEvent &evt) override
+    bool keyReleased(const OgreBites::KeyboardEvent &evt) 
     {
 
         if (evt.keysym.sym == OgreBites::SDLK_LEFT)
