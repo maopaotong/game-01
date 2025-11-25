@@ -51,5 +51,6 @@ namespace fog
     enum EventType{
         MovableStatePicked,
         MovableStateUnpicked,
+        MovableStateStartMoving,
     };
 };

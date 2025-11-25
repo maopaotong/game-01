@@ -116,10 +116,24 @@ namespace fog
     class MovingStateManager : public State, public Stairs
     {
         std::vector<std::unique_ptr<MoveToCellTask>> tasks;
+        State *state;
 
     public:
-        MovingStateManager()
+        MovingStateManager() : state(nullptr)
         {
+            Context<Event::Bus>::get()-> //
+                subscribe<EventType, State *>([this](EventType evtType, State *state)
+                                              {
+                                                  if (evtType == EventType::MovableStatePicked)
+                                                  {
+                                                      this->state = state;
+                                                  }
+                                                  else if (evtType == EventType::MovableStateUnpicked)
+                                                  {
+                                                      this->state = nullptr;
+                                                  }
+                                                  return true; //
+                                              });
         }
         virtual ~MovingStateManager()
         {
@@ -129,20 +143,11 @@ namespace fog
         }
         void movingActiveStateToCell(CellKey cKey2)
         {
+            if (this->state == nullptr)
+            {
+                return;
+            }
 
-            // add new tasks
-            Context<MovableStateManager>::get()-> //
-                forEach([this, &cKey2](State *state)
-                        {
-                            if (state->isActive())
-                            {
-                                this->addTask(state, cKey2);
-                            }
-                            return true; //
-                        });
-        }
-        void addTask(State *state, CellKey cKey2)
-        {
             // clear old task on the same state
             for (auto &it = this->tasks.begin(); it != tasks.end();)
             {
@@ -160,6 +165,7 @@ namespace fog
             //
             MoveToCellTask *task = new MoveToCellTask(state, cKey2);
             this->tasks.push_back(std::unique_ptr<MoveToCellTask>(task));
+            Context<Event::Bus>::get()->emit<EventType, State *>(EventType::MovableStateStartMoving, state);
         }
         template <typename F>
         void forEachTask(F &&f)
@@ -187,7 +193,6 @@ namespace fog
                 }
 
                 it++;
-                
             }
             return true;
         }

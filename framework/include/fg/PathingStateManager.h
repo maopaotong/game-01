@@ -25,17 +25,17 @@ namespace fog
      */
     class PathingStateManager : public State, public Stairs
     {
-        State *currentPicked;
-        float actorHighOffset;
+        //
+        State *sourceState;
         CellInstanceState *targetCis;
-        PathState *currentPath;
+        PathState *path;
 
     protected:
         CellKey cKey2;
         CellKey cKey1;
 
     public:
-        PathingStateManager() : currentPicked(nullptr), targetCis(nullptr), currentPath(nullptr), actorHighOffset(.0f)
+        PathingStateManager() : sourceState(nullptr), targetCis(nullptr), path(nullptr)
         {
             std::cout << "PathingStateManager created." << std::endl;
             Context<Event::Bus>::get()-> //
@@ -43,11 +43,15 @@ namespace fog
                                               {
                                                   if (evtType == EventType::MovableStateUnpicked)
                                                   {
-                                                      this->unPick(state);
+                                                      this->setSource(nullptr);
                                                   }
                                                   else if (evtType == EventType::MovableStatePicked)
                                                   {
-                                                      this->pick(state);
+                                                      this->setSource(state);
+                                                  }
+                                                  else if (evtType == EventType::MovableStateStartMoving)
+                                                  {
+                                                      this->setSource(nullptr);
                                                   }
                                                   return true; //
                                               });
@@ -56,26 +60,46 @@ namespace fog
         {
             std::cout << "~PathingStateManager destroyed." << std::endl;
         }
-        void unPick(State *state)
+
+        void setPath(PathState *path2)
         {
-            clearPath();
-        }
-        void clearPath()
-        {
-            if (this->currentPath)
+            if (this->path)
             {
-                this->removeChild(currentPath);
-                this->currentPath = nullptr;
+                this->removeChild(this->path);
+            }
+            this->path = path2;
+            if (this->path)
+            {
+                this->addChild(path);
             }
         }
-        void pick(State *state)
+
+        void setSource(State *state)
         {
-            this->currentPicked = state;
+            if (this->sourceState)
+            {
+                this->setPath(nullptr);
+                this->setTargetCis(nullptr);
+                this->sourceState = nullptr;
+            }
+            this->sourceState = state;
+        }
+        void setTargetCis(CellInstanceState *cis)
+        {
+            if (this->targetCis)
+            {
+                this->targetCis->unsetColour();
+            }
+            this->targetCis = cis;
+            if (this->targetCis)
+            {
+                this->targetCis->setColour(ColourValue::White);
+            }
         }
 
         CONSUMED onMouseMoved(int x, int y)
         {
-            if (!this->currentPicked)
+            if (!this->sourceState)
             {
                 return false;
             }
@@ -122,7 +146,7 @@ namespace fog
 
         GOON step(float time) override
         {
-            if (!currentPicked)
+            if (!sourceState)
             {
                 return true;
             }
@@ -165,9 +189,7 @@ namespace fog
             PathState *pathState2 = new PathState();
             pathState2->init();
             pathState2->setPath(pathByCellKey);
-            this->clearPath();
-            currentPath = pathState2;
-            this->addChild(currentPath);
+            this->setPath(pathState2);
             return true;
         }
 

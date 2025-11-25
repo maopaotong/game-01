@@ -7,17 +7,75 @@
 #include "fg/core/EntityState.h"
 namespace fog
 {
-    class PickedTask : public State, public Stairs
+    class MovingState : public State, public Stairs
     {
+    public:
+        State *state;
+        CellInstanceState *cis;
+        MovingState() : state(nullptr), cis(nullptr)
+        {
+        }
+
+        ~MovingState()
+        {
+            setState(nullptr);
+        }
+
+        GOON step(float time) override
+        {
+            tryUpdateCis();
+            return true;
+        }
+        void setState(State *state2)
+        {
+            if (this->state)
+            {
+                trySetCis(nullptr);
+            }
+            this->state = state2;
+            tryUpdateCis();
+            Context<Event::Bus>::get()-> //
+                emit<EventType, State *>(state2 ? EventType::MovableStatePicked : EventType::MovableStateUnpicked, state2);
+        }
+        void tryUpdateCis()
+        {
+            if (this->state)
+            {
+                CellInstanceManager *cisManager = Context<CellInstanceManager>::get();
+                CellInstanceState *cis2 = cisManager->getCellInstanceStateByPosition(state->getSceneNode()->getPosition());
+                this->trySetCis(cis2);
+            }
+            else
+            {
+                trySetCis(nullptr);
+            }
+        }
+        void trySetCis(CellInstanceState *cis2)
+        {
+            if (this->cis == cis2)
+            {
+                return;
+            }
+            if (this->cis)
+            {
+                this->cis->unsetColour();
+            }
+            this->cis = cis2;
+            if (this->cis)
+            {
+                this->cis->setColour(ColourValue::White);
+            }
+        }
     };
 
     class MovableStateManager : public State, public Stairs
     {
-        State *currentPicked;
+        MovingState movingState;
+
         std::vector<std::string> aniNames = {"RunBase", "RunTop"};
 
     public:
-        MovableStateManager() : currentPicked(nullptr)
+        MovableStateManager()
         {
         }
         virtual ~MovableStateManager()
@@ -35,43 +93,8 @@ namespace fog
         }
         bool step(float time) override
         {
-            // tracking
-            CellInstanceManager *cisManager = Context<CellInstanceManager>::get();
-            if (!this->currentPicked)
-            {
-                return true;
-            }
-            State *state = this->currentPicked;
-            CellInstanceState *currentCis = cisManager->getCellInstanceStateByPosition(state->getSceneNode()->getPosition());
-
-            if (currentCis->getCellKey() != state->getCellKey())
-            {
-                CellInstanceState *preCis = cisManager->getCellInstanceStateByCellKey(state->getCellKey());
-                if (preCis)
-                {
-                    preCis->unsetColour();
-                }
-
-                state->setCellKey(currentCis->getCellKey());
-
-                currentCis->setColour(Ogre::ColourValue::White);
-            }
-
+            movingState.step(time);
             return true;
-        }
-
-        void unpick()
-        {
-            if (!currentPicked)
-            {
-                return;
-            }
-            currentPicked->setActive(false);
-
-            CellInstanceState *cis = Context<CellInstanceManager>::get()->getCellInstanceStateByPosition(currentPicked->getSceneNode()->getPosition());
-            cis->unsetColour();
-            Context<Event::Bus>::get()->emit<EventType, State *>(EventType::MovableStateUnpicked, currentPicked);
-            currentPicked = nullptr;
         }
 
         void pick(Ray &ray)
@@ -98,21 +121,7 @@ namespace fog
                 }
             }
             Context<CoreMod>::get()->getSceneManager()->destroyQuery(rayQuery);
-            if (this->currentPicked == picked)
-            {
-                return;
-            }
-            this->unpick();
-            if (!picked)
-            {
-                return;
-            }
-            currentPicked = picked;
-            picked->setActive(true);
-
-            CellInstanceState *cis = Context<CellInstanceManager>::get()->getCellInstanceStateByPosition(picked->getSceneNode()->getPosition());
-            cis->setColour(Ogre::ColourValue::White);
-            Context<Event::Bus>::get()->emit<EventType, State *>(EventType::MovableStatePicked, picked);
+            this->movingState.setState(picked);
         }
 
     }; // end of class
