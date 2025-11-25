@@ -58,8 +58,10 @@ namespace fog
             if (currentPicked && currentPicked != state)
             {
                 currentPicked->setActive(false);
+                Context<Event::Bus*>::get()->emit<EventType, State*>(EventType::MovableStateUnpicked, currentPicked);
             }
             currentPicked = state;
+            Context<Event::Bus*>::get()->emit<EventType, State*>(EventType::MovableStatePicked, state);
             return state;
             // high light the cell in which the actor stand.
         }

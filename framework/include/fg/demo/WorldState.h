@@ -5,12 +5,11 @@
 #include "fg/core/CameraState.h"
 #include "fg/core/EntityState.h"
 #include "fg/core/MouseCameraController.h"
-#include "fg/core/MouseClickPicker.h"
 #include "fg/MovingStateManager.h"
 #include "fg/CellInstanceManager.h"
-#include "fg/core/HoverCellController.h"
+#include "fg/demo/EntryController.h"
 #include "fg/MovableStateManager.h"
-
+#include "fg/core/MouseClickPicker.h"
 namespace fog
 {
     class WorldState : public State
@@ -46,7 +45,10 @@ namespace fog
             core->getAppContext()->addInputListener(keyHandler);
             core->getAppContext()->addInputListener(inputState);
 
-            core->getAppContext()->addInputListener(new HoverCellController());
+            EntryController *entryController = new EntryController();
+            core->getAppContext()->addInputListener(entryController);
+            root->addFrameListener(entryController);
+
 
             core->getAppContext()->addInputListener(new MouseClickPicker(this, core->getCamera(), core->getSceneManager(), core->getViewport()));
         }

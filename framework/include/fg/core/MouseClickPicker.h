@@ -28,7 +28,6 @@
 #include "fg/util/CellMark.h"
 #include "fg/util/CellUtil.h"
 #include "fg/Pickable.h"
-#include "fg/core/TrackActorTask.h"
 #include "fg/MovingStateManager.h"
 #include "fg/CellInstanceManager.h"
 namespace fog
@@ -78,12 +77,12 @@ namespace fog
             if (picked)
             {
                 picked->setActive(true);
-                picked->slot(1)->tryCancelAndPush([picked]()
-                                                  {
-                                                      TrackActorTask *task = new TrackActorTask(picked);
-                                                      task->init();
-                                                      return task; //
-                                                  });
+                // picked->slot(1)->tryCancelAndPush([picked]()
+                //                                   {
+                //                                       TrackActorTask *task = new TrackActorTask(picked);
+                //                                       task->init();
+                //                                       return task; //
+                //                                   });
             }
             // unselect all other active state.
             // this->state->forEach([picked](State *state)
