@@ -88,12 +88,12 @@ namespace fog
         {
             if (this->targetCis)
             {
-                this->targetCis->unsetColour();
+                this->targetCis->popColour();
             }
             this->targetCis = cis;
             if (this->targetCis)
             {
-                this->targetCis->setColour(ColourValue::White);
+                this->targetCis->pushColour(ColourValue::White);
             }
         }
 
@@ -136,9 +136,9 @@ namespace fog
             }
             if (targetCis)
             {
-                targetCis->unsetColour();
+                targetCis->popColour();
             }
-            cis->setColour(ColourValue::White);
+            cis->pushColour(ColourValue::White);
             targetCis = cis;
 
             return false;

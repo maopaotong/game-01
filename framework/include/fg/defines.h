@@ -52,5 +52,8 @@ namespace fog
         MovableStatePicked,
         MovableStateUnpicked,
         MovableStateStartMoving,
+        MovableStateEndMoving,
+        MovableStaeEnterCell,
+        MovableStateLeaveCell
     };
 };

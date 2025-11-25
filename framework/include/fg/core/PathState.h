@@ -43,12 +43,12 @@ namespace fog
                 CellInstanceState *cis = Context<CellInstanceManager>::get()->getCellInstanceStateByCellKey(cKey);
                 if (unset)
                 {
-                    cis->unsetColour();
+                    cis->popColour();
                 }
                 else
                 {
 
-                    cis->setColour(Ogre::ColourValue::Blue);
+                    cis->pushColour(Ogre::ColourValue::Blue);
                 }
             }
         }

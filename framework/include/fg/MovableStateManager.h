@@ -58,12 +58,12 @@ namespace fog
             }
             if (this->cis)
             {
-                this->cis->unsetColour();
+                this->cis->popColour();
             }
             this->cis = cis2;
             if (this->cis)
             {
-                this->cis->setColour(ColourValue::White);
+                this->cis->pushColour(ColourValue::White);
             }
         }
     };
@@ -77,6 +77,15 @@ namespace fog
     public:
         MovableStateManager()
         {
+            Context<Event::Bus>::get()-> //
+                subscribe<EventType, State *>([this](EventType evtType, State *state)
+                                              {
+                                                  if (evtType == EventType::MovableStateStartMoving)
+                                                  {
+                                                      this->movingState.setState(nullptr);
+                                                  }
+                                                  return true; //
+                                              });
         }
         virtual ~MovableStateManager()
         {

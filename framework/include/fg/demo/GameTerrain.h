@@ -12,6 +12,7 @@
 #include <OgreShaderGenerator.h>
 #include "fg/Terrains.h"
 #include "fg/util/OgreCode.h"
+#include "fg/demo/ModifyHeightImg.h"
 namespace fog
 {
     using namespace Ogre;
@@ -224,13 +225,17 @@ namespace fog
             }
             Image img;
             getTerrainImage(x % 2 != 0, y % 2 != 0, img);
+            ModifyHeightImg modHeight(img);
+            modHeight.modifyHeight();
             terrainGroup->defineTerrain(x, y, &img);
         }
+        
 
         void getTerrainImage(bool flipX, bool flipY, Image &img)
         {
             //! [heightmap]
             img.load("terrain.png", terrainGroup->getResourceGroup());
+
             if (flipX)
                 img.flipAroundY();
             if (flipY)

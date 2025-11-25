@@ -33,19 +33,9 @@ namespace fog
 
         static T* unset()
         {
-            T* previousCtxObj = ctxObj;
-            ctxObj = nullptr;
-            return previousCtxObj;
+            return std::exchange<T*>(ctxObj, nullptr);
         }
 
-        template <typename R, typename... Args>
-        static R callWithContext(T ctxObj, R (*func)(), Args... args)
-        {
-            R ret;
-            runWithContext<T, Args...>(ctxObj, [](R (*func)(), &ret, Args... args)
-                                       { ret = func(args...); }, func, ret, args...);
-            return ret;
-        }
         template <typename... Args, typename F>
         static void runWithContext(T* ctxObj, F &&func, Args... args)
         {

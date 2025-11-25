@@ -83,16 +83,16 @@ namespace fog
             return this->cis.cKey;
         }
 
-        void unsetColour()
+        void popColour()
         {
-            if (!this->colours.empty())
-            {
-                this->colours.pop();
-            }
+            //if (!this->colours.empty())
+            //{
+            this->colours.pop();
+            //}
             buildMesh();
         }
 
-        void setColour(ColourValue color)
+        void pushColour(ColourValue color)
         {
             this->colours.push(color);
             buildMesh();
