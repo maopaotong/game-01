@@ -91,7 +91,7 @@ namespace fog
         public:
             Center(Node2D *root) : root(root)
             {
-                costMap = Context<CostMap*>::get();
+                costMap = Context<CostMap>::get();
             }
 
             void translateToCenter()

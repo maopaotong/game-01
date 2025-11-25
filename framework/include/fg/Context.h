@@ -13,33 +13,28 @@ namespace fog
     class Context
     {
     private:
-    public:
-        static T default_;
-        static T ctxObj;
+    public:        
+        static T* ctxObj;
 
-        static T get()
+        static T* get()
         {
             return ctxObj;
         }
-        static void setDefault(T obj)
+        
+        static T* exchange(T* obj)
         {
-            default_ = obj;
+            return std::exchange<T*>(ctxObj, obj);
         }
 
-        static T exchange(T obj)
-        {
-            return std::exchange<T>(ctxObj, obj);
-        }
-
-        static void set(T obj)
+        static void set(T* obj)
         {
             ctxObj = obj;
         }
 
-        static T unset()
+        static T* unset()
         {
-            T previousCtxObj = ctxObj;
-            ctxObj = default_;
+            T* previousCtxObj = ctxObj;
+            ctxObj = nullptr;
             return previousCtxObj;
         }
 
@@ -52,9 +47,9 @@ namespace fog
             return ret;
         }
         template <typename... Args, typename F>
-        static void runWithContext(T ctxObj, F &&func, Args... args)
+        static void runWithContext(T* ctxObj, F &&func, Args... args)
         {
-            T previousCtxObj = exchange(ctxObj);
+            T* previousCtxObj = exchange(ctxObj);
             func(args...);
             set(previousCtxObj);
         }

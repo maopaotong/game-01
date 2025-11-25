@@ -156,11 +156,11 @@ namespace fog
 
         void active() override
         {
-            Context<CoreMod *>::set(this);
+            Context<CoreMod >::set(this);
         }
         void deactive() override
         {
-            Context<CoreMod *>::set(nullptr);
+            Context<CoreMod >::set(nullptr);
         }
 
         bool frameStarted(const FrameEvent &evt)

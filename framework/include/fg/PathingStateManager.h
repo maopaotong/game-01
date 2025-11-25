@@ -38,7 +38,7 @@ namespace fog
         PathingStateManager() : currentPicked(nullptr), targetCis(nullptr), currentPath(nullptr), actorHighOffset(.0f)
         {
             std::cout << "PathingStateManager created." << std::endl;
-            Context<Event::Bus *>::get()-> //
+            Context<Event::Bus>::get()-> //
                 subscribe<EventType, State *>([this](EventType evtType, State *state)
                                               {
                                                   if (evtType == EventType::MovableStateUnpicked)
@@ -80,8 +80,8 @@ namespace fog
                 return false;
             }
 
-            Viewport *viewport = Context<CoreMod *>::get()->getViewport();
-            Camera *camera = Context<CoreMod *>::get()->getCamera();
+            Viewport *viewport = Context<CoreMod>::get()->getViewport();
+            Camera *camera = Context<CoreMod>::get()->getCamera();
 
             float ndcX = x / (float)viewport->getActualWidth();
             float ndcY = y / (float)viewport->getActualHeight();
@@ -100,7 +100,7 @@ namespace fog
             }
 
             pos2 = ray.getPoint(hitGrd.second);
-            CellInstanceManager *cellInstMgrState = Context<CellInstanceManager *>::get();
+            CellInstanceManager *cellInstMgrState = Context<CellInstanceManager>::get();
             CellInstanceState *cis = cellInstMgrState->getCellInstanceStateByPosition(pos2);
             if (!cis)
             {
@@ -133,12 +133,12 @@ namespace fog
 
             CellInstanceState *sourceCis = nullptr;
             // find source cell
-            MovableStateManager *movableStateMgr = Context<MovableStateManager *>::get();
+            MovableStateManager *movableStateMgr = Context<MovableStateManager>::get();
             movableStateMgr->forEach([&sourceCis](State *state)
                                      {
                                          if (state->isActive())
                                          {
-                                             sourceCis = Context<CellInstanceManager *>::get()->getCellInstanceStateByPosition(state->getSceneNode()->getPosition());
+                                             sourceCis = Context<CellInstanceManager>::get()->getCellInstanceStateByPosition(state->getSceneNode()->getPosition());
                                              if (sourceCis)
                                              {
                                                  return false; // break
@@ -160,7 +160,7 @@ namespace fog
             this->cKey1 = cKey1;
             this->cKey2 = cKey2;
 
-            std::vector<Vector2> pathByPoint2DNom = Context<CostMap *>::get()->findPath(cKey1, cKey2);
+            std::vector<Vector2> pathByPoint2DNom = Context<CostMap>::get()->findPath(cKey1, cKey2);
 
             PathState *pathState2 = new PathState();
             pathState2->init();

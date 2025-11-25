@@ -50,12 +50,12 @@ namespace fog
 
         CONSUMED mouseMoved(const MouseMotionEvent &evt) override
         {
-            Context<PathingStateManager *>::get()->onMouseMoved(evt.x, evt.y);
+            Context<PathingStateManager>::get()->onMouseMoved(evt.x, evt.y);
             return false;
         }
         GOON frameStarted(const FrameEvent &evt) override
         {
-            Context<PathingStateManager *>::get()->step(evt.timeSinceLastFrame);
+            Context<PathingStateManager>::get()->step(evt.timeSinceLastFrame);
             return true;
         }
     };

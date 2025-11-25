@@ -22,8 +22,8 @@ namespace fog
     public:
         WorldState()
         {
-            CostMap *costMap = Context<CostMap *>::get();
-            CoreMod *core = Context<CoreMod *>::get();
+            CostMap *costMap = Context<CostMap>::get();
+            CoreMod *core = Context<CoreMod>::get();
             Ogre::Root *root = core->getRoot();
 
             // Create frame listener for main loop
@@ -38,7 +38,7 @@ namespace fog
             MovableStateManager *movableStateMgr = new MovableStateManager();
             movableStateMgr->init();
             this->addChild(movableStateMgr);
-            Context<MovableStateManager *>::set(movableStateMgr);
+            Context<MovableStateManager >::set(movableStateMgr);
             //           
 
             MainInputListener *keyHandler = new MainInputListener(costMap);

@@ -55,10 +55,10 @@ namespace fog
     public:
         MainInputListener(CostMap *costMap) : costMap(costMap)
         {
-            this->cameraTopDistanceVptr = Context<Var<float>::Bag *>::get()->createBindVptr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
-            this->cameraHighMinVptr = Context<Var<float>::Bag *>::get()->createBindVptr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
-            this->cameraHighMaxVptr = Context<Var<float>::Bag *>::get()->createBindVptr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
-            this->cameraRollSpeedVptr = Context<Var<float>::Bag *>::get()->createBindVptr(".cameraRollSpeed", DEFAULT_CAMERA_ROLL_SPEED, 0.0f, DEFAULT_CAMERA_ROLL_SPEED * 3);           //
+            this->cameraTopDistanceVptr = Context<Var<float>::Bag>::get()->createBindVptr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
+            this->cameraHighMinVptr = Context<Var<float>::Bag>::get()->createBindVptr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
+            this->cameraHighMaxVptr = Context<Var<float>::Bag>::get()->createBindVptr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
+            this->cameraRollSpeedVptr = Context<Var<float>::Bag>::get()->createBindVptr(".cameraRollSpeed", DEFAULT_CAMERA_ROLL_SPEED, 0.0f, DEFAULT_CAMERA_ROLL_SPEED * 3);           //
         }
        
 
@@ -72,7 +72,7 @@ namespace fog
 
         bool mouseWheelRolled(const MouseWheelEvent &evt) override
         {
-            Camera *cam = Context<CoreMod*>::get()->getCamera();
+            Camera *cam = Context<CoreMod>::get()->getCamera();
             Ogre::SceneNode *node = cam->getParentSceneNode();
             Vector3 translate = Ogre::Vector3::NEGATIVE_UNIT_Y * evt.y * *cameraRollSpeedVptr;
             Vector3 posTarget = node->getPosition() + translate;
@@ -87,7 +87,7 @@ namespace fog
 
             node->setPosition(posTarget);
 
-            Context<Var<Vector3>::Bag *>::get()->setVar(".camera.position", posTarget);
+            Context<Var<Vector3>::Bag>::get()->setVar(".camera.position", posTarget);
 
             alignHorizonToTop(node, cam, *this->cameraTopDistanceVptr);
             return false;

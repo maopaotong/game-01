@@ -15,13 +15,13 @@ namespace fog
     public:
         StatisticTrayUI() : UIState("StatisticTray")
         {
-            // Context<ActorPropEC *>::get()->addListener(this);
+            // Context<ActorPropEC>::get()->addListener(this);
         }
 
         void doOpen() override
         {
 
-            RenderWindow *window = Context<CoreMod*>::get()->getWindow();
+            RenderWindow *window = Context<CoreMod>::get()->getWindow();
             const Ogre::RenderTarget::FrameStats &fs = window->getStatistics();
             ImGui::Text(fmt::format("FPS:     {:.2f}", fs.lastFPS).c_str());
             ImGui::Text(fmt::format("Tris:    {}", fs.triangleCount).c_str());

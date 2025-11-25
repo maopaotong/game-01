@@ -70,13 +70,13 @@ namespace fog
         template <typename T>
         Property::Ref<T> createProperty(std::string name, T defaultValue)
         {
-            return Context<Property::Bag *>::get()->createProperty<T>(name, defaultValue);
+            return Context<Property::Bag>::get()->createProperty<T>(name, defaultValue);
         }
 
         template <typename T>
         Property::Ref<T> getProperty(std::string name)
         {
-            return Context<Property::Bag *>::get()->getProperty<T>(name);
+            return Context<Property::Bag>::get()->getProperty<T>(name);
         }
 
     public:
@@ -130,12 +130,12 @@ namespace fog
 
         Vector3 to3D(Vector2 point)
         {
-            return Context<Node2D *>::get()->to3D(point);
+            return Context<Node2D>::get()->to3D(point);
         }
 
         bool findCell(Vector3 aPos3, Cell::Instance &cell)
         {
-            return Context<Cell::Center *>::get()->findCellByWorldPosition(aPos3, cell);
+            return Context<Cell::Center>::get()->findCellByWorldPosition(aPos3, cell);
         }
 
         SceneNode *getSceneNode()
@@ -197,8 +197,8 @@ namespace fog
             // if (changed)
             // {
 
-            //     // Context<ActorPropEC *>::get()->emit(this, std::string("active"));
-            //     Context<Event::Bus *>::get()->emit<State *, std::string &>(this, std::string("active"));
+            //     // Context<ActorPropEC>::get()->emit(this, std::string("active"));
+            //     Context<Event::Bus>::get()->emit<State *, std::string &>(this, std::string("active"));
             // }
         }
 

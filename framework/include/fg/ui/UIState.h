@@ -31,7 +31,7 @@ namespace fog
         template <typename T>
         Property::Ref<T> getProperty(std::string name, bool now)
         {
-            return Context<Property::Bag *>::get()->getProperty<T>(name, now);
+            return Context<Property::Bag>::get()->getProperty<T>(name, now);
         }
         
     public:

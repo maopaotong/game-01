@@ -44,7 +44,7 @@ namespace fog
         void rebuildMesh() override
         {
 
-            Cell::Center *cc = Context<Cell::Center *>::get();
+            Cell::Center *cc = Context<Cell::Center>::get();
             // MeshBuild::PointOnCircle buildMesh(obj);
             MeshBuild::SpiderNet buildMesh(obj);
             buildMesh.begin(this->material);
@@ -61,7 +61,7 @@ namespace fog
         // Get color based on cost
         bool getCostColor(Cell::Instance &cell, Ogre::ColourValue &color) const
         {
-            CostMap* costMap = Context<CostMap*>::get();
+            CostMap* costMap = Context<CostMap>::get();
             const int cost = costMap->getCost(cell.cKey.first, cell.cKey.second);
             switch (cost)
             {

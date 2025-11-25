@@ -72,7 +72,7 @@ namespace fog
             float ndcX = evt.x / (float)viewport->getActualWidth();
             float ndcY = evt.y / (float)viewport->getActualHeight();
             Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
-            State *picked = Context<MovableStateManager *>::get()->pick(ray);
+            State *picked = Context<MovableStateManager>::get()->pick(ray);
 
             if (picked)
             {
@@ -101,8 +101,8 @@ namespace fog
         {
 
             // normalized (0,1)
-            Viewport *viewport = Context<CoreMod *>::get()->getViewport();
-            Camera *camera = Context<CoreMod *>::get()->getCamera();
+            Viewport *viewport = Context<CoreMod>::get()->getViewport();
+            Camera *camera = Context<CoreMod>::get()->getCamera();
 
             float ndcX = mx / (float)viewport->getActualWidth();
             float ndcY = my / (float)viewport->getActualHeight();
@@ -119,11 +119,11 @@ namespace fog
                 // bool hitCell = CellUtil::findCellByPoint(costMap, Vector2(pos.x, pos.z), cKey);
                 // bool hitCell = CellUtil::findCellByPoint(costMap, Ground::Transfer::to2D(pos), cKey);
                 Cell::Instance cell2;
-                bool hitCell = Context<Cell::Center *>::get()->findCellByWorldPosition(pos, cell2);
+                bool hitCell = Context<Cell::Center>::get()->findCellByWorldPosition(pos, cell2);
                 if (hitCell)
                 {
                     CellKey cKey2 = cell2.cKey;
-                    MovingStateManager *msm = Context<MovingStateManager *>::get();
+                    MovingStateManager *msm = Context<MovingStateManager>::get();
                     // state
                     msm->movingActiveStateToCell(cKey2);
                 }

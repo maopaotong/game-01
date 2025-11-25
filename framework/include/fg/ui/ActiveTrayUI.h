@@ -16,9 +16,9 @@ namespace fog
     public:
         ActiveTrayUI() : UIState("ActiveActor")
         {
-            // Context<ActorPropEC *>::get()->addListener(this);
+            // Context<ActorPropEC>::get()->addListener(this);
 
-            // Context<Event::Bus *>::get()->subscribe<State *, std::string &>([this](State *s, std::string &ss)
+            // Context<Event::Bus>::get()->subscribe<State *, std::string &>([this](State *s, std::string &ss)
             //                                                                 { this->onEvent(s, ss); });
         }
         void init() override
@@ -49,7 +49,7 @@ namespace fog
         void doOpen() override
         {
             int counter = 0;
-            Context<MovableStateManager *>::get()->forEach([&counter](State *state)
+            Context<MovableStateManager>::get()->forEach([&counter](State *state)
                                              {
                                                  if (state->isActive())
                                                  {

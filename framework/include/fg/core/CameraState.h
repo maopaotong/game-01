@@ -69,7 +69,7 @@ namespace fog
             }
             Vector3 viewCenterOnGround = ray.getPoint(hitGrd.second);
             Cell::Instance cell;
-            if(Context<Cell::Center*>::get()->findCellByWorldPosition(viewCenterOnGround, cell)){
+            if(Context<Cell::Center>::get()->findCellByWorldPosition(viewCenterOnGround, cell)){
                 return true;
             }
 

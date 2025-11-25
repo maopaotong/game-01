@@ -24,7 +24,7 @@ namespace fog
             int id = 0;
             
             //
-            Context<MovingStateManager*>::get()->forEachTask([this, &id](MoveToCellTask* task)
+            Context<MovingStateManager>::get()->forEachTask([this, &id](MoveToCellTask* task)
             {
                 std::string label = fmt::format("Task##{}", id);
                 if (ImGui::TreeNode(label.c_str()))
@@ -37,7 +37,7 @@ namespace fog
                 return true;
             });
 
-            // Context<State*>::get()->forEachChild([](State* state)
+            // Context<State>::get()->forEachChild([](State* state)
             // {
             //     Tasks::Slot * owner = state->tryGetSlot(0);
 

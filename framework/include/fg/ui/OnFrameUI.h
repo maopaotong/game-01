@@ -34,7 +34,7 @@ namespace fog
     public:
         OnFrameUI()
         {
-            this->core = Context<CoreMod*>::get();
+            this->core = Context<CoreMod>::get();
 
             this->window = core->getWindow();
             this->vp = core->getViewport();

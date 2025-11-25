@@ -52,7 +52,7 @@ public:
         ImGui::Indent(15.0f);
         int actors = 0;
 
-        //Context<Var<Actor*>::Bag*>::get()->forEachVarPtr<int &>(MainUI::forEachVarPtr, actors);
+        //Context<Var<Actor*>::Bag>::get()->forEachVarPtr<int &>(MainUI::forEachVarPtr, actors);
         ImGui::Unindent(15.0f);
 
         vp = core->getViewport();
@@ -63,9 +63,9 @@ public:
 
         int counter = 0;
 
-        Context<Var<Vector3>::Bag*>::get()->forEachVarPtr<int &>(MainUI::forEachVarPtr, counter);
+        Context<Var<Vector3>::Bag>::get()->forEachVarPtr<int &>(MainUI::forEachVarPtr, counter);
 
-        Vector3 pO = Context<Node2D*>::get()->plane->getOrigin();
+        Vector3 pO = Context<Node2D>::get()->plane->getOrigin();
 
         ImGui::Text(fmt::format("({:.1f},{:.1f},{:.1f})", pO.x, pO.y, pO.z).c_str());
                 // stats
@@ -118,8 +118,8 @@ public:
 
     void initGlobalVarPtr()
     {
-        Context<Var<float>::Bag*>::get()->createBindVptr(".aniSpeed", 0.55f, 0.0f, 2.0f);
-        Context<Var<float>::Bag*>::get()->createBindVptr(".pathSpeed", 1.0f, 1.0f, 10.0f);
+        Context<Var<float>::Bag>::get()->createBindVptr(".aniSpeed", 0.55f, 0.0f, 2.0f);
+        Context<Var<float>::Bag>::get()->createBindVptr(".pathSpeed", 1.0f, 1.0f, 10.0f);
     }
 };
 };//end of namespace

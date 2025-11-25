@@ -39,8 +39,8 @@ namespace fog
         EntityState(std::string name) : name(name)
         {
 
-            this->actorScaleVptr = Context<Var<float>::Bag *>::get()->createBindVptr(name + ".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
-            this->actorHighVptr = Context<Var<float>::Bag *>::get()->createBindVptr(name + ".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
+            this->actorScaleVptr = Context<Var<float>::Bag>::get()->createBindVptr(name + ".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
+            this->actorHighVptr = Context<Var<float>::Bag>::get()->createBindVptr(name + ".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
 
             this->actorHighOffset = *this->actorHighVptr / 2.0f * *actorScaleVptr;
 
@@ -53,7 +53,7 @@ namespace fog
         virtual void init() override
         {
 
-            SceneManager *sMgr = Context<CoreMod *>::get()->getSceneManager();
+            SceneManager *sMgr = Context<CoreMod>::get()->getSceneManager();
            
             entity = sMgr->createEntity("Sinbad.mesh");
             entity->setQueryFlags(0x00000001);
@@ -64,7 +64,7 @@ namespace fog
 
             this->setSceneNode(sceNode);
 
-            float height = Context<Terrains *>::get()->getHeightWithNormalAtWorldPosition(Vector3(0, 0, 0), nullptr);
+            float height = Context<Terrains>::get()->getHeightWithNormalAtWorldPosition(Vector3(0, 0, 0), nullptr);
 
             this->position = this->createProperty(name + ".position", Vector3(0, height + this->actorHighOffset, 0));
             sceNode->translate(this->position);

@@ -28,7 +28,7 @@ namespace fog
         CellStateBase()
         {
 
-            Ogre::SceneManager *sceneMgr = Context<CoreMod *>::get()->getSceneManager();
+            Ogre::SceneManager *sceneMgr = Context<CoreMod>::get()->getSceneManager();
             obj = sceneMgr->createManualObject();
             this->sceNode = sceneMgr->getRootSceneNode()->createChildSceneNode();
             sceNode->attachObject(obj);
@@ -36,7 +36,7 @@ namespace fog
         }
         virtual ~CellStateBase()
         {
-            Ogre::SceneManager *sceneMgr = Context<CoreMod *>::get()->getSceneManager();
+            Ogre::SceneManager *sceneMgr = Context<CoreMod>::get()->getSceneManager();
             sceneMgr->getRootSceneNode()->removeChild(this->sceNode);
             sceneMgr->destroyManualObject(this->obj);
         }

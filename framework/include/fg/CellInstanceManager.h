@@ -17,8 +17,8 @@ namespace fog
     public:
         CellInstanceState(Cell::Instance cis) : cis(cis)
         {
-            this->sceNode = Context<CoreMod *>::get()->getSceneManager()->getRootSceneNode()->createChildSceneNode();
-            this->obj = Context<CoreMod *>::get()->getSceneManager()->createManualObject();
+            this->sceNode = Context<CoreMod>::get()->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+            this->obj = Context<CoreMod>::get()->getSceneManager()->createManualObject();
             this->sceNode->attachObject(this->obj);
         }
 
@@ -53,7 +53,7 @@ namespace fog
         // Get color based on cost
         bool getCostColor(Cell::Instance &cell, Ogre::ColourValue &color) const
         {
-            CostMap* costMap = Context<CostMap*>::get();
+            CostMap* costMap = Context<CostMap>::get();
             const int cost = costMap->getCost(cell.cKey.first, cell.cKey.second);
             switch (cost)
             {
@@ -110,8 +110,8 @@ namespace fog
         }
         void init() override
         {
-            this->sceNode = Context<CoreMod *>::get()->getSceneManager()->getRootSceneNode()->createChildSceneNode();
-            Context<Cell::Center *>::get()-> //
+            this->sceNode = Context<CoreMod>::get()->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+            Context<Cell::Center>::get()-> //
                 forEachCell([this](Cell::Instance &cell)
                             {
                                 CellInstanceState *state = new CellInstanceState(cell);
@@ -123,7 +123,7 @@ namespace fog
         CellInstanceState *getCellInstanceStateByPosition(Vector3 pos)
         {
             Cell::Instance cell;
-            if (Context<Cell::Center *>::get()->findCellByWorldPosition(pos, cell))
+            if (Context<Cell::Center>::get()->findCellByWorldPosition(pos, cell))
             {
                 return this->cellInstanceStates[cell.cKey];
             }

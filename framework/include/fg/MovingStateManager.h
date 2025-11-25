@@ -50,7 +50,7 @@ namespace fog
 
         std::tuple<CellKey, Vector2> resolveOwnerCell()
         {
-            Cell::Center *cells = Context<Cell::Center *>::get();
+            Cell::Center *cells = Context<Cell::Center>::get();
 
             // check if this state's position on the target cell
             Vector3 aPos3 = this->movingState->getSceneNode()->getPosition();
@@ -58,7 +58,7 @@ namespace fog
             Vector2 actorPosIn2D = root2D->to2D(aPos3);
             Cell::Instance cell;
             // bool hitCell = CellUtil::findCellByPoint(costMap, aPos2, aCellKey);
-            bool hitCell = Context<Cell::Center *>::get()->findCellByWorldPosition(aPos3, cell);
+            bool hitCell = Context<Cell::Center>::get()->findCellByWorldPosition(aPos3, cell);
             // todo: not hit?
             return {cell.cKey, actorPosIn2D};
         }
@@ -68,18 +68,18 @@ namespace fog
 
             std::tuple<CellKey, Vector2> keyAndPosition = this->resolveOwnerCell();
 
-            std::vector<Vector2> pathByPoint2DNom = Context<CostMap *>::get()->findPath(std::get<CellKey>(keyAndPosition), cKey2);
+            std::vector<Vector2> pathByPoint2DNom = Context<CostMap>::get()->findPath(std::get<CellKey>(keyAndPosition), cKey2);
 
             std::vector<Vector2> pathByCellCenterIn2D;
 
             // CellUtil::translatePathToCellCenter(pathByKey, pathByPosition, CellUtil::offset(costMap));
 
-            // Context<Node2D*>::get()->
+            // Context<Node2D>::get()->
 
-            std::vector<Vector2> pathByPointIn2D = Context<Cell::Center *>::get()->getCellPointListByNomPoints(pathByPoint2DNom);
-            // float pathSpeed = this->Context<Var<float>::Bag*>::get()->getVarVal(".pathSpeed", 1.0f);
+            std::vector<Vector2> pathByPointIn2D = Context<Cell::Center>::get()->getCellPointListByNomPoints(pathByPoint2DNom);
+            // float pathSpeed = this->Context<Var<float>::Bag>::get()->getVarVal(".pathSpeed", 1.0f);
 
-            float pathSpeed = Context<Var<float>::Bag *>::get()->getVarVal(".pathSpeed", 1.0f);
+            float pathSpeed = Context<Var<float>::Bag>::get()->getVarVal(".pathSpeed", 1.0f);
             PathFollow2 path(std::get<Vector2>(keyAndPosition), pathByPointIn2D, pathSpeed);
             // PathState *pathState = new PathState();
             // pathState->init();
@@ -101,8 +101,8 @@ namespace fog
             {
                 throw std::runtime_error("no animation set, not supported for now.");
             }
-            // float aniSpeed = this->Context<Var<float>::Bag*>::get()->getVarVal(".aniSpeed", 1.0f);
-            float aniSpeed = Context<Var<float>::Bag *>::get()->getVarVal(".aniSpeed", 1.0f);
+            // float aniSpeed = this->Context<Var<float>::Bag>::get()->getVarVal(".aniSpeed", 1.0f);
+            float aniSpeed = Context<Var<float>::Bag>::get()->getVarVal(".aniSpeed", 1.0f);
 
             // new child state.
             mission = new PathFollow2MissionState(this->movingState, path2D, anisSet, movingState->getAnimationNames(), aniSpeed, movingState->getActorHighOffset()); //
@@ -131,7 +131,7 @@ namespace fog
         {
 
             // add new tasks
-            Context<MovableStateManager *>::get()-> //
+            Context<MovableStateManager>::get()-> //
                 forEach([this, &cKey2](State *state)
                         {
                             if (state->isActive())
@@ -175,7 +175,7 @@ namespace fog
 
         GOON step(float time) override
         {
-            CellInstanceManager *cisManager = Context<CellInstanceManager *>::get();
+            CellInstanceManager *cisManager = Context<CellInstanceManager>::get();
 
             for (auto it = this->tasks.begin(); it != this->tasks.end();)
             {

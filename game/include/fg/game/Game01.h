@@ -38,22 +38,22 @@ namespace fog
         void deactive() override
         {
 
-            delete Context<Terrains *>::unset();
-            delete Context<CostMap *>::unset();
+            delete Context<Terrains>::unset();
+            delete Context<CostMap>::unset();
             delete this->onFrameUI;
         }
 
         void active() override
         {
-            CoreMod *core = Context<CoreMod *>::get();
+            CoreMod *core = Context<CoreMod>::get();
             this->window = core->getWindow();
             this->vp = core->getViewport();
             this->sceMgr = core->getSceneManager();
             CostMap *costMap = createCostMap();
-            Context<CostMap *>::set(costMap);
+            Context<CostMap>::set(costMap);
 
             this->onFrameUI = new OnFrameUI();
-            Context<CoreMod *>::get()->getImGuiApp()->addFrameListener(this->onFrameUI);
+            Context<CoreMod>::get()->getImGuiApp()->addFrameListener(this->onFrameUI);
             //
             //
 
@@ -64,39 +64,38 @@ namespace fog
             RenderSystem *rSys = core->getRoot()->getRenderSystem();
             Light *light = core->getLight();
             terrains->load(rSys, sceMgr, light);
-            Context<Terrains *>::set(terrains);
+            Context<Terrains>::set(terrains);
             //
             fog::Plane *p = new fog::Plane(terrains);
-            Context<Plane *>::set(p);
+            Context<Plane>::set(p);
 
             float scale = 30.0f;
             Node2D *root2D = new Node2D(p, scale); //
 
-            Context<Node2D *>::set(root2D);
+            Context<Node2D>::set(root2D);
 
             Cell::Center *cells = new Cell::Center(root2D);
             cells->translateToCenter();
 
             // root2D->position = -cells->getCenterIn2D(); // move center to (0,0)
-            Context<Cell::Center *>::set(cells);
+            Context<Cell::Center>::set(cells);
             // Ground *ground = new CostMapGround(costMap);
 
             //
             State *world = new WorldState();
             SceneNode *node = sceMgr->getRootSceneNode();
             world->setSceneNode(node);
-            Context<State *>::set(world);
+            Context<State>::set(world);
 
-           
             //
-            CellInstanceManager *cellInstances = Context<CellInstanceManager*>::get();
+            CellInstanceManager *cellInstances = Context<CellInstanceManager>::get();
             cellInstances->init();
 
-            //moving state manager.
-            MovingStateManager *movingStateManager = Context<MovingStateManager*>::get();
+            // moving state manager.
+            MovingStateManager *movingStateManager = Context<MovingStateManager>::get();
             movingStateManager->init();
             //
-            Context<CoreMod *>::get()->addStepListener(movingStateManager);
+            Context<CoreMod>::get()->addStepListener(movingStateManager);
 
             world->init();
             core->addFrameListener(this);
@@ -104,7 +103,7 @@ namespace fog
 
         virtual bool frameStarted(const FrameEvent &evt)
         {
-            // Context<State *>::get()->forEach([&evt](State *state)
+            // Context<State>::get()->forEach([&evt](State *state)
             //                                  {
             //                                      state->getSlots().step(evt.timeSinceLastFrame);
 

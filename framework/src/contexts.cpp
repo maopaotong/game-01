@@ -11,86 +11,48 @@ namespace fog
     //
 
     template <>
-    Var<float>::Bag *Context<Var<float>::Bag *>::default_ = nullptr;
+    Var<float>::Bag *Context<Var<float>::Bag>::ctxObj = new Var<float>::Bag();
 
     template <>
-    Var<float>::Bag *Context<Var<float>::Bag *>::ctxObj = new Var<float>::Bag();
+    Var<Vector3>::Bag *Context<Var<Vector3>::Bag>::ctxObj = new Var<Vector3>::Bag();
 
     template <>
-    Var<Vector3>::Bag *Context<Var<Vector3>::Bag *>::default_ = nullptr;
+    Property::Bag *Context<Property::Bag>::ctxObj = new Property::Bag();
 
     template <>
-    Var<Vector3>::Bag *Context<Var<Vector3>::Bag *>::ctxObj = new Var<Vector3>::Bag();
+    Terrains *Context<Terrains>::ctxObj = nullptr;
 
     template <>
-    Property::Bag *Context<Property::Bag *>::default_ = nullptr;
+    Event::Bus *Context<Event::Bus>::ctxObj = new Event::Bus();
 
     template <>
-    Property::Bag *Context<Property::Bag *>::ctxObj = new Property::Bag();
+    Node2D *Context<Node2D>::ctxObj = nullptr;
 
     template <>
-    Terrains *Context<Terrains *>::default_ = nullptr;
-    template <>
-    Terrains *Context<Terrains *>::ctxObj = nullptr;
+    Cell::Center *Context<Cell::Center>::ctxObj = nullptr;
 
     template <>
-    Event::Bus *Context<Event::Bus *>::default_ = nullptr;
-    template <>
-    Event::Bus *Context<Event::Bus *>::ctxObj = new Event::Bus();
+    CoreMod *Context<CoreMod>::ctxObj = nullptr;
 
+    template <>
+    CostMap *Context<CostMap>::ctxObj = nullptr;
     //
     template <>
-    Node2D *Context<Node2D *>::default_ = nullptr;
-    template <>
-    Node2D *Context<Node2D *>::ctxObj = nullptr;
-
-    //
-    template <>
-    Cell::Center *Context<Cell::Center *>::default_ = nullptr;
-    template <>
-    Cell::Center *Context<Cell::Center *>::ctxObj = nullptr;
-
-    // Core context used during the setup stage,no need to provide the core for event handling.
-    template <>
-    CoreMod *Context<CoreMod *>::default_ = nullptr;
-    template <>
-    CoreMod *Context<CoreMod *>::ctxObj = nullptr;
-
-    // TODO remove this app level contex.
-    template <>
-    CostMap *Context<CostMap *>::default_ = nullptr;
-    template <>
-    CostMap *Context<CostMap *>::ctxObj = nullptr;
-    //
-    template <>
-    State *Context<State *>::default_ = nullptr;
-    template <>
-    State *Context<State *>::ctxObj = nullptr;
+    State *Context<State>::ctxObj = nullptr;
 
     template <>
-    Plane *Context<Plane *>::default_ = nullptr;
-    template <>
-    Plane *Context<Plane *>::ctxObj = nullptr;
+    Plane *Context<Plane>::ctxObj = nullptr;
 
     template <>
-    MovingStateManager *Context<MovingStateManager *>::default_ = nullptr;
-    template <>
-    MovingStateManager *Context<MovingStateManager *>::ctxObj = new MovingStateManager();
-
-    //
-    template <>
-    CellInstanceManager *Context<CellInstanceManager *>::default_ = nullptr;
-    template <>
-    CellInstanceManager *Context<CellInstanceManager *>::ctxObj = new CellInstanceManager();
+    MovingStateManager *Context<MovingStateManager>::ctxObj = new MovingStateManager();
 
     template <>
-    MovableStateManager *Context<MovableStateManager *>::default_ = nullptr;
-    template <>
-    MovableStateManager *Context<MovableStateManager *>::ctxObj = new MovableStateManager();
+    CellInstanceManager *Context<CellInstanceManager>::ctxObj = new CellInstanceManager();
 
     template <>
-    PathingStateManager *Context<PathingStateManager *>::default_ = nullptr;
+    MovableStateManager *Context<MovableStateManager>::ctxObj = new MovableStateManager();
+
     template <>
-    PathingStateManager *Context<PathingStateManager *>::ctxObj = new PathingStateManager();
+    PathingStateManager *Context<PathingStateManager>::ctxObj = new PathingStateManager();
 
 };

@@ -50,7 +50,7 @@ namespace fog
         void startRendering() override
         {
 
-            Ogre::Root *root = Context<CoreMod *>::get()->getRoot();
+            Ogre::Root *root = Context<CoreMod>::get()->getRoot();
             root->startRendering(); //
         }
 
