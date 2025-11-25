@@ -105,12 +105,12 @@ namespace fog
 
             float pathSpeed = Context<Var<float>::Bag *>::get()->getVarVal(".pathSpeed", 1.0f);
             PathFollow2 path(std::get<Vector2>(keyAndPosition), pathByPointIn2D, pathSpeed);
-            PathState *pathState = new PathState();
-            pathState->init();
-            pathState->setPath(pathByPoint2DNom, std::get<CellKey>(keyAndPosition), cKey2);
+            // PathState *pathState = new PathState();
+            // pathState->init();
+            // pathState->setPath(pathByPoint2DNom, std::get<CellKey>(keyAndPosition), cKey2);
 
             // TODO add pathState to another common state.
-            this->addChild(pathState); //
+            //this->addChild(pathState); //
 
             return path;
         }

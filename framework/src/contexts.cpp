@@ -49,9 +49,8 @@ namespace fog
     Cell::Center *Context<Cell::Center *>::default_ = nullptr;
     template <>
     Cell::Center *Context<Cell::Center *>::ctxObj = nullptr;
-    
 
-    //Core context used during the setup stage,no need to provide the core for event handling.
+    // Core context used during the setup stage,no need to provide the core for event handling.
     template <>
     CoreMod *Context<CoreMod *>::default_ = nullptr;
     template <>
@@ -79,22 +78,19 @@ namespace fog
     MovingStateManager *Context<MovingStateManager *>::ctxObj = new MovingStateManager();
 
     //
-        template <>
+    template <>
     CellInstanceManager *Context<CellInstanceManager *>::default_ = nullptr;
     template <>
     CellInstanceManager *Context<CellInstanceManager *>::ctxObj = new CellInstanceManager();
 
-    
-        template <>
+    template <>
     MovableStateManager *Context<MovableStateManager *>::default_ = nullptr;
     template <>
     MovableStateManager *Context<MovableStateManager *>::ctxObj = new MovableStateManager();
 
-        template <>
+    template <>
     PathingStateManager *Context<PathingStateManager *>::default_ = nullptr;
     template <>
     PathingStateManager *Context<PathingStateManager *>::ctxObj = new PathingStateManager();
 
-    
-    
 };

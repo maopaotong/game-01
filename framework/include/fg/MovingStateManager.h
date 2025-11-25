@@ -40,6 +40,7 @@ namespace fog
         }
         void addTask(State *state, CellKey cKey2)
         {
+            // clear old task on the same state
             for (auto &it = this->tasks.begin(); it != tasks.end();)
             {
                 MoveToCellTask *task = it->get();
@@ -53,6 +54,7 @@ namespace fog
                 }
             }
 
+            //
             MoveToCellTask *task = new MoveToCellTask(state, cKey2);
             this->tasks.push_back(std::unique_ptr<MoveToCellTask>(task));
         }
@@ -71,9 +73,18 @@ namespace fog
         GOON step(float time) override
         {
             CellInstanceManager *cisManager = Context<CellInstanceManager *>::get();
-            for (auto &task : this->tasks)
+
+            for (auto it = this->tasks.begin(); it != this->tasks.end();)
             {
-                task->step(time);
+                MoveToCellTask *task = it->get();
+                if (!task->step(time))
+                {
+                    it = this->tasks.erase(it);
+                    continue;
+                }
+
+                it++;
+                //tracking 
                 State *state = task->getState();
                 CellInstanceState *currentCis = cisManager->getCellInstanceStateByPosition(state->getSceneNode()->getPosition());
                 if (currentCis)
