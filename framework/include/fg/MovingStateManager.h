@@ -26,24 +26,38 @@ namespace fog
         }
         void movingActiveStateToCell(CellKey cKey2)
         {
-            // remove all previous tasks
-            this->tasks.clear();
+
             // add new tasks
-            Context<MovableStateManager *>::get()->forEach([this, &cKey2](State *state)
-                                             {
-                                                 if (state->isActive())
-                                                 {
-                                                     this->addTask(new MoveToCellTask(state, cKey2));
-                                                 }
-                                                 return true; //
-                                             });
+            Context<MovableStateManager *>::get()-> //
+                forEach([this, &cKey2](State *state)
+                        {
+                            if (state->isActive())
+                            {
+                                this->addTask(state, cKey2);
+                            }
+                            return true; //
+                        });
         }
-        void addTask(MoveToCellTask *task)
+        void addTask(State *state, CellKey cKey2)
         {
+            for (auto &it = this->tasks.begin(); it != tasks.end();)
+            {
+                MoveToCellTask *task = it->get();
+                if (task->getState() == state)
+                {
+                    it = tasks.erase(it);
+                }
+                else
+                {
+                    it++;
+                }
+            }
+
+            MoveToCellTask *task = new MoveToCellTask(state, cKey2);
             this->tasks.push_back(std::unique_ptr<MoveToCellTask>(task));
         }
-        template<typename F>
-        void forEachTask(F&& f)
+        template <typename F>
+        void forEachTask(F &&f)
         {
             for (auto &task : this->tasks)
             {

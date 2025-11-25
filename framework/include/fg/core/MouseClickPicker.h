@@ -73,7 +73,7 @@ namespace fog
             float ndcX = evt.x / (float)viewport->getActualWidth();
             float ndcY = evt.y / (float)viewport->getActualHeight();
             Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
-            State *picked = this->pick(ray);
+            State *picked = Context<MovableStateManager *>::get()->pick(ray);
 
             if (picked)
             {
@@ -94,7 +94,6 @@ namespace fog
             //                          } //
             //                          return true; //
             //                      });
-
 
             return true;
         }
@@ -126,55 +125,12 @@ namespace fog
                 {
                     CellKey cKey2 = cell2.cKey;
                     MovingStateManager *msm = Context<MovingStateManager *>::get();
-                    //state 
+                    // state
                     msm->movingActiveStateToCell(cKey2);
-                    // find all active state
-                    // Move to cell task.
-                    // Context<State *>::get()->forEach([this, &cKey](State *state)
-                    //                                  {
-                    //                                      if (state->isActive())
-                    //                                      {
-                    //                                          // state->getTaskRunner()->pushOrWait(task);
-                    //                                          state->slot(0)->tryCancelAndPush([state, &cKey]()
-                    //                                                                           {
-                    //                                                                               return new MoveToCellTask(state, cKey); //
-                    //                                                                           });
-                    //                                      }
-                    //                                      return true; //
-                    //                                  });
-                    //
                 }
                 // cout << "worldPoint(" << pickX << ",0," << pickZ << "),cellIdx:[" << cx << "," << cy << "]" << endl;
             }
             return true;
-        }
-
-        State *pick(Ray &ray)
-        {
-            // 创建射线查询对象
-            Ogre::RaySceneQuery *rayQuery = sMgr->createRayQuery(ray);
-            rayQuery->setSortByDistance(true);  // 按距离排序（最近的优先）
-            rayQuery->setQueryMask(0x00000001); // 与 Entity 的查询掩码匹配
-
-            // 执行查询
-            Ogre::RaySceneQueryResult &result = rayQuery->execute();
-
-            State *state = nullptr;
-            // 遍历结果
-            for (auto &it : result)
-            {
-                Node *node = it.movable->getParentNode();
-                State *s = State::get(node);
-                if (s && s->pickable())
-                {
-                    state = s;
-                    break;
-                }
-            }
-
-            sMgr->destroyQuery(rayQuery);
-            return state;
-            // high light the cell in which the actor stand.
         }
     };
 
