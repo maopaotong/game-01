@@ -7,7 +7,7 @@
 
 namespace fog
 {
-    
+
     class CellInstanceState : public State
     {
         std::stack<ColourValue> colours;
@@ -30,10 +30,11 @@ namespace fog
         {
             ColourValue bottomColour;
             bool hasBottomColor = getCostColor(cis, bottomColour);
-            if(hasBottomColor){
+            if (hasBottomColor)
+            {
                 colours.push(bottomColour);
             }
-            
+
             buildMesh();
         }
 
@@ -41,11 +42,12 @@ namespace fog
         {
             MeshBuild::SpiderNet buildMesh(obj);
             buildMesh.begin(MaterialNames::materialNameInUse);
-            if(!colours.empty()){
+            if (!colours.empty())
+            {
                 ColourValue currentColour = colours.top();
                 buildMesh(cis, currentColour); //
             }
-        
+
             buildMesh.end();
             // this->sceNode->setPosition(cis.getOrigin3D());
         }
@@ -53,7 +55,7 @@ namespace fog
         // Get color based on cost
         bool getCostColor(Cell::Instance &cell, Ogre::ColourValue &color) const
         {
-            CostMap* costMap = Context<CostMap>::get();
+            CostMap *costMap = Context<CostMap>::get();
             const int cost = costMap->getCost(cell.cKey.first, cell.cKey.second);
             switch (cost)
             {
@@ -83,12 +85,13 @@ namespace fog
 
         void unsetColour()
         {
-            if(!this->colours.empty()){
+            if (!this->colours.empty())
+            {
                 this->colours.pop();
             }
             buildMesh();
         }
-        
+
         void setColour(ColourValue color)
         {
             this->colours.push(color);
@@ -118,6 +121,12 @@ namespace fog
                                 state->init();
                                 this->addChild(state); //
                                 this->cellInstanceStates[cell.cKey] = state; });
+        }
+
+        CellInstanceState *getCellInstanceStateByPosition(Vector2 posIn2D)
+        {
+            Vector3 pos3D = Context<Node2D>::get()->to3D(posIn2D);
+            return getCellInstanceStateByPosition(pos3D);
         }
 
         CellInstanceState *getCellInstanceStateByPosition(Vector3 pos)

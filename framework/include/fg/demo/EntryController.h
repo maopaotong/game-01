@@ -56,6 +56,8 @@ namespace fog
         GOON frameStarted(const FrameEvent &evt) override
         {
             Context<PathingStateManager>::get()->step(evt.timeSinceLastFrame);
+            Context<MovableStateManager>::get()->step(evt.timeSinceLastFrame);
+
             return true;
         }
     };

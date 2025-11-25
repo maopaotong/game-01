@@ -160,11 +160,11 @@ namespace fog
             this->cKey1 = cKey1;
             this->cKey2 = cKey2;
 
-            std::vector<Vector2> pathByPoint2DNom = Context<CostMap>::get()->findPath(cKey1, cKey2);
+            std::vector<CellKey> pathByCellKey = Context<CostMap>::get()->findPath(cKey1, cKey2);
 
             PathState *pathState2 = new PathState();
             pathState2->init();
-            pathState2->setPath(pathByPoint2DNom, cKey1, cKey2);
+            pathState2->setPath(pathByCellKey);
             this->clearPath();
             currentPath = pathState2;
             this->addChild(currentPath);

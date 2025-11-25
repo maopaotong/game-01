@@ -8,105 +8,51 @@
 #include "fg/util/HexGridPrinter.h"
 #include "fg/util/CellMark.h"
 #include "fg/core/CellStateBase.h"
-
+#include "fg/CellInstanceManager.h"
 namespace fog
 {
     using namespace Ogre;
 
 #define DEFAULT_HIGH_OFFSET 1.1f
 
-    class PathState : public CellStateBase
+    class PathState : public State
     {
-        std::vector<Ogre::Vector2> currentPath;
-        CellKey start = CellKey(-1, -1);
-        CellKey end = CellKey(-1, -1);
-        std::unordered_set<std::pair<int, int>, PairHash> pathSet;
+        std::vector<CellKey> currentPath;        
 
     public:
-        PathState() : CellStateBase()
+        PathState()
         {
         }
-
-        void clearPath()
+        ~PathState()
         {
-            this->setPath({}, CellKey(-1, -1), CellKey(-1, -1));
+            this->resetPathColor(true);
         }
 
-        bool getStart(CellKey &start)
+        void setPath(const std::vector<CellKey> &path)
         {
-            if (this->start.first == -1)
+            this->resetPathColor(true);
+            currentPath = path;                        
+            this->resetPathColor(false);
+        }
+
+        void resetPathColor(bool unset)
+        {
+            for (auto it = currentPath.begin(); it != currentPath.end(); ++it)
             {
-                return false;
+                CellKey cKey = *it;
+                CellInstanceState *cis = Context<CellInstanceManager>::get()->getCellInstanceStateByCellKey(cKey);
+                if (unset)
+                {
+                    cis->unsetColour();
+                }
+                else
+                {
+
+                    cis->setColour(Ogre::ColourValue::Blue);
+                }
             }
-            start = this->start;
-            return true;
         }
 
-        void setPath(const std::vector<Ogre::Vector2> &path, CellKey ck1, CellKey ck2)
-        {
-            currentPath = path;
-            start = ck1;
-            end = ck2;
-            pathSet.clear();
-            for (const auto &p : currentPath)
-            {
-                pathSet.insert({static_cast<int>(p.x), static_cast<int>(p.y)});
-            }
-            this->rebuildMesh();
-        }
-
-        virtual CellKey getDestinationCell()
-        {
-            return this->end;
-        }
-
-        void rebuildMesh() override
-        {
-
-            Cell::Center *cc = Context<Cell::Center>::get();
-            //MeshBuild::PointOnCircle buildMesh(obj);
-            MeshBuild::SpiderNet buildMesh(obj);
-            buildMesh.useDefaultNorm = false;
-
-            buildMesh.begin(this->material);
-            cc->forEachCell([this, &buildMesh](Cell::Instance &cell)
-                            {
-                                ColourValue color;
-                                bool ok = this->resolveColor(cell, color);
-                                if (ok)
-                                {
-                                    buildMesh(cell, color);
-                                } //
-                            });
-            buildMesh.end();
-        }
-
-        bool resolveColor(Cell::Instance &cell, ColourValue &color)
-        {
-
-            bool draw = false;
-            int x = cell.cKey.first;
-            int y = cell.cKey.second;
-            if (x == start.first && y == start.second)
-            {
-                // Start point in green
-                color = Ogre::ColourValue::Green;
-                draw = true;
-            }
-            else if (x == end.first && y == end.second)
-            {
-                // End point in blue
-                color = Ogre::ColourValue::Blue;
-                draw = true;
-            }
-            else if (pathSet.find({x, y}) != pathSet.end())
-            {
-                color = ColourValue(1.0f, 1.0f, 0.0f);
-                // Path in yellow
-                draw = true;
-            }
-            return draw;
-        }
     };
 
 }; // end of namespace

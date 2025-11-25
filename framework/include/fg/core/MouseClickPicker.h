@@ -72,28 +72,7 @@ namespace fog
             float ndcX = evt.x / (float)viewport->getActualWidth();
             float ndcY = evt.y / (float)viewport->getActualHeight();
             Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
-            State *picked = Context<MovableStateManager>::get()->pick(ray);
-
-            if (picked)
-            {
-                picked->setActive(true);
-                // picked->slot(1)->tryCancelAndPush([picked]()
-                //                                   {
-                //                                       TrackActorTask *task = new TrackActorTask(picked);
-                //                                       task->init();
-                //                                       return task; //
-                //                                   });
-            }
-            // unselect all other active state.
-            // this->state->forEach([picked](State *state)
-            //                      {
-            //                          if (state->isActive() && state != picked)
-            //                          {
-            //                              state->setActive(false);
-            //                          } //
-            //                          return true; //
-            //                      });
-
+            Context<MovableStateManager>::get()->pick(ray);
             return true;
         }
 

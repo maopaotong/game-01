@@ -68,7 +68,7 @@ namespace fog
 
             std::tuple<CellKey, Vector2> keyAndPosition = this->resolveOwnerCell();
 
-            std::vector<Vector2> pathByPoint2DNom = Context<CostMap>::get()->findPath(std::get<CellKey>(keyAndPosition), cKey2);
+            std::vector<Vector2> pathByPoint2DNom = Context<CostMap>::get()->findNormPath(std::get<CellKey>(keyAndPosition), cKey2);
 
             std::vector<Vector2> pathByCellCenterIn2D;
 
@@ -187,24 +187,7 @@ namespace fog
                 }
 
                 it++;
-                // tracking
-                State *state = task->getState();
-                CellInstanceState *currentCis = cisManager->getCellInstanceStateByPosition(state->getSceneNode()->getPosition());
-                if (currentCis)
-                {
-                    if (currentCis->getCellKey() != state->getCellKey())
-                    {
-                        CellInstanceState *preCis = cisManager->getCellInstanceStateByCellKey(state->getCellKey());
-                        if (preCis)
-                        {
-                            preCis->unsetColour();
-                        }
-
-                        state->setCellKey(currentCis->getCellKey());
-
-                        currentCis->setColour(Ogre::ColourValue::Green);
-                    }
-                }
+                
             }
             return true;
         }

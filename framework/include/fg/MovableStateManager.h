@@ -7,10 +7,14 @@
 #include "fg/core/EntityState.h"
 namespace fog
 {
+    class PickedTask : public State, public Stairs
+    {
+    };
 
-    class MovableStateManager : public State
+    class MovableStateManager : public State, public Stairs
     {
         State *currentPicked;
+        std::vector<std::string> aniNames = {"RunBase", "RunTop"};
 
     public:
         MovableStateManager() : currentPicked(nullptr)
@@ -29,8 +33,48 @@ namespace fog
             actor2->init();
             this->addChild(actor2);
         }
+        bool step(float time) override
+        {
+            // tracking
+            CellInstanceManager *cisManager = Context<CellInstanceManager>::get();
+            if (!this->currentPicked)
+            {
+                return true;
+            }
+            State *state = this->currentPicked;
+            CellInstanceState *currentCis = cisManager->getCellInstanceStateByPosition(state->getSceneNode()->getPosition());
 
-        State *pick(Ray &ray)
+            if (currentCis->getCellKey() != state->getCellKey())
+            {
+                CellInstanceState *preCis = cisManager->getCellInstanceStateByCellKey(state->getCellKey());
+                if (preCis)
+                {
+                    preCis->unsetColour();
+                }
+
+                state->setCellKey(currentCis->getCellKey());
+
+                currentCis->setColour(Ogre::ColourValue::White);
+            }
+
+            return true;
+        }
+
+        void unpick()
+        {
+            if (!currentPicked)
+            {
+                return;
+            }
+            currentPicked->setActive(false);
+
+            CellInstanceState *cis = Context<CellInstanceManager>::get()->getCellInstanceStateByPosition(currentPicked->getSceneNode()->getPosition());
+            cis->unsetColour();
+            Context<Event::Bus>::get()->emit<EventType, State *>(EventType::MovableStateUnpicked, currentPicked);
+            currentPicked = nullptr;
+        }
+
+        void pick(Ray &ray)
         {
 
             // 创建射线查询对象
@@ -41,7 +85,7 @@ namespace fog
             // 执行查询
             Ogre::RaySceneQueryResult &result = rayQuery->execute();
 
-            State *state = nullptr;
+            State *picked = nullptr;
             // 遍历结果
             for (auto &it : result)
             {
@@ -49,21 +93,26 @@ namespace fog
                 State *s = State::get(node);
                 if (s && s->pickable())
                 {
-                    state = s;
+                    picked = s;
                     break;
                 }
             }
             Context<CoreMod>::get()->getSceneManager()->destroyQuery(rayQuery);
-
-            if (currentPicked && currentPicked != state)
+            if (this->currentPicked == picked)
             {
-                currentPicked->setActive(false);
-                Context<Event::Bus>::get()->emit<EventType, State*>(EventType::MovableStateUnpicked, currentPicked);
+                return;
             }
-            currentPicked = state;
-            Context<Event::Bus>::get()->emit<EventType, State*>(EventType::MovableStatePicked, state);
-            return state;
-            // high light the cell in which the actor stand.
+            this->unpick();
+            if (!picked)
+            {
+                return;
+            }
+            currentPicked = picked;
+            picked->setActive(true);
+
+            CellInstanceState *cis = Context<CellInstanceManager>::get()->getCellInstanceStateByPosition(picked->getSceneNode()->getPosition());
+            cis->setColour(Ogre::ColourValue::White);
+            Context<Event::Bus>::get()->emit<EventType, State *>(EventType::MovableStatePicked, picked);
         }
 
     }; // end of class
