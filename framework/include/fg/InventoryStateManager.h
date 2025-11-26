@@ -63,9 +63,15 @@ namespace fog
         }
         void init() override
         {
-            Inventory *inv = new Inventory(InventoryType::BuildingPermit);
+            this->add(InventoryType::BuildingPermit, 1.0f);
+            this->add(InventoryType::Population, 10.0f);
+        }
+
+        void add(InventoryType type, float amount)
+        {
+            Inventory *inv = new Inventory(type);
             inv->init();
-            inv->add(1.0f); //
+            inv->add(amount); //
             this->addChild(inv);
         }
 

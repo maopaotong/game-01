@@ -13,6 +13,8 @@ namespace fog
 {
     const std::unordered_map<InventoryType, std::string> InventoryTypeToString = {
         {InventoryType::BuildingPermit, "BuildingPermit"},
+        {InventoryType::Population, "Population"},
+        
     };
 
     static std::string to_string(InventoryType level)

@@ -45,15 +45,18 @@ namespace fog
 
         void buildMesh()
         {
-            MeshBuild::SpiderNet buildMesh(obj);
-            buildMesh.begin(MaterialNames::materialNameInUse);
-            if (!colours.empty())
+            if (colours.empty())
             {
+                obj->clear();
+            }
+            else
+            {
+                MeshBuild::SpiderNet buildMesh(obj);
+                buildMesh.begin(MaterialNames::materialNameInUse);
                 ColourValue currentColour = colours.top();
                 buildMesh(cis, currentColour); //
+                buildMesh.end();
             }
-
-            buildMesh.end();
             // this->sceNode->setPosition(cis.getOrigin3D());
         }
 
@@ -90,7 +93,7 @@ namespace fog
 
         void popColour()
         {
-            //if (!this->colours.empty())
+            // if (!this->colours.empty())
             //{
             this->colours.pop();
             //}

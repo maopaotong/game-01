@@ -77,6 +77,8 @@ namespace fog
     enum class InventoryType
     {
         BuildingPermit,
+        Population,
+
     };
 
 };
