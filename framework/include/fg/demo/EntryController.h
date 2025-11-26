@@ -42,6 +42,7 @@ namespace fog
     // === Custom hash function ===
     //
     // === Input handler for closing application ===
+    
     class EntryController : public OgreBites::InputListener, public FrameListener
     {
 
@@ -58,7 +59,6 @@ namespace fog
             else if (evt.button == ButtonType::BUTTON_RIGHT)
             {
                 Context<MovingStateManager>::get()->movingActiveStateToCellByMousePosition(evt.x, evt.y);
-                
             }
             return false;
         }

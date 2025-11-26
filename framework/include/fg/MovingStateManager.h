@@ -142,6 +142,7 @@ namespace fog
         {
         }
 
+        //TODO move this function to MouseStateManager
         bool movingActiveStateToCellByMousePosition(int mx, int my)
         {
             // normalized (0,1)
@@ -170,6 +171,9 @@ namespace fog
             {
                 return false;
             }
+
+            Context<Event::Bus>::get()->emit<CellEventType, CellKey>(CellEventType::CellAsTarget, cell2.cKey);
+
             CellKey cKey2 = cell2.cKey;
             // state
             this->movingActiveStateToCell(cKey2);
@@ -224,6 +228,7 @@ namespace fog
                 MoveToCellTask *task = it->get();
                 if (!task->step(time))
                 {
+                    Context<Event::Bus>::get()->emit<MovableEventType, State *>(MovableEventType::StateStopMoving, task->getState());
                     it = this->tasks.erase(it);
                     continue;
                 }

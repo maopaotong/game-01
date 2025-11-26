@@ -47,15 +47,26 @@ namespace fog
             return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
         }
     };
+    
+    enum class MouseCellEventType{
+        MouseLeaveCell,
+        MouseEnterCell,
+        
+    };
 
+    enum class CellEventType{
+        CellAsTarget,
+        CellEntered,
+        CellLeft,
+    };
     enum class MovableEventType
     {
         StatePicked,
         StateUnpicked,
         StateStartMoving,
-        StateEndMoving,
+        StateStopMoving,
         StaeEnterCell,
-        StateLeaveCell
+        StateLeaveCell,
     };
     enum class BuildingEventType
     {

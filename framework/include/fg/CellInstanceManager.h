@@ -134,6 +134,16 @@ namespace fog
             return getCellInstanceStateByPosition(pos3D);
         }
 
+        CellKey getCellKeyByPosition(Vector3 pos)
+        {
+            Cell::Instance cell;
+            if (Context<Cell::Center>::get()->findCellByWorldPosition(pos, cell))
+            {
+                return cell.cKey;
+            }
+            return CellKey(-1, -1);
+        }
+
         CellInstanceState *getCellInstanceStateByPosition(Vector3 pos)
         {
             Cell::Instance cell;

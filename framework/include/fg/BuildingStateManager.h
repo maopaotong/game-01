@@ -7,18 +7,52 @@
 #include "fg/core/EntityState.h"
 #include "fg/core/Sinbad.h"
 #include "fg/core/Tower.h"
-
+#include "fg/InventoryStateManager.h"
 namespace fog
 {
+
+    class BuildingPlan
+    {
+    protected:
+        CellKey cKey;
+        State *building;
+
+    public:
+        BuildingPlan(State *building) : building(building)
+        {
+        }
+
+        void setBuilding(State *state)
+        {
+            if (this->building)
+            {
+                delete this->building;
+            }
+            this->building = state;
+        }
+        State *getBuilding()
+        {
+            return this->building;
+        }
+        virtual ~BuildingPlan()
+        {
+            if (this->building)
+            {
+                delete this->building;
+                this->building = nullptr;
+            }
+        }
+    };
 
     class BuildingStateManager : public State
     {
         State *picked;
+        BuildingPlan *plan;
 
         std::unordered_map<CellKey, std::vector<State *>, PairHash> buildingsInCells;
 
     protected:
-        void setState(State *picked)
+        void setPicked(State *picked)
         {
             if (this->picked == picked)
             {
@@ -40,7 +74,7 @@ namespace fog
         }
 
     public:
-        BuildingStateManager() : picked(nullptr)
+        BuildingStateManager() : picked(nullptr), plan(nullptr)
         {
         }
         virtual ~BuildingStateManager()
@@ -48,9 +82,38 @@ namespace fog
         }
         void init() override
         {
+            Context<Event::Bus>::get()-> //
+                subscribe<MouseCellEventType, CellKey>([this](MouseCellEventType type, CellKey cKey)
+                                                       {
+                                                           if (type == MouseCellEventType::MouseEnterCell)
+                                                           {
+                                                               if (this->plan)//move the position if has plan
+                                                               {
+                                                                   this->plan->getBuilding()->findSceneNode()->setPosition(
+                                                                       Context<Cell::Center>::get()->getCell(cKey).getOrigin3D());
+                                                               }
+                                                           }
+
+                                                           return true; //
+                                                       });
+            Context<Event::Bus>::get()-> //
+                subscribe<CellEventType, CellKey>([this](CellEventType type, CellKey cKey)
+                                                       {
+                                                           if (type == CellEventType::CellAsTarget)
+                                                           {
+                                                               if (this->plan)//finish the plan by set the position of the building.
+                                                               {
+
+                                                                   this->createBuildingAtCell(cKey);
+                                                                   delete this->plan;
+                                                                   this->plan = nullptr;
+                                                               }
+                                                           }
+                                                           return true; //
+                                                       });
         }
 
-        bool pick(Ray &ray)
+        bool pick(Ray &ray) // pick a building.
         {
 
             // 创建射线查询对象
@@ -75,16 +138,21 @@ namespace fog
                 }
             }
             Context<CoreMod>::get()->getSceneManager()->destroyQuery(rayQuery);
-            this->setState(picked);
+            this->setPicked(picked);
             return picked != nullptr;
         }
 
-        bool createBuildingBy(State *actor)
+        bool planToBuild() // plan a building and waiting mouse cell event to choose a position for the building.
         {
-            Vector3 pos = actor->findSceneNode()->getPosition();
-            CellInstanceState *cis = Context<CellInstanceManager>::get()->getCellInstanceStateByPosition(pos);
-            CellKey cKey = cis->getCellKey();
-            return createBuildingAtCell(cKey);
+            if (this->plan)
+            {
+                delete this->plan;
+                this->plan = nullptr;
+            }
+            Tower *tower = new Tower();
+            tower->init();
+            this->plan = new BuildingPlan(tower);
+            return true;
         }
 
         bool createBuildingAtCell(CellKey cKey)
@@ -92,6 +160,11 @@ namespace fog
 
             auto it = this->buildingsInCells.find(cKey);
             if (it != this->buildingsInCells.end())
+            {
+                return false;
+            }
+
+            if (!Context<InventoryStateManager>::get()->consumeInventory(InventoryType::BuildingPermit, 1.0f))
             {
                 return false;
             }

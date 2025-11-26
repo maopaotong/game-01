@@ -33,6 +33,8 @@ namespace fog
                         this->state = nullptr;
                         this->setActive(false);
                     } });
+
+            
         }
 
         void doOpen() override
@@ -47,17 +49,9 @@ namespace fog
                 ImGuiUtil::Text(sNode->getPosition());
                 counter++;
                 //
-                if (ImGui::Button("Cteate Building"))
+                if (ImGui::Button("Tower Building"))
                 {
-
-                    if (Context<BuildingStateManager>::get()->createBuildingBy(this->state))
-                    {
-                        std::cout << "Create building success" << std::endl;
-                    }
-                    else
-                    {
-                        std::cout << "Create building failed" << std::endl;
-                    }
+                    Context<BuildingStateManager>::get()->planToBuild();
                 }
             }
 

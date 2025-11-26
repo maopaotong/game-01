@@ -29,6 +29,17 @@ namespace fog
             this->capacity += amount;
         }
 
+        bool consume(float amount)
+        {
+            if (this->capacity < amount)
+            {
+                return false;
+            }
+            this->capacity -= amount;
+
+            return true;
+        }
+
         InventoryType getType() const
         {
             return this->type;
@@ -70,6 +81,28 @@ namespace fog
                                    }
                                    return true; //
                                });
+        }
+
+        bool consumeInventory(InventoryType type, float amount)
+        {
+            Inventory *inv = this->getInventory(type);
+            if (!inv)
+            {
+                return false;
+            }
+            return inv->consume(amount);
+        }
+
+        Inventory * getInventory(InventoryType type){
+            Inventory * result = nullptr;
+            this->forEachInventory([&](Inventory * inv){
+                if(inv->getType() == type){
+                    result = inv;
+                    return false; // stop
+                }
+                return true; // continue
+            });
+            return result;
         }
 
     }; // end of class

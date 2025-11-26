@@ -40,21 +40,21 @@ namespace fog
             std::cout << "PathingStateManager created." << std::endl;
             Context<Event::Bus>::get()-> //
                 subscribe<MovableEventType, State *>([this](MovableEventType evtType, State *state)
-                                              {
-                                                  if (evtType == MovableEventType::StateUnpicked)
-                                                  {
-                                                      this->setSource(nullptr);
-                                                  }
-                                                  else if (evtType == MovableEventType::StatePicked)
-                                                  {
-                                                      this->setSource(state);
-                                                  }
-                                                  else if (evtType == MovableEventType::StateStartMoving)
-                                                  {
-                                                      this->setSource(nullptr);
-                                                  }
-                                                  return true; //
-                                              });
+                                                     {
+                                                         if (evtType == MovableEventType::StateUnpicked)
+                                                         {
+                                                             this->setSource(nullptr);
+                                                         }
+                                                         else if (evtType == MovableEventType::StatePicked)
+                                                         {
+                                                             this->setSource(state);
+                                                         }
+                                                         else if (evtType == MovableEventType::StateStartMoving)
+                                                         {
+                                                             this->setSource(nullptr);
+                                                         }
+                                                         return true; //
+                                                     });
         }
         virtual ~PathingStateManager()
         {
@@ -97,6 +97,7 @@ namespace fog
             }
         }
 
+        //TODO move this function to MouseStateManager
         CONSUMED onMouseMoved(int x, int y)
         {
             if (!this->sourceState)
@@ -137,9 +138,13 @@ namespace fog
             if (targetCis)
             {
                 targetCis->popColour();
+                Context<Event::Bus>::get()-> //
+                    emit<MouseCellEventType, CellKey>(MouseCellEventType::MouseLeaveCell, targetCis->getCellKey());
             }
             cis->pushColour(ColourValue::White);
             targetCis = cis;
+            Context<Event::Bus>::get()-> //
+                emit<MouseCellEventType, CellKey>(MouseCellEventType::MouseEnterCell, targetCis->getCellKey());
 
             return false;
         }
