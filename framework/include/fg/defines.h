@@ -48,7 +48,8 @@ namespace fog
         }
     };
 
-    enum class MovableEventType{
+    enum class MovableEventType
+    {
         StatePicked,
         StateUnpicked,
         StateStartMoving,
@@ -56,9 +57,15 @@ namespace fog
         StaeEnterCell,
         StateLeaveCell
     };
-    enum class BuildingEventType{
+    enum class BuildingEventType
+    {
         StatePicked,
         StateUnpicked,
     };
-    
+
+    enum class InventoryType
+    {
+        BuildingPermit,
+    };
+
 };

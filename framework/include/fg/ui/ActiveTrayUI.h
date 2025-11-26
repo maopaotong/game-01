@@ -15,7 +15,6 @@ namespace fog
     public:
         ActiveTrayUI() : UIState("ActiveActor"), state(nullptr)
         {
-            
         }
         void init() override
         {
@@ -23,7 +22,7 @@ namespace fog
             UIState::init();
             Context<Event::Bus>::get()-> //
                 subscribe<MovableEventType, State *>([this](MovableEventType et, State *s)
-                                              {
+                                                     {
                     if (et == MovableEventType::StatePicked)
                     {
                         this->state = s;
@@ -47,6 +46,19 @@ namespace fog
                 ImGui::SameLine();
                 ImGuiUtil::Text(sNode->getPosition());
                 counter++;
+                //
+                if (ImGui::Button("Cteate Building"))
+                {
+
+                    if (Context<BuildingStateManager>::get()->createBuildingBy(this->state))
+                    {
+                        std::cout << "Create building success" << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "Create building failed" << std::endl;
+                    }
+                }
             }
 
             if (!counter)

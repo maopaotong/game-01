@@ -38,6 +38,11 @@ namespace fog
             buildMesh();
         }
 
+        Vector3 getOrigin3D()
+        {
+            return this->cis.getOrigin3D();
+        }
+
         void buildMesh()
         {
             MeshBuild::SpiderNet buildMesh(obj);

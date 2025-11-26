@@ -9,6 +9,7 @@
 #include "fg/demo/EntryController.h"
 #include "fg/MovableStateManager.h"
 #include "fg/BuildingStateManager.h"
+#include "fg/InventoryStateManager.h"   
 namespace fog
 {
     class WorldState : public State
@@ -40,6 +41,11 @@ namespace fog
             BuildingStateManager *buildingStateMgr = Context<BuildingStateManager >::get();
             buildingStateMgr->init();
             this->addChild(buildingStateMgr);
+            //
+
+            InventoryStateManager *inventoryStateMgr = Context<InventoryStateManager >::get();
+            inventoryStateMgr->init();
+            this->addChild(inventoryStateMgr);
             //
 
             MainInputListener *keyHandler = new MainInputListener(costMap);

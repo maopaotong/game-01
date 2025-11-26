@@ -13,6 +13,7 @@
 #include "TasksUI.h"
 #include "BuildingTrayUI.h"
 #include "ActiveTrayUI.h"
+#include "InventoryUI.h"
 namespace fog
 {
 
@@ -36,6 +37,7 @@ namespace fog
         void init() override
         {
 
+            this->add(new InventoryUI());
             this->add(new OptionsUI());
             this->add(new PropertyRefsUI());
             this->add(new ActiveTrayUI());

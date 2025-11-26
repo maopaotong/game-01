@@ -7,6 +7,7 @@
 #include "fg/PathingStateManager.h"
 #include "fg/demo/InputStateController.h"
 #include "fg/BuildingStateManager.h"
+#include "fg/InventoryStateManager.h"
 namespace fog
 {
     // If the var here not initialised, app must provide the value.
@@ -62,6 +63,9 @@ namespace fog
 
     template <>
     BuildingStateManager *Context<BuildingStateManager>::ctxObj = new BuildingStateManager();
+
+    template <>
+    InventoryStateManager *Context<InventoryStateManager>::ctxObj = new InventoryStateManager();
     
 
 };

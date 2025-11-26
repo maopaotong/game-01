@@ -221,11 +221,11 @@ namespace fog
             return false;
         }
 
-        template <typename... Args>
-        void forEachChild(void (*func)(State *, Args...), Args... args)
-        {
-            forEachChild<Args...>(true, func, args...);
-        }
+        // template <typename... Args>
+        // void forEachChild(void (*func)(State *, Args...), Args... args)
+        // {
+        //     forEachChild<Args...>(true, func, args...);
+        // }
 
         template <typename F>
         bool forEachChild(F &&func, bool recursive = true)

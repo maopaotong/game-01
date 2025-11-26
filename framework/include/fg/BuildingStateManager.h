@@ -15,6 +15,8 @@ namespace fog
     {
         State *picked;
 
+        std::unordered_map<CellKey, std::vector<State *>, PairHash> buildingsInCells;
+
     protected:
         void setState(State *picked)
         {
@@ -46,10 +48,6 @@ namespace fog
         }
         void init() override
         {
-
-            EntityState *tower = new Tower();
-            tower->init();
-            this->addChild(tower);
         }
 
         bool pick(Ray &ray)
@@ -79,6 +77,34 @@ namespace fog
             Context<CoreMod>::get()->getSceneManager()->destroyQuery(rayQuery);
             this->setState(picked);
             return picked != nullptr;
+        }
+
+        bool createBuildingBy(State *actor)
+        {
+            Vector3 pos = actor->findSceneNode()->getPosition();
+            CellInstanceState *cis = Context<CellInstanceManager>::get()->getCellInstanceStateByPosition(pos);
+            CellKey cKey = cis->getCellKey();
+            return createBuildingAtCell(cKey);
+        }
+
+        bool createBuildingAtCell(CellKey cKey)
+        {
+
+            auto it = this->buildingsInCells.find(cKey);
+            if (it != this->buildingsInCells.end())
+            {
+                return false;
+            }
+
+            Tower *tower = new Tower();
+            tower->init();
+            Cell::Instance ci = Context<Cell::Center>::get()->getCell(cKey);
+            Vector3 cisPos = ci.getOrigin3D();
+            tower->findSceneNode()->setPosition(cisPos);
+            this->addChild(tower);
+
+            this->buildingsInCells[cKey].push_back(tower);
+            return true;
         }
     }; // end of class
 }; // end of namespace
