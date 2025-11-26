@@ -38,7 +38,7 @@ namespace fog
             this->heighOffset = this->heigh / 2.0f * scale;
         }
 
-        ~EntityState()
+        virtual ~EntityState()
         {
         }
 

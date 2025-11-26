@@ -11,12 +11,7 @@
 #include "fg/InventoryStateManager.h"
 namespace fog
 {
-    const std::unordered_map<InventoryType, std::string> InventoryTypeToString = {
-        {InventoryType::BuildingPermit, "BuildingPermit"},
-        {InventoryType::Population, "Population"},
-        
-    };
-
+   
     static std::string to_string(InventoryType level)
     {
         auto it = InventoryTypeToString.find(level);
@@ -50,7 +45,7 @@ namespace fog
                                      {
                                          ImGui::Text(to_string(inv->getType()).c_str());
                                          ImGui::SameLine();
-                                         ImGui::Text(std::to_string(inv->getCapacity()).c_str());
+                                         ImGui::Text(std::to_string(inv->getAmount()).c_str());
                                          ImGui::TreePop();
                                      }
                                      id++;

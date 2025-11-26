@@ -78,7 +78,19 @@ namespace fog
     {
         BuildingPermit,
         Population,
+        Food,
+        Building,
+        Land,
 
     };
+
+     const std::unordered_map<InventoryType, std::string> InventoryTypeToString = {
+        {InventoryType::BuildingPermit, "BuildingPermit"},
+        {InventoryType::Population, "Population"},
+        {InventoryType::Food, "Food"},
+        {InventoryType::Building, "Building"},
+        {InventoryType::Land, "Land"},        
+    };
+
 
 };

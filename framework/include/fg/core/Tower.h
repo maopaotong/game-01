@@ -28,7 +28,7 @@ namespace fog
         {
         }
 
-        ~Tower()
+        virtual ~Tower()
         {
         }
 

@@ -14,10 +14,11 @@ namespace fog
     class Inventory : public State
     {
         InventoryType type;
+        float amount;
         float capacity;
 
     public:
-        Inventory(InventoryType type) : type(type), capacity(0.0f)
+        Inventory(InventoryType type) : type(type), amount(0.0f), capacity(1e6f)
         {
         }
         virtual ~Inventory()
@@ -26,16 +27,16 @@ namespace fog
 
         void add(float amount)
         {
-            this->capacity += amount;
+            this->amount += amount;
         }
 
         bool consume(float amount)
         {
-            if (this->capacity < amount)
+            if (this->amount < amount)
             {
                 return false;
             }
-            this->capacity -= amount;
+            this->amount -= amount;
 
             return true;
         }
@@ -44,9 +45,30 @@ namespace fog
         {
             return this->type;
         }
+        float getAmount() const
+        {
+            return this->amount;
+        }
         float getCapacity() const
         {
             return this->capacity;
+        }
+    };
+
+    class InventoryMonitor : public Stairs
+    {
+    public:
+        InventoryMonitor() : Stairs()
+        {
+        }
+        virtual ~InventoryMonitor()
+        {
+        }
+       
+        bool step(float time) override
+        {
+            
+            return true;
         }
     };
 
@@ -89,6 +111,16 @@ namespace fog
                                });
         }
 
+        void returnInventory(InventoryType type, float amount)
+        {
+            Inventory *inv = this->getInventory(type);
+            if (!inv)
+            {
+                this->add(type, amount);
+            }
+            inv->add(amount);
+        }
+
         bool consumeInventory(InventoryType type, float amount)
         {
             Inventory *inv = this->getInventory(type);
@@ -99,15 +131,37 @@ namespace fog
             return inv->consume(amount);
         }
 
-        Inventory * getInventory(InventoryType type){
-            Inventory * result = nullptr;
-            this->forEachInventory([&](Inventory * inv){
-                if(inv->getType() == type){
-                    result = inv;
-                    return false; // stop
-                }
-                return true; // continue
-            });
+        float getAmount(InventoryType type)
+        {
+            Inventory *inv = this->getInventory(type);
+            if (!inv)
+            {
+                return 0.0f;
+            }
+            return inv->getAmount();
+        }
+        float getCapacity(InventoryType type)
+        {
+            Inventory *inv = this->getInventory(type);
+            if (!inv)
+            {
+                return 0.0f;
+            }
+            return inv->getCapacity();
+        }
+
+        Inventory *getInventory(InventoryType type)
+        {
+            Inventory *result = nullptr;
+            this->forEachInventory([&](Inventory *inv)
+                                   {
+                                       if (inv->getType() == type)
+                                       {
+                                           result = inv;
+                                           return false; // stop
+                                       }
+                                       return true; // continue
+                                   });
             return result;
         }
 

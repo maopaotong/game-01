@@ -11,19 +11,34 @@ namespace fog
 {
     class TopBarUI : /* public Listener<State *, std::string &>,*/ public UIState
     {
+        static float getAmount(InventoryType type)
+        {
+            return Context<InventoryStateManager>::get()->getAmount(type);
+        }
+        static float getCapacity(InventoryType type)
+        {
+            return Context<InventoryStateManager>::get()->getCapacity(type);
+        }
+
     public:
         TopBarUI() : UIState("TopBar")
         {
         }
         void init() override
         {
-            // actorPosition = this->getProperty<Vector3>("actor1.position", false);
             UIState::init();
         }
 
         void doOpen() override
         {
-            ImGui::Text("Population: %d", Context<InventoryStateManager>::get()->getTotalPopulation());
+            for(auto it = InventoryTypeToString.begin(); it != InventoryTypeToString.end(); ++it){
+                InventoryType type = it->first;
+                std::string name = it->second;
+                ImGui::Text("%s: %.0f/%.0f", name.c_str(), getAmount(type), getCapacity(type));
+                ImGui::SameLine();
+            }
+            ImGui::NewLine();            
+
         }
     };
 

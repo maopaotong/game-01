@@ -86,11 +86,14 @@ namespace fog
         }
         virtual ~State()
         {
-            // todo delete child.
-            // todo remove sceneNode...
-
-            // std::cout << "~State()" << this << "" << std::endl;
-            // this->children.clear();
+            // children no need to delete , unique ptr will help.
+            // 
+            if(this->sceNode){
+                State::set(this->sceNode, nullptr);
+                Node * pNode = this->sceNode->getParent();
+                pNode->removeChild(this->sceNode);
+                this->sceNode = nullptr;
+            }            
         }
         
         State * getParent(){

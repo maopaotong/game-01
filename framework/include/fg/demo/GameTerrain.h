@@ -30,7 +30,7 @@ namespace fog
     {
         const String FFP_Transform = "FFP_Transform";
         const float flatHight = 0.0f;
-        const float terrainScale = 100.0f; // height
+        const float terrainScale = 25.0f; // height
 
         float minHeight0 = 40;
         float fadeDist0 = 30;

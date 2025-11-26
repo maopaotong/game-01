@@ -16,20 +16,26 @@ namespace fog
     protected:
         CellKey cKey;
         State *building;
+        float amount;
 
     public:
-        BuildingPlan(State *building) : building(building)
+        BuildingPlan(State *building, float amount) : building(building), amount(amount)
         {
         }
 
-        void setBuilding(State *state)
+        template <typename T>
+        T *exchangeBuilding(State *state)
         {
-            if (this->building)
-            {
-                delete this->building;
-            }
-            this->building = state;
+
+            State *ret = std::exchange(this->building, state);
+
+            return static_cast<T *>(ret);
         }
+        float getAmount() const
+        {
+            return this->amount;
+        }
+
         State *getBuilding()
         {
             return this->building;
@@ -41,6 +47,12 @@ namespace fog
                 delete this->building;
                 this->building = nullptr;
             }
+        }
+
+        void moveToCell(CellKey cKey)
+        {
+            this->cKey = cKey;
+            this->building->findSceneNode()->setPosition(Context<Cell::Center>::get()->getCell(cKey).getOrigin3D());
         }
     };
 
@@ -87,10 +99,9 @@ namespace fog
                                                        {
                                                            if (type == MouseCellEventType::MouseEnterCell)
                                                            {
-                                                               if (this->plan)//move the position if has plan
+                                                               if (this->plan) // move the position if has plan
                                                                {
-                                                                   this->plan->getBuilding()->findSceneNode()->setPosition(
-                                                                       Context<Cell::Center>::get()->getCell(cKey).getOrigin3D());
+                                                                   this->plan->moveToCell(cKey);
                                                                }
                                                            }
 
@@ -98,19 +109,16 @@ namespace fog
                                                        });
             Context<Event::Bus>::get()-> //
                 subscribe<CellEventType, CellKey>([this](CellEventType type, CellKey cKey)
-                                                       {
-                                                           if (type == CellEventType::CellAsTarget)
-                                                           {
-                                                               if (this->plan)//finish the plan by set the position of the building.
-                                                               {
-
-                                                                   this->createBuildingAtCell(cKey);
-                                                                   delete this->plan;
-                                                                   this->plan = nullptr;
-                                                               }
-                                                           }
-                                                           return true; //
-                                                       });
+                                                  {
+                                                      if (type == CellEventType::CellAsTarget)
+                                                      {
+                                                          if (this->plan) // finish the plan by set the position of the building.
+                                                          {
+                                                              this->finishPlan(cKey);
+                                                          }
+                                                      }
+                                                      return true; //
+                                                  });
         }
 
         bool pick(Ray &ray) // pick a building.
@@ -146,38 +154,44 @@ namespace fog
         {
             if (this->plan)
             {
+                float invAmount = this->plan->getAmount();
+                Context<InventoryStateManager>::get()->returnInventory(InventoryType::BuildingPermit, invAmount);
                 delete this->plan;
                 this->plan = nullptr;
             }
-            Tower *tower = new Tower();
-            tower->init();
-            this->plan = new BuildingPlan(tower);
+
+            float invAmount = 1.0f;
+            bool success = Context<InventoryStateManager>::get()->consumeInventory(InventoryType::BuildingPermit, invAmount);
+
+            if (success)
+            {
+                Tower *tower = new Tower();
+                tower->init();
+                this->plan = new BuildingPlan(tower, invAmount);
+            }
+
             return true;
         }
 
-        bool createBuildingAtCell(CellKey cKey)
+        void finishPlan(CellKey cKey)
         {
 
             auto it = this->buildingsInCells.find(cKey);
-            if (it != this->buildingsInCells.end())
+            if (it == this->buildingsInCells.end()) // cannot build two at the same cell
             {
-                return false;
+
+                Tower *tower = this->plan->exchangeBuilding<Tower>(nullptr);
+                this->addChild(tower);
+                this->buildingsInCells[cKey].push_back(tower);
+            }
+            else
+            {
+                float invAmount = this->plan->getAmount();
+                Context<InventoryStateManager>::get()->returnInventory(InventoryType::BuildingPermit, invAmount);
             }
 
-            if (!Context<InventoryStateManager>::get()->consumeInventory(InventoryType::BuildingPermit, 1.0f))
-            {
-                return false;
-            }
-
-            Tower *tower = new Tower();
-            tower->init();
-            Cell::Instance ci = Context<Cell::Center>::get()->getCell(cKey);
-            Vector3 cisPos = ci.getOrigin3D();
-            tower->findSceneNode()->setPosition(cisPos);
-            this->addChild(tower);
-
-            this->buildingsInCells[cKey].push_back(tower);
-            return true;
+            delete this->plan;
+            this->plan = nullptr;
         }
     }; // end of class
 }; // end of namespace

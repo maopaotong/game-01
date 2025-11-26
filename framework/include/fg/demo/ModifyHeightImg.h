@@ -56,9 +56,9 @@ private:
     {
         const int TRANSITION_WIDTH = 5; // 过渡带半宽（总宽约 2*W+1）
 
-        const int LOOPS = 5;
+        const int LOOPS = 10;
 
-        const float STEP_SIZE = 1.0f / 4.0f /*4 pass*/ / static_cast<float>(LOOPS);
+        const float STEP_SIZE = 1.0f / static_cast<float>(LOOPS);
 
         // 1. 读取原始二值高度图（0.0f 或 1.0f）
 
@@ -137,10 +137,11 @@ private:
                 //
                 // float t = d0 / (d0 + d1);
                 // float h = t * t * (3 - 2 * t); // smoothstep
-                float total = LOOPS; //
+                float total = d0 + d1; //
                 float t = d0 / total;
                 float h = t;
-                // float h = t * t * (3 - 2 * t); // smoothstep
+                //h = t * t * (3 - 2 * t); // smoothstep
+
 
                 // 可选：限制过渡带宽度（只在 width 范围内平滑）
                 if (d0 > TRANSITION_WIDTH && d1 > TRANSITION_WIDTH)
