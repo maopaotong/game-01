@@ -9,7 +9,6 @@
 #include "fg/Pickable.h"
 #include "fg/core/PathFollow2MissionState.h"
 #include "fg/util/CollectionUtil.h"
-#include "fg/Movable.h"
 #include "fg/core/EntityState.h"
 namespace fog
 {

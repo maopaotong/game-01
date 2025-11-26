@@ -18,6 +18,5 @@
 #include "fg/Cell.h"
 namespace fog
 {
-    using BaseTask = Tasks::Task;
-    
+       
 };

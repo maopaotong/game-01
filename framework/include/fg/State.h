@@ -9,7 +9,6 @@
 #include "PathFollow2.h"
 #include "Pickable.h"
 #include "OgreFrameListener.h"
-#include "Movable.h"
 #include "fg/Event.h"
 #include "fg/Context.h"
 #include "fg/MeshBuild.h"
@@ -63,7 +62,6 @@ namespace fog
         List<UniquePtr<State>> children;
         bool active = false;
         Options options;
-        Tasks::Slots slots;
         std::string name;
         CellKey cKey;
 
@@ -116,17 +114,7 @@ namespace fog
             }
             return true;
         }
-        Tasks::Slots & getSlots(){
-            return this->slots;
-        }
-        Tasks::Slot * tryGetSlot(int idx){
-            return this->slots.tryGetSlot(idx);
-        }
-        Tasks::Slot *slot(int idx)
-        {
-            return this->slots.slot(idx);
-        }
-
+        
         virtual void init() {
 
         };

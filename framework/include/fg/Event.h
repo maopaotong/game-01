@@ -12,63 +12,21 @@
 #include <unordered_map>
 #include <memory>
 
-#include "fg/Listener.h"
-
 namespace fog
 {
 
     class Event
     {
     public:
-        class Mask
-        {
-        };
-
-        template <typename... Args>
-        class Center
-        {
-            std::vector<Listener<Args...> *> listeners;
-
-        public:
-            void addListener(Listener<Args...> *listener)
-            {
-                listeners.push_back(listener);
-            }
-
-            void emit(Args... evt)
-            {
-                for (auto listener : listeners)
-                {
-                    listener->onEvent(evt...);
-                }
-            }
-        };
-
         class Bus
         {
         public:
-            // template <typename... Args>
-            // void subscribe(std::function<void(Args...)> callback)
-            // {
-            //     getCallbacks<Args...>().push_back(std::move(callback));
-            // }
-
             template <typename... Args, typename F>
             void subscribe(F &&func)
             {
                 //
                 getCallbacks<Args...>().emplace_back(std::forward<F>(func));
             }
-
-            // template <typename... Args>
-            // void subscribe(Listener<Args...> *callback)
-            // {
-            //     std::function<void(Args...)> func = [callback](Args... args)
-            //     {
-            //         callback->onEvent(args...);
-            //     };
-            //     subscribe<Args...>(func);
-            // }
 
             template <typename... Args>
             void emit(Args... args)
@@ -80,7 +38,6 @@ namespace fog
             }
 
         private:
-            // 类型擦除：用基类指针统一管理不同事件类型的回调列表
             struct CallbackBase
             {
                 virtual ~CallbackBase() = default;
