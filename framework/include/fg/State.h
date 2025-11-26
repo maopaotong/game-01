@@ -92,6 +92,10 @@ namespace fog
             // std::cout << "~State()" << this << "" << std::endl;
             // this->children.clear();
         }
+        
+        State * getParent(){
+            return this->parent;
+        }
 
         CellKey getCellKey()
         {

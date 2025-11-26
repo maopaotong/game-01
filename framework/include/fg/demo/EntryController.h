@@ -33,6 +33,8 @@
 #include "fg/CellInstanceManager.h"
 #include "fg/PathingStateManager.h"
 #include "fg/demo/InputStateController.h"
+#include "fg/MovingStateManager.h"
+#include "fg/BuildingStateManager.h"    
 namespace fog
 {
     using namespace OgreBites;
@@ -51,11 +53,12 @@ namespace fog
         {
             if (evt.button == ButtonType::BUTTON_LEFT)
             {
-                mouseButtonLeftPressed(evt);
+                return mouseButtonLeftPressed(evt);
             }
             else if (evt.button == ButtonType::BUTTON_RIGHT)
             {
                 Context<MovingStateManager>::get()->movingActiveStateToCellByMousePosition(evt.x, evt.y);
+                
             }
             return false;
         }
@@ -68,7 +71,15 @@ namespace fog
             float ndcX = evt.x / (float)viewport->getActualWidth();
             float ndcY = evt.y / (float)viewport->getActualHeight();
             Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
-            Context<MovableStateManager>::get()->pick(ray);
+            
+            if(Context<MovableStateManager>::get()->pick(ray)){
+                return true;
+            }
+            if(Context<BuildingStateManager>::get()->pick(ray)){
+                return true;
+            }
+            
+
             return true;
         }
 

@@ -39,17 +39,17 @@ namespace fog
         {
             std::cout << "PathingStateManager created." << std::endl;
             Context<Event::Bus>::get()-> //
-                subscribe<EventType, State *>([this](EventType evtType, State *state)
+                subscribe<MovableEventType, State *>([this](MovableEventType evtType, State *state)
                                               {
-                                                  if (evtType == EventType::MovableStateUnpicked)
+                                                  if (evtType == MovableEventType::StateUnpicked)
                                                   {
                                                       this->setSource(nullptr);
                                                   }
-                                                  else if (evtType == EventType::MovableStatePicked)
+                                                  else if (evtType == MovableEventType::StatePicked)
                                                   {
                                                       this->setSource(state);
                                                   }
-                                                  else if (evtType == EventType::MovableStateStartMoving)
+                                                  else if (evtType == MovableEventType::StateStartMoving)
                                                   {
                                                       this->setSource(nullptr);
                                                   }

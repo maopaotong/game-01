@@ -8,12 +8,12 @@
 #include "UIState.h"
 namespace fog
 {
-    class ActiveTrayUI : /* public Listener<State *, std::string &>,*/ public UIState
+    class BuildingTrayUI : /* public Listener<State *, std::string &>,*/ public UIState
     {
         State *state;
 
     public:
-        ActiveTrayUI() : UIState("ActiveActor"), state(nullptr)
+        BuildingTrayUI() : UIState("BuildingTray"), state(nullptr)
         {
             
         }
@@ -22,14 +22,14 @@ namespace fog
             // actorPosition = this->getProperty<Vector3>("actor1.position", false);
             UIState::init();
             Context<Event::Bus>::get()-> //
-                subscribe<MovableEventType, State *>([this](MovableEventType et, State *s)
+                subscribe<BuildingEventType, State *>([this](BuildingEventType et, State *s)
                                               {
-                    if (et == MovableEventType::StatePicked)
+                    if (et == BuildingEventType::StatePicked)
                     {
                         this->state = s;
                         this->setActive(true);
                     }
-                    else if (et == MovableEventType::StateUnpicked)
+                    else if (et == BuildingEventType::StateUnpicked)
                     {
                         this->state = nullptr;
                         this->setActive(false);
@@ -43,7 +43,7 @@ namespace fog
             {
 
                 SceneNode *sNode = state->findSceneNode();
-                ImGui::Text(("Active State: " + std::to_string((uintptr_t)state)).c_str());
+                ImGui::Text(("Building State: " + std::to_string((uintptr_t)state)).c_str());
                 ImGui::SameLine();
                 ImGuiUtil::Text(sNode->getPosition());
                 counter++;
@@ -51,10 +51,7 @@ namespace fog
 
             if (!counter)
             {
-                ImGui::Text("No Active State");
-                if (ImGui::Button("Active actor"))
-                {
-                }
+                ImGui::Text("No Building State");                
             }
         }
     };

@@ -8,6 +8,7 @@
 #include "fg/CellInstanceManager.h"
 #include "fg/demo/EntryController.h"
 #include "fg/MovableStateManager.h"
+#include "fg/BuildingStateManager.h"
 namespace fog
 {
     class WorldState : public State
@@ -30,11 +31,16 @@ namespace fog
             CameraState *cameraState = new CameraState();
             root->addFrameListener(cameraState);
 
-            MovableStateManager *movableStateMgr = new MovableStateManager();
+            //
+            MovableStateManager *movableStateMgr = Context<MovableStateManager >::get();
             movableStateMgr->init();
             this->addChild(movableStateMgr);
-            Context<MovableStateManager >::set(movableStateMgr);
+            //Context<MovableStateManager >::set(movableStateMgr);
             //           
+            BuildingStateManager *buildingStateMgr = Context<BuildingStateManager >::get();
+            buildingStateMgr->init();
+            this->addChild(buildingStateMgr);
+            //
 
             MainInputListener *keyHandler = new MainInputListener(costMap);
             core->getAppContext()->addInputListener(keyHandler);

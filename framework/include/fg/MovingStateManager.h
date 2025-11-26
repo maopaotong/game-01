@@ -122,13 +122,13 @@ namespace fog
         MovingStateManager() : state(nullptr)
         {
             Context<Event::Bus>::get()-> //
-                subscribe<EventType, State *>([this](EventType evtType, State *state)
+                subscribe<MovableEventType, State *>([this](MovableEventType evtType, State *state)
                                               {
-                                                  if (evtType == EventType::MovableStatePicked)
+                                                  if (evtType == MovableEventType::StatePicked)
                                                   {
                                                       this->state = state;
                                                   }
-                                                  else if (evtType == EventType::MovableStateUnpicked)
+                                                  else if (evtType == MovableEventType::StateUnpicked)
                                                   {
                                                       this->state = nullptr;
                                                   }
@@ -201,7 +201,7 @@ namespace fog
             //
             MoveToCellTask *task = new MoveToCellTask(state, cKey2);
             this->tasks.push_back(std::unique_ptr<MoveToCellTask>(task));
-            Context<Event::Bus>::get()->emit<EventType, State *>(EventType::MovableStateStartMoving, state);
+            Context<Event::Bus>::get()->emit<MovableEventType, State *>(MovableEventType::StateStartMoving, state);
         }
         template <typename F>
         void forEachTask(F &&f)

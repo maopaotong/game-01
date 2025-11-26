@@ -48,12 +48,17 @@ namespace fog
         }
     };
 
-    enum EventType{
-        MovableStatePicked,
-        MovableStateUnpicked,
-        MovableStateStartMoving,
-        MovableStateEndMoving,
-        MovableStaeEnterCell,
-        MovableStateLeaveCell
+    enum class MovableEventType{
+        StatePicked,
+        StateUnpicked,
+        StateStartMoving,
+        StateEndMoving,
+        StaeEnterCell,
+        StateLeaveCell
     };
+    enum class BuildingEventType{
+        StatePicked,
+        StateUnpicked,
+    };
+    
 };

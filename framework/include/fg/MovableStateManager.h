@@ -5,6 +5,9 @@
 #include "fg/MaterialNames.h"
 #include "fg/MeshBuild.h"
 #include "fg/core/EntityState.h"
+#include "fg/core/Sinbad.h"
+#include "fg/core/Tower.h"
+
 namespace fog
 {
     class MovingState : public State, public Stairs
@@ -35,7 +38,7 @@ namespace fog
             this->state = state2;
             tryUpdateCis();
             Context<Event::Bus>::get()-> //
-                emit<EventType, State *>(state2 ? EventType::MovableStatePicked : EventType::MovableStateUnpicked, state2);
+                emit<MovableEventType, State *>(state2 ? MovableEventType::StatePicked : MovableEventType::StateUnpicked, state2);
         }
         void tryUpdateCis()
         {
@@ -78,9 +81,9 @@ namespace fog
         MovableStateManager()
         {
             Context<Event::Bus>::get()-> //
-                subscribe<EventType, State *>([this](EventType evtType, State *state)
+                subscribe<MovableEventType, State *>([this](MovableEventType evtType, State *state)
                                               {
-                                                  if (evtType == EventType::MovableStateStartMoving)
+                                                  if (evtType == MovableEventType::StateStartMoving)
                                                   {
                                                       this->movingState.setState(nullptr);
                                                   }
@@ -92,13 +95,14 @@ namespace fog
         }
         void init() override
         {
-            EntityState *actor1 = new EntityState("actor1");
+            EntityState *actor1 = new Sinbad();
             actor1->init();
             this->addChild(actor1);
 
-            EntityState *actor2 = new EntityState("actor2");
+            EntityState *actor2 = new Sinbad();
             actor2->init();
             this->addChild(actor2);
+
         }
         bool step(float time) override
         {
@@ -106,7 +110,7 @@ namespace fog
             return true;
         }
 
-        void pick(Ray &ray)
+        bool pick(Ray &ray)
         {
 
             // 创建射线查询对象
@@ -123,14 +127,16 @@ namespace fog
             {
                 Node *node = it.movable->getParentNode();
                 State *s = State::get(node);
-                if (s && s->pickable())
+                if (s && s->pickable()&&s->getParent() == this)
                 {
+                    
                     picked = s;
                     break;
                 }
             }
             Context<CoreMod>::get()->getSceneManager()->destroyQuery(rayQuery);
             this->movingState.setState(picked);
+            return picked != nullptr;
         }
 
     }; // end of class

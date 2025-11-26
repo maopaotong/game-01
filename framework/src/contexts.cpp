@@ -6,6 +6,7 @@
 #include "fg/MovableStateManager.h"
 #include "fg/PathingStateManager.h"
 #include "fg/demo/InputStateController.h"
+#include "fg/BuildingStateManager.h"
 namespace fog
 {
     // If the var here not initialised, app must provide the value.
@@ -58,6 +59,9 @@ namespace fog
 
     template <>
     InputStateController *Context<InputStateController>::ctxObj = new InputStateController();
+
+    template <>
+    BuildingStateManager *Context<BuildingStateManager>::ctxObj = new BuildingStateManager();
     
 
 };

@@ -15,35 +15,27 @@ namespace fog
 {
     using namespace Ogre;
     using Vector3Ref = Property::Ref<Vector3>;
-    
+
     class EntityState : public State
     {
-
-        constexpr static float ACTOR_SCALE = 5.0f;
-        constexpr static float ACTOR_HEIGHT = 10.0f;
 
     protected:
         Ogre::Entity *entity;
 
-        PathFollow2MissionState *mission = nullptr;
-        std::vector<std::string> aniNames = {"RunBase", "RunTop"};
-        float *actorScaleVptr;
-        float *actorHighVptr;
-        float actorHighOffset = 0.0f;
+        std::vector<std::string> aniNames;
+        float scale;
+        float heigh;
+        float heighOffset;
 
-        Vector3Ref position;
-
-        std::string name;
+        std::string mesh;
 
     public:
-        EntityState(std::string name) : name(name)
+        EntityState(std::string mesh, float scale, float height, std::vector<std::string> aniNames) : mesh(mesh),
+                                                                                                      scale(scale),
+                                                                                                      heigh(height),
+                                                                                                      aniNames(aniNames)
         {
-
-            this->actorScaleVptr = Context<Var<float>::Bag>::get()->createBindVptr(name + ".actorScale", ACTOR_SCALE, 0.0f, ACTOR_SCALE * 3);
-            this->actorHighVptr = Context<Var<float>::Bag>::get()->createBindVptr(name + ".actorHighVptr", ACTOR_HEIGHT, 0.0f, ACTOR_HEIGHT * 10);
-
-            this->actorHighOffset = *this->actorHighVptr / 2.0f * *actorScaleVptr;
-
+            this->heighOffset = this->heigh / 2.0f * scale;
         }
 
         ~EntityState()
@@ -54,20 +46,19 @@ namespace fog
         {
 
             SceneManager *sMgr = Context<CoreMod>::get()->getSceneManager();
-           
-            entity = sMgr->createEntity("Sinbad.mesh");
+
+            entity = sMgr->createEntity(mesh);
             entity->setQueryFlags(0x00000001);
 
             sceNode = sMgr->getRootSceneNode()->createChildSceneNode();
-            sceNode->setScale(*actorScaleVptr, *actorScaleVptr, *actorScaleVptr);
+            sceNode->setScale(scale, scale, scale);
             sceNode->attachObject(entity);
 
             this->setSceneNode(sceNode);
 
             float height = Context<Terrains>::get()->getHeightWithNormalAtWorldPosition(Vector3(0, 0, 0), nullptr);
 
-            this->position = this->createProperty(name + ".position", Vector3(0, height + this->actorHighOffset, 0));
-            sceNode->translate(this->position);
+            sceNode->translate(Vector3(0, height + this->heighOffset, 0));
             // init task owner.
         }
 
@@ -85,7 +76,7 @@ namespace fog
         }
         float getActorHighOffset()
         {
-            return this->actorHighOffset;
+            return this->heighOffset;
         }
     };
 }; // end of namespace
