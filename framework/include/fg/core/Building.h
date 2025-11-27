@@ -20,11 +20,9 @@ namespace fog
 
     protected:
         BuildingType type;
-        CellKey cKey;
-        float offsetY = 10.0f;
 
     public:
-        Building(BuildingType type, CellKey cKey) : ManualState(), cKey(cKey), type(type)
+        Building(BuildingType type) : ManualState(), type(type)
         {
         }
 
@@ -35,19 +33,25 @@ namespace fog
         virtual void init() override
         {
             ManualState::init();
+            
         }
-        void setCellKey(CellKey ckey)
-        {
-            this->cKey = ckey;
-            rebuildMesh();
-        }        
+        
 
         void rebuildMesh() override
         {
             MeshBuild::SpiderNet buildMesh(obj);
             buildMesh.begin(this->material);
-            Cell::Instance ci = Context<Cell::Center>::get()->getCell(CellKey(0, 0));
-            buildMesh(ci, ColourValue::Green);
+            //
+
+            Node2D * node2D = Context<Node2D>::get();
+            auto position=[node2D](Vector2 &pointOnLayer){
+                float scale = node2D->getScale();
+                 Vector2 pointIn2D = pointOnLayer * scale;
+                 Vector3 positionIn3D = node2D->plane->to3DInPlane(pointIn2D);
+                 return positionIn3D;
+            };
+
+            buildMesh(position, ColourValue::Green);
             buildMesh.end();
         }
     };

@@ -21,7 +21,7 @@ namespace fog
 
     protected:
         Ogre::ManualObject *obj;
-        
+
         std::string material = MaterialNames::materialNameInUse;
 
     public:
@@ -30,6 +30,8 @@ namespace fog
 
             Ogre::SceneManager *sceneMgr = Context<CoreMod>::get()->getSceneManager();
             obj = sceneMgr->createManualObject();
+            obj->setQueryFlags(0x00000001);
+
             this->sceNode = sceneMgr->getRootSceneNode()->createChildSceneNode();
             sceNode->attachObject(obj);
             //
@@ -43,7 +45,8 @@ namespace fog
 
         virtual void init() override
         {
-            rebuildMesh();
+            rebuildMesh();            
+            this->setSceneNode(sceNode);
         }
 
         virtual void rebuildMesh() = 0;

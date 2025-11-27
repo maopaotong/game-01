@@ -24,13 +24,12 @@ namespace fog
         {
         }
 
-        template <typename T>
-        T *exchangeBuilding(State *state)
+        State *exchangeBuilding(State *state)
         {
 
             State *ret = std::exchange(this->building, state);
 
-            return static_cast<T *>(ret);
+            return ret;
         }
         float getAmount() const
         {
@@ -53,7 +52,7 @@ namespace fog
         void moveToCell(CellKey cKey)
         {
             this->cKey = cKey;
-            Vector3 pos3 = Context<Cell::Center>::get()->getCell(cKey).getOrigin3D() + Vector3(0.0f, 10.0f, 0.0f);
+            Vector3 pos3 = Context<Cell::Center>::get()->getCell(cKey).getOrigin3D() ;//+ Vector3(0.0f, 10.0f, 0.0f);
             
             this->building->findSceneNode()->setPosition(pos3);
         }
@@ -176,7 +175,7 @@ namespace fog
                 }
                 else
                 {
-                    building = new Building(type, CellKey(0, 0));
+                    building = new Building(type);
                     building->init();
                 }
 
@@ -193,12 +192,12 @@ namespace fog
             if (it == this->buildingsInCells.end()) // cannot build two at the same cell
             {
 
-                Tower *tower = this->plan->exchangeBuilding<Tower>(nullptr);
-                this->addChild(tower);
-                this->buildingsInCells[cKey].push_back(tower);
+                State *building = this->plan->exchangeBuilding(nullptr);
+                this->addChild(building);
+                this->buildingsInCells[cKey].push_back(building);
             }
             else
-            {
+            {   //failed to build on the target cell.
                 float invAmount = this->plan->getAmount();
                 Context<InventoryStateManager>::get()->returnInventory(InventoryType::BuildingPermit, invAmount);
             }

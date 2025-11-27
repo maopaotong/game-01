@@ -230,8 +230,8 @@ namespace fog
             {
                 AutoNormManualObject *obj;
                 ColourValue color;
-                Cell::Instance *cell;
-                Vector2 origin;
+                //Cell::Instance *cell;
+                //Vector2 origin;
 
                 int layer;
                 int layerSize;
@@ -243,11 +243,12 @@ namespace fog
                 // so it visits each cell and each points of cells.
                 int idx; // point index
 
-                void operator()(int pIdx, Vector2 &pointOnCircle)
+                template<typename F>
+                void operator()(int pIdx, Vector2 &pointOnCircle, F&&to3DFunc)
                 {
                     Vector2 pointOnLayer = pointOnCircle * ((float)layer / (float)totalLayer);
-                    Vector3 pos = cell->node->to3D(origin, pointOnLayer, nullptr);
-
+                    //Vector3 pos = cell->node->to3D(origin, pointOnLayer, nullptr);
+                    Vector3 pos = to3DFunc(pointOnLayer);
                     obj->position(pos);
                     obj->colour(color);
 
@@ -308,12 +309,18 @@ namespace fog
                 visitPoint.idx = baseIndex;
             }
 
+            void operator()(Cell::Instance &cell, ColourValue color){
+                operator()([&cell,this](Vector2 &pointOnLayer){
+                    return cell.node->to3D(cell.getOrigin2D(), pointOnLayer, useDefaultNorm ? &defaultNorm : nullptr);
+                }, color);
+            }
             // each cell visit op.
-            void operator()(Cell::Instance &cell, ColourValue color)
+            template<typename F>
+            void operator()(F&&to3DFunc, ColourValue color)
             {
-                visitPoint.cell = &cell;
+                //visitPoint.cell = &cell;
+                //visitPoint.origin = cell.getOrigin2D();
                 visitPoint.color = color;
-                visitPoint.origin = cell.getOrigin2D();
                 visitPoint.layerSize = 0;
                 //
                 for (int i = visitPoint.botLayer; i < visitPoint.topLayer + 1; i++)
@@ -322,7 +329,7 @@ namespace fog
                     visitPoint.preLayerSize = visitPoint.layerSize;
                     visitPoint.layerSize = layerSize(i);
 
-                    Cell::forEachPointOnCircle(visitPoint.layerSize, 0.0f, visitPoint);
+                    Cell::forEachPointOnCircle(visitPoint.layerSize, 0.0f, visitPoint, to3DFunc);
                 }
                 objProxy.commit();
             }

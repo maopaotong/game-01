@@ -40,9 +40,14 @@ namespace fog
             this->origin = origin;
         }
 
+        Vector3 to3DInPlane(Vector2 point){
+            Vector3 ret = Vector3(point.x, 0, -point.y);
+            return ret;
+        }
+
         Vector3 to3D(Vector2 point, Vector3 *norm)
         {
-            Vector3 ret = Vector3(point.x, 0, -point.y);
+            Vector3 ret = to3DInPlane(point);
             ret = ret + origin;
 
             ret.y = height(ret, norm);
@@ -82,6 +87,11 @@ namespace fog
         {
             Vector2 ret = this->plane->to2D(pos);
             return ret;
+        }
+
+        float getScale()
+        {
+            return this->scale;
         }
 
         Vector3 to3D(Vector2 cellOrigin, Vector2 pointInCell, Vector3 *norm)
