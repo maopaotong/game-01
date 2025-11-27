@@ -10,8 +10,6 @@
 #include "Cell.h"
 #define FG_REPORT_ERROR_INDEX_OUT_OF_RANGE 0
 #define FG_SPIDER_TOTAL_LAYER 3
-#define FG_SPIDER_TOP_LAYER 3
-#define FG_SPIDER_BOTTOM_LAYER 0
 
 using namespace Ogre;
 
@@ -113,7 +111,7 @@ namespace fog
             int v3;
         };
 
-        class AutoNormManualObject
+        class NormManualObject
         {
         public:
             ManualObject *obj;
@@ -228,7 +226,7 @@ namespace fog
         public:
             struct PointVisit
             {
-                AutoNormManualObject *obj;
+                NormManualObject *obj;
                 ColourValue color;
                 // Cell::Instance *cell;
                 // Vector2 origin;
@@ -237,8 +235,7 @@ namespace fog
                 int layerSize;
                 int preLayerSize;
                 int totalLayer = FG_SPIDER_TOTAL_LAYER; // settings global
-                int topLayer = FG_SPIDER_TOP_LAYER;
-                int botLayer = FG_SPIDER_BOTTOM_LAYER;
+                
                 // to build the mesh, this context alive on the whole building operation.
                 // so it visits each cell and each points of cells.
                 int idx; // point index
@@ -246,9 +243,10 @@ namespace fog
                 template <typename F>
                 void operator()(int pIdx, Vector2 &pointOnCircle, F &&positionFunc)
                 {
-                    Vector2 pointOnLayer = pointOnCircle * ((float)layer / (float)totalLayer);
-                    // Vector3 pos = cell->node->to3D(origin, pointOnLayer, nullptr);
-                    Vector3 pos = positionFunc(pointOnLayer);
+                    // Vector2 pointOnLayer = pointOnCircle * ((float)layer / (float)totalLayer);
+                    //  Vector3 pos = cell->node->to3D(origin, pointOnLayer, nullptr);
+                    // Vector3 pos = positionFunc(pointOnLayer);
+                    Vector3 pos = positionFunc(pointOnCircle, layer, totalLayer);
                     obj->position(pos);
                     obj->colour(color);
 
@@ -259,7 +257,7 @@ namespace fog
                     int j = pIdx; //
                     // skip i==0
 
-                    if (i > botLayer) //
+                    if (i > 0) //
                     {
                         // (j-1-size1)        .       .     .   .   .   .
                         //         |   \     | \      | \   | \ | \ | \ |
@@ -293,7 +291,7 @@ namespace fog
             PointVisit visitPoint;
             bool useDefaultNorm = true;
             Vector3 defaultNorm = Vector3::UNIT_Y;
-            AutoNormManualObject objProxy;
+            NormManualObject normObj;
 
             SpiderNet(ManualObject *obj) : obj(obj) {}
             void begin(std::string material)
@@ -302,17 +300,22 @@ namespace fog
                 obj->begin(material, Ogre::RenderOperation::OT_TRIANGLE_LIST);
                 baseIndex = obj->getCurrentVertexCount();
                 //
-                visitPoint.obj = &objProxy;
+                visitPoint.obj = &normObj;
 
-                objProxy.begin(obj);
+                normObj.begin(obj);
 
                 visitPoint.idx = baseIndex;
             }
 
             void operator()(Cell::Instance &cell, ColourValue color)
             {
-                operator()([&cell, this](Vector2 & pointOnLayer)
-                           { return cell.node->to3D(cell.getOrigin2D(), pointOnLayer, useDefaultNorm ? &defaultNorm : nullptr); }, color);
+                operator()([&cell, this](Vector2 & pointOnCircle, int layer, int totalLayer)
+                           {
+                               Vector2 pointOnLayer = pointOnCircle * ((float)layer / (float)totalLayer);
+                               return cell.node->to3D(cell.getOrigin2D(), pointOnLayer, useDefaultNorm ? &defaultNorm : nullptr); //
+                           },
+                           color //
+                );
             }
             // each cell visit op.
             template <typename F>
@@ -323,7 +326,7 @@ namespace fog
                 visitPoint.color = color;
                 visitPoint.layerSize = 0;
                 //
-                for (int i = visitPoint.botLayer; i < visitPoint.topLayer + 1; i++)
+                for (int i = 0; i < visitPoint.totalLayer; i++)
                 {
                     visitPoint.layer = i;
                     visitPoint.preLayerSize = visitPoint.layerSize;
@@ -331,7 +334,7 @@ namespace fog
 
                     Cell::forEachPointOnCircle(visitPoint.layerSize, 0.0f, visitPoint, positionFunc);
                 }
-                objProxy.commit();
+                normObj.commit();
             }
 
             int layerSize(int layer)
@@ -361,7 +364,6 @@ namespace fog
 
             void operator()(ColourValue color)
             {
-
             }
             void end()
             {

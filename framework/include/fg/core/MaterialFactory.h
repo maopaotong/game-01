@@ -25,79 +25,104 @@
 #include <OgreTechnique.h>
 #include "fg/MaterialNames.h"
 
-namespace fog{
-// === Custom hash function ===
-//
-// === Hexagonal Map Visualizer class ===
-using namespace Ogre;
-using namespace OgreBites;
-
-class MaterialFactory
+namespace fog
 {
-private:
-    // 在你的 HexMapVisualizer 构造函数或初始化函数中调用
-    static Ogre::MaterialPtr createVertexColourMaterialForSelected(MaterialManager * matMgr)
+    // === Custom hash function ===
+    //
+    // === Hexagonal Map Visualizer class ===
+    using namespace Ogre;
+    using namespace OgreBites;
+
+    class MaterialFactory
     {
-        using namespace Ogre;
+    private:
+        // 在你的 HexMapVisualizer 构造函数或初始化函数中调用
+        static Ogre::MaterialPtr createVertexColourMaterialForSelected(MaterialManager *matMgr)
+        {
+            using namespace Ogre;
 
-        // 创建材质，名称和资源组
-        MaterialPtr mat = matMgr->create(MaterialNames::materialNameSelected, "General");
+            // 创建材质，名称和资源组
+            MaterialPtr mat = matMgr->create(MaterialNames::materialNameSelected, "General");
 
-        // 禁用阴影接收
-        mat->setReceiveShadows(false);
-        mat->setDepthWriteEnabled(false);
-        mat->setTransparencyCastsShadows(false);
+            // 禁用阴影接收
+            mat->setReceiveShadows(false);
+            mat->setDepthWriteEnabled(false);
+            mat->setTransparencyCastsShadows(false);
 
-        // 获取默认技术（Ogre 2.x 默认会自动创建一个）
-        Technique *tech = mat->getTechnique(0);
+            // 获取默认技术（Ogre 2.x 默认会自动创建一个）
+            Technique *tech = mat->getTechnique(0);
 
-        // 配置 Pass
-        Pass *pass = tech->getPass(0);
-        pass->setVertexColourTracking(TrackVertexColourEnum::TVC_EMISSIVE); // 自发光
-        pass->setSceneBlending(Ogre::SceneBlendType::SBT_TRANSPARENT_ALPHA);
-        pass->setDepthCheckEnabled(false);
-        pass->setLightingEnabled(false);
-        pass->setSelfIllumination(1, 1, 0.8);
-        pass->setDepthBias(1.0f, 0.0f);
-        return mat;
-    }
-    static Ogre::MaterialPtr createVertexColourMaterial(MaterialManager * matMgr)
-    {
-        using namespace Ogre;
+            // 配置 Pass
+            Pass *pass = tech->getPass(0);
+            pass->setVertexColourTracking(TrackVertexColourEnum::TVC_EMISSIVE); // 自发光
+            pass->setSceneBlending(Ogre::SceneBlendType::SBT_TRANSPARENT_ALPHA);
+            pass->setDepthCheckEnabled(false);
+            pass->setLightingEnabled(false);
+            pass->setSelfIllumination(1, 1, 0.8);
+            pass->setDepthBias(1.0f, 0.0f);
+            return mat;
+        }
+        static Ogre::MaterialPtr createVertexColourMaterial(MaterialManager *matMgr)
+        {
+            using namespace Ogre;
 
-        // 创建材质，名称和资源组
-        MaterialPtr mat = matMgr->create(MaterialNames::materialNameToCreate, "General");
+            // 创建材质，名称和资源组
+            MaterialPtr mat = matMgr->create(MaterialNames::materialNameToCreate, "General");
 
-        // 禁用阴影接收
-        mat->setReceiveShadows(false);
+            // 禁用阴影接收
+            mat->setReceiveShadows(false);
 
-        // 获取默认技术（Ogre 2.x 默认会自动创建一个）
-        Technique *tech = mat->getTechnique(0);
+            // 获取默认技术（Ogre 2.x 默认会自动创建一个）
+            Technique *tech = mat->getTechnique(0);
 
-        // 配置 Pass
-        Pass *pass = tech->getPass(0);
-        pass->setLightingEnabled(true);
-        pass->setVertexColourTracking(TrackVertexColourEnum::TVC_DIFFUSE); // 漫反射
-        // pass->setVertexColourTracking(TrackVertexColourEnum::TVC_AMBIENT);//环境光
-        // pass->setVertexColourTracking(TrackVertexColourEnum::TVC_EMISSIVE);//自发光
-        // pass->setVertexColourTracking(TrackVertexColourEnum::TVC_SPECULAR);//镜面反射
-        return mat;
-    }
+            // 配置 Pass
+            Pass *pass = tech->getPass(0);
+            pass->setLightingEnabled(true);
+            pass->setVertexColourTracking(TrackVertexColourEnum::TVC_DIFFUSE); // 漫反射
+            // pass->setVertexColourTracking(TrackVertexColourEnum::TVC_AMBIENT);//环境光
+            // pass->setVertexColourTracking(TrackVertexColourEnum::TVC_EMISSIVE);//自发光
+            // pass->setVertexColourTracking(TrackVertexColourEnum::TVC_SPECULAR);//镜面反射
+            return mat;
+        }
+        static Ogre::MaterialPtr createVertexColourMaterialBuilding(MaterialManager *matMgr)
+        {
+            using namespace Ogre;
 
-    void update()
-    {
-    }
+            // 创建材质，名称和资源组
+            MaterialPtr mat = matMgr->create(MaterialNames::materialNameBuilding, "General");
 
-public:
-    static void createMaterials(MaterialManager * matMgr)
-    {
-        //
-        // Create hexagonal grid object
+            // 禁用阴影接收
+            mat->setReceiveShadows(true);
 
-        //
-        createVertexColourMaterial(matMgr);
-        createVertexColourMaterialForSelected(matMgr); // for selected
-    }
-};
+            // 获取默认技术（Ogre 2.x 默认会自动创建一个）
+            Technique *tech = mat->getTechnique(0);
 
-};//end of namespace
+            // 配置 Pass
+            Pass *pass = tech->getPass(0);
+            pass->setLightingEnabled(true);
+            pass->setVertexColourTracking(TrackVertexColourEnum::TVC_DIFFUSE   // 漫反射
+                                          | TrackVertexColourEnum::TVC_AMBIENT // 环境光
+            );
+            // pass->setVertexColourTracking(TrackVertexColourEnum::TVC_EMISSIVE);//自发光
+            // pass->setVertexColourTracking(TrackVertexColourEnum::TVC_SPECULAR);//镜面反射
+            return mat;
+        }
+
+        void update()
+        {
+        }
+
+    public:
+        static void createMaterials(MaterialManager *matMgr)
+        {
+            //
+            // Create hexagonal grid object
+
+            //
+            createVertexColourMaterial(matMgr);
+            createVertexColourMaterialForSelected(matMgr); // for selected
+            createVertexColourMaterialBuilding(matMgr);    // for building
+        }
+    };
+
+}; // end of namespace
