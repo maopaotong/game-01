@@ -230,8 +230,8 @@ namespace fog
             {
                 AutoNormManualObject *obj;
                 ColourValue color;
-                //Cell::Instance *cell;
-                //Vector2 origin;
+                // Cell::Instance *cell;
+                // Vector2 origin;
 
                 int layer;
                 int layerSize;
@@ -243,12 +243,12 @@ namespace fog
                 // so it visits each cell and each points of cells.
                 int idx; // point index
 
-                template<typename F>
-                void operator()(int pIdx, Vector2 &pointOnCircle, F&&to3DFunc)
+                template <typename F>
+                void operator()(int pIdx, Vector2 &pointOnCircle, F &&positionFunc)
                 {
                     Vector2 pointOnLayer = pointOnCircle * ((float)layer / (float)totalLayer);
-                    //Vector3 pos = cell->node->to3D(origin, pointOnLayer, nullptr);
-                    Vector3 pos = to3DFunc(pointOnLayer);
+                    // Vector3 pos = cell->node->to3D(origin, pointOnLayer, nullptr);
+                    Vector3 pos = positionFunc(pointOnLayer);
                     obj->position(pos);
                     obj->colour(color);
 
@@ -309,17 +309,17 @@ namespace fog
                 visitPoint.idx = baseIndex;
             }
 
-            void operator()(Cell::Instance &cell, ColourValue color){
-                operator()([&cell,this](Vector2 &pointOnLayer){
-                    return cell.node->to3D(cell.getOrigin2D(), pointOnLayer, useDefaultNorm ? &defaultNorm : nullptr);
-                }, color);
+            void operator()(Cell::Instance &cell, ColourValue color)
+            {
+                operator()([&cell, this](Vector2 & pointOnLayer)
+                           { return cell.node->to3D(cell.getOrigin2D(), pointOnLayer, useDefaultNorm ? &defaultNorm : nullptr); }, color);
             }
             // each cell visit op.
-            template<typename F>
-            void operator()(F&&to3DFunc, ColourValue color)
+            template <typename F>
+            void operator()(F &&positionFunc, ColourValue color)
             {
-                //visitPoint.cell = &cell;
-                //visitPoint.origin = cell.getOrigin2D();
+                // visitPoint.cell = &cell;
+                // visitPoint.origin = cell.getOrigin2D();
                 visitPoint.color = color;
                 visitPoint.layerSize = 0;
                 //
@@ -329,7 +329,7 @@ namespace fog
                     visitPoint.preLayerSize = visitPoint.layerSize;
                     visitPoint.layerSize = layerSize(i);
 
-                    Cell::forEachPointOnCircle(visitPoint.layerSize, 0.0f, visitPoint, to3DFunc);
+                    Cell::forEachPointOnCircle(visitPoint.layerSize, 0.0f, visitPoint, positionFunc);
                 }
                 objProxy.commit();
             }
@@ -344,5 +344,29 @@ namespace fog
                 this->obj->end();
             }
         }; // end of spider net.
+
+        class HexPrism
+        {
+            ManualObject *obj;
+            int baseIndex;
+
+        public:
+            HexPrism(ManualObject *obj) : obj(obj) {}
+            void begin(std::string material)
+            {
+                obj->clear();
+                obj->begin(material, Ogre::RenderOperation::OT_TRIANGLE_LIST);
+                baseIndex = obj->getCurrentVertexCount();
+            }
+
+            void operator()(ColourValue color)
+            {
+
+            }
+            void end()
+            {
+                this->obj->end();
+            }
+        };
     };
 };
