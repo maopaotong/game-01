@@ -8,6 +8,8 @@
 #include "fg/demo/InputStateController.h"
 #include "fg/BuildingStateManager.h"
 #include "fg/InventoryStateManager.h"
+#include "fg/CameraState.h"
+#include "fg/MouseCameraController.h"
 namespace fog
 {
     // If the var here not initialised, app must provide the value.
@@ -67,5 +69,9 @@ namespace fog
     template <>
     InventoryStateManager *Context<InventoryStateManager>::ctxObj = new InventoryStateManager();
     
-
+    template <>
+    CameraState *Context<CameraState>::ctxObj = new CameraState();
+    
+    template <>
+    MouseCameraController *Context<MouseCameraController>::ctxObj = new MouseCameraController();
 };

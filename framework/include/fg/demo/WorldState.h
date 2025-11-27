@@ -1,9 +1,8 @@
 #pragma once
 #include "fg/State.h"
 #include "CellStateControl.h"
-#include "fg/core/CameraState.h"
+#include "fg/CameraState.h"
 #include "fg/core/EntityState.h"
-#include "fg/core/MouseCameraController.h"
 #include "fg/MovingStateManager.h"
 #include "fg/CellInstanceManager.h"
 #include "fg/demo/EntryController.h"
@@ -28,10 +27,6 @@ namespace fog
             this->cells = new CellStateControl();
             this->cells->init();
             this->addChild(this->cells);
-
-            CameraState *cameraState = new CameraState();
-            root->addFrameListener(cameraState);
-
             //
             MovableStateManager *movableStateMgr = Context<MovableStateManager >::get();
             movableStateMgr->init();
@@ -47,9 +42,6 @@ namespace fog
             inventoryStateMgr->init();
             this->addChild(inventoryStateMgr);
             //
-
-            MainInputListener *keyHandler = new MainInputListener(costMap);
-            core->getAppContext()->addInputListener(keyHandler);
 
             EntryController *entryController = new EntryController();
             core->getAppContext()->addInputListener(entryController);

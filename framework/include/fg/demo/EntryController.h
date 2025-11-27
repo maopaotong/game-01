@@ -33,7 +33,8 @@
 #include "fg/PathingStateManager.h"
 #include "fg/demo/InputStateController.h"
 #include "fg/MovingStateManager.h"
-#include "fg/BuildingStateManager.h"    
+#include "fg/BuildingStateManager.h"
+#include "fg/MouseCameraController.h"
 namespace fog
 {
     using namespace OgreBites;
@@ -41,13 +42,18 @@ namespace fog
     // === Custom hash function ===
     //
     // === Input handler for closing application ===
-    
+
     class EntryController : public OgreBites::InputListener, public FrameListener
     {
 
     public:
         EntryController()
         {
+        }
+        bool mouseWheelRolled(const MouseWheelEvent &evt)
+        {
+            Context<MouseCameraController>::get()->mouseWheelRolled(evt);
+            return false;
         }
         bool mousePressed(const MouseButtonEvent &evt) override
         {
@@ -70,14 +76,15 @@ namespace fog
             float ndcX = evt.x / (float)viewport->getActualWidth();
             float ndcY = evt.y / (float)viewport->getActualHeight();
             Ogre::Ray ray = camera->getCameraToViewportRay(ndcX, ndcY);
-            
-            if(Context<MovableStateManager>::get()->pick(ray)){
+
+            if (Context<MovableStateManager>::get()->pick(ray))
+            {
                 return true;
             }
-            if(Context<BuildingStateManager>::get()->pick(ray)){
+            if (Context<BuildingStateManager>::get()->pick(ray))
+            {
                 return true;
             }
-            
 
             return true;
         }
@@ -103,7 +110,7 @@ namespace fog
         {
             Context<PathingStateManager>::get()->step(evt.timeSinceLastFrame);
             Context<MovableStateManager>::get()->step(evt.timeSinceLastFrame);
-
+            Context<CameraState>::get()->step(evt.timeSinceLastFrame);
             return true;
         }
     };

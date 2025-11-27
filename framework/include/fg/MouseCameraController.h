@@ -37,7 +37,7 @@ namespace fog
     // === Custom hash function ===
     //
     // === Input handler for closing application ===
-    class MainInputListener : public OgreBites::InputListener
+    class MouseCameraController
     {
         static constexpr float DEFAULT_CAMERA_TOP_DISTANCE = 2 * 1000.0f;
         static constexpr float DEFAULT_CAMERA_HIGH_MIN = 100.0f;
@@ -45,50 +45,39 @@ namespace fog
         static constexpr float DEFAULT_CAMERA_ROLL_SPEED = (DEFAULT_CAMERA_HITH_MAX - DEFAULT_CAMERA_HIGH_MIN) / 10.0f;
 
     private:
-        float *cameraTopDistanceVptr;
-        float *cameraHighMinVptr;
-        float *cameraHighMaxVptr;
-        float *cameraRollSpeedVptr;
-        CostMap *costMap;
+        float cameraTopDistance;
+        float cameraHighMin;
+        float cameraHighMax;
+        float cameraRollSpeed;
 
     public:
-        MainInputListener(CostMap *costMap) : costMap(costMap)
+        MouseCameraController() : cameraTopDistance(DEFAULT_CAMERA_TOP_DISTANCE),
+                                  cameraHighMin(DEFAULT_CAMERA_HIGH_MIN),
+                                  cameraHighMax(DEFAULT_CAMERA_HITH_MAX),
+                                  cameraRollSpeed(DEFAULT_CAMERA_ROLL_SPEED)
         {
-            this->cameraTopDistanceVptr = Context<Var<float>::Bag>::get()->createBindVptr(".viewportTopDistance", DEFAULT_CAMERA_TOP_DISTANCE, 0.0f, DEFAULT_CAMERA_TOP_DISTANCE * 3); //
-            this->cameraHighMinVptr = Context<Var<float>::Bag>::get()->createBindVptr(".cameraHighMin", DEFAULT_CAMERA_HIGH_MIN, 0.0f, DEFAULT_CAMERA_HIGH_MIN * 3);                   //
-            this->cameraHighMaxVptr = Context<Var<float>::Bag>::get()->createBindVptr(".cameraHighMax", DEFAULT_CAMERA_HITH_MAX, 0.0f, DEFAULT_CAMERA_HITH_MAX * 3);                   //
-            this->cameraRollSpeedVptr = Context<Var<float>::Bag>::get()->createBindVptr(".cameraRollSpeed", DEFAULT_CAMERA_ROLL_SPEED, 0.0f, DEFAULT_CAMERA_ROLL_SPEED * 3);           //
-        }
-       
-
-        bool mouseReleased(const MouseButtonEvent &evt) override
-        {
-            if (evt.button == ButtonType::BUTTON_LEFT)
-            {
-            }
-            return false;
         }
 
-        bool mouseWheelRolled(const MouseWheelEvent &evt) override
+        bool mouseWheelRolled(const MouseWheelEvent &evt)
         {
             Camera *cam = Context<CoreMod>::get()->getCamera();
             Ogre::SceneNode *node = cam->getParentSceneNode();
-            Vector3 translate = Ogre::Vector3::NEGATIVE_UNIT_Y * evt.y * *cameraRollSpeedVptr;
+            Vector3 translate = Ogre::Vector3::NEGATIVE_UNIT_Y * evt.y * cameraRollSpeed;
             Vector3 posTarget = node->getPosition() + translate;
-            if (posTarget.y < *this->cameraHighMinVptr)
+            if (posTarget.y < this->cameraHighMin)
             {
-                posTarget.y = *this->cameraHighMinVptr;
+                posTarget.y = this->cameraHighMin;
             }
-            if (posTarget.y > *this->cameraHighMaxVptr)
+            if (posTarget.y > this->cameraHighMax)
             {
-                posTarget.y = *this->cameraHighMaxVptr;
+                posTarget.y = this->cameraHighMax;
             }
 
             node->setPosition(posTarget);
 
             Context<Var<Vector3>::Bag>::get()->setVar(".camera.position", posTarget);
 
-            alignHorizonToTop(node, cam, *this->cameraTopDistanceVptr);
+            alignHorizonToTop(node, cam, this->cameraTopDistance);
             return false;
         }
         void alignHorizonToTop(Ogre::SceneNode *camNode, Ogre::Camera *cam, Ogre::Real distance)

@@ -35,7 +35,7 @@ namespace fog
     using namespace Ogre;
 
     // === Frame Listener class for main loop ===
-    class CameraState : public Ogre::FrameListener, public State
+    class CameraState : public State, public Stairs
     {
     private:
         bool quit;
@@ -70,7 +70,7 @@ namespace fog
             return false;
         }
 
-        bool frameStarted(const Ogre::FrameEvent &evt) override
+        bool step(float timeSinceLastFrame) override
         {
             // std::cout << "Frame started!\n";
 
@@ -93,19 +93,19 @@ namespace fog
             if (inputState->isFront())
             {
                 // node->translate(-back * speed * evt.timeSinceLastFrame);
-                step += -back * speed * evt.timeSinceLastFrame;
+                step += -back * speed * timeSinceLastFrame;
             }
             if (inputState->isBack())
             {
-                step += (back * speed * evt.timeSinceLastFrame);
+                step += (back * speed * timeSinceLastFrame);
             }
             if (inputState->isLeft())
             {
-                step += (-right * speed * evt.timeSinceLastFrame);
+                step += (-right * speed * timeSinceLastFrame);
             }
             if (inputState->isRight())
             {
-                step += (right * speed * evt.timeSinceLastFrame);
+                step += (right * speed * timeSinceLastFrame);
             }
 
             Vector3 position2 = position + step;
