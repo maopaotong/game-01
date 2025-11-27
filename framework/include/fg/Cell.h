@@ -15,8 +15,8 @@ namespace fog
     class Cell
     {
     public:
-        template <typename F>
-        static void forEachPointOnCircle(float size, float offsetAngle, F &&visit)
+        template <typename F, typename... Args>
+        static void forEachPointOnCircle(float size, float offsetAngle, F &&visit, Args... args)
         {
 
             // rad=1, RAD=2
@@ -30,7 +30,7 @@ namespace fog
                 float dx = std::cos(angle_rad);
                 float dy = std::sin(angle_rad);
 
-                visit(i, Ogre::Vector2(dx, dy));
+                visit(i, Ogre::Vector2(dx, dy), args...);
             }
         };
 
@@ -80,7 +80,6 @@ namespace fog
                 Vector2 origin2D = getOrigin2D();
                 return node->to3D(origin2D);
             }
-
         };
 
         class Center
@@ -100,8 +99,9 @@ namespace fog
                 Vector3 pos3D = root->to3D(pos2D);
                 root->plane->setOrigin(Vector3(-pos3D.x, 0.0f, -pos3D.z));
             }
-            
-            Cell::Instance getCell(CellKey cKey){
+
+            Cell::Instance getCell(CellKey cKey)
+            {
                 return Cell::Instance(cKey, root);
             }
 
