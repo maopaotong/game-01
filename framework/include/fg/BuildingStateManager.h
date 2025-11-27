@@ -8,6 +8,7 @@
 #include "fg/core/Sinbad.h"
 #include "fg/core/Tower.h"
 #include "fg/InventoryStateManager.h"
+#include "fg/core/Building.h"
 namespace fog
 {
 
@@ -52,7 +53,9 @@ namespace fog
         void moveToCell(CellKey cKey)
         {
             this->cKey = cKey;
-            this->building->findSceneNode()->setPosition(Context<Cell::Center>::get()->getCell(cKey).getOrigin3D());
+            Vector3 pos3 = Context<Cell::Center>::get()->getCell(cKey).getOrigin3D() + Vector3(0.0f, 10.0f, 0.0f);
+            
+            this->building->findSceneNode()->setPosition(pos3);
         }
     };
 
@@ -150,7 +153,7 @@ namespace fog
             return picked != nullptr;
         }
 
-        bool planToBuild() // plan a building and waiting mouse cell event to choose a position for the building.
+        bool planToBuild(BuildingType type) // plan a building and waiting mouse cell event to choose a position for the building.
         {
             if (this->plan)
             {
@@ -165,9 +168,19 @@ namespace fog
 
             if (success)
             {
-                Tower *tower = new Tower();
-                tower->init();
-                this->plan = new BuildingPlan(tower, invAmount);
+                State *building = nullptr;
+                if (type == BuildingType::Tower)
+                {
+                    building = new Tower();
+                    building->init();
+                }
+                else
+                {
+                    building = new Building(type, CellKey(0, 0));
+                    building->init();
+                }
+
+                this->plan = new BuildingPlan(building, invAmount);
             }
 
             return true;

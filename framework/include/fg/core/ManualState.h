@@ -16,7 +16,7 @@ namespace fog
     using namespace Ogre;
 
     //
-    class CellStateBase : public State
+    class ManualState : public State
     {
 
     protected:
@@ -25,7 +25,7 @@ namespace fog
         std::string material = MaterialNames::materialNameInUse;
 
     public:
-        CellStateBase()
+        ManualState()
         {
 
             Ogre::SceneManager *sceneMgr = Context<CoreMod>::get()->getSceneManager();
@@ -34,7 +34,7 @@ namespace fog
             sceNode->attachObject(obj);
             //
         }
-        virtual ~CellStateBase()
+        virtual ~ManualState()
         {
             Ogre::SceneManager *sceneMgr = Context<CoreMod>::get()->getSceneManager();
             sceneMgr->getRootSceneNode()->removeChild(this->sceNode);

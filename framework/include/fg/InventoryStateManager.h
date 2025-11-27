@@ -85,7 +85,7 @@ namespace fog
         }
         void init() override
         {
-            this->add(InventoryType::BuildingPermit, 1.0f);
+            this->add(InventoryType::BuildingPermit, 100.0f);
             this->add(InventoryType::Population, 10.0f);
         }
 

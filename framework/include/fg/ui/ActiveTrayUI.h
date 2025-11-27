@@ -50,7 +50,7 @@ namespace fog
                 //
                 if (ImGui::Button("Tower Building(1*120-Person-Month)"))
                 {
-                    Context<BuildingStateManager>::get()->planToBuild();
+                    Context<BuildingStateManager>::get()->planToBuild(BuildingType::Tower);
                 }
 
                 if (ImGui::Button("Create Sinbad(1*10-Persen-Month)"))
@@ -58,7 +58,12 @@ namespace fog
 
                     Context<MovableStateManager>::get()->createSinbad();
                 }
-                
+
+                if (ImGui::Button("Build Farm(1*10-Persen-Month)"))
+                {
+
+                    Context<BuildingStateManager>::get()->planToBuild(BuildingType::Farm);
+                }
             }
 
             if (!counter)

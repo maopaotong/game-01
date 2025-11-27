@@ -7,11 +7,11 @@
 #include "fg/CoreMod.h"
 #include "fg/util/CostMap.h"
 #include "fg/Cell.h"
-#include "fg/core/CellStateBase.h"
 #include "fg/util/CostMap.h"
 #include "fg/MeshBuild.h"
 #include "fg/VarBag.h"
 #include "fg/Property.h"
+#include "fg/core/ManualState.h"
 
 namespace fog
 {
@@ -20,7 +20,7 @@ namespace fog
     typedef Property::Ref<bool> boolRef;
 
     //
-    class CellStateControl : public CellStateBase
+    class CellStateControl : public ManualState
     {
     public:
         boolRef showCost0;
@@ -30,7 +30,7 @@ namespace fog
         boolRef showOther;
 
     public:
-        CellStateControl() : CellStateBase()
+        CellStateControl() : ManualState()
         {
         }
         void init() override
@@ -39,7 +39,7 @@ namespace fog
             this->showCost1 = createProperty("showCost1", false);
             this->showCost2 = createProperty("showCost2", true);
             this->showCost3 = createProperty("showCost3", true);
-            CellStateBase::init();
+            ManualState::init();
         }
         void rebuildMesh() override
         {

@@ -68,6 +68,14 @@ namespace fog
         StaeEnterCell,
         StateLeaveCell,
     };
+    enum class BuildingType
+    {
+        House,
+        Farm,
+        Barrack,
+        Market,
+        Tower,
+    };
     enum class BuildingEventType
     {
         StatePicked,

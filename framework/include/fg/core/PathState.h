@@ -7,7 +7,6 @@
 #include "fg/util/CostMap.h"
 #include "fg/util/HexGridPrinter.h"
 #include "fg/util/CellMark.h"
-#include "fg/core/CellStateBase.h"
 #include "fg/CellInstanceManager.h"
 namespace fog
 {
