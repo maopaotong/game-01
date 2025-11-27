@@ -29,112 +29,114 @@
 #include "fg/util/CellUtil.h"
 #include "fg/InputState.h"
 #include "fg/CoreMod.h"
-namespace fog{
-using namespace OgreBites;
-using namespace Ogre;
-// === Custom hash function ===
-//
-// === Input handler for closing application ===
-class InputStateController : public InputState
+namespace fog
 {
-private:
-    bool left = false;
-    bool right = false;
-    bool front = false;
-    bool back = false;
+    using namespace OgreBites;
+    using namespace Ogre;
+    // === Custom hash function ===
+    //
+    // === Input handler for closing application ===
+    class InputStateController : public InputState
+    {
+    private:
+        bool left = false;
+        bool right = false;
+        bool front = false;
+        bool back = false;
 
-public:
-    InputStateController()
-    {
-    }
+    public:
+        InputStateController()
+        {
+        }
 
-    bool mouseMoved(const MouseMotionEvent &evt) 
-    {
-        RenderWindow *window = Context<CoreMod>::get()->getWindow();
+        bool mouseMoved(const MouseMotionEvent &evt)
+        {
+            RenderWindow *window = Context<CoreMod>::get()->getWindow();
 
-        int width = window->getWidth();
-        int height = window->getHeight();
-        // 定义边缘区域（例如：10 像素）
-        int edgeSize = 10;
-        int x = evt.x;
-        int y = evt.y;
-        this->left = (x <= edgeSize);
-        this->right = (x >= width - edgeSize);
-        this->front = (y <= edgeSize);
-        this->back = (y >= height - edgeSize);
-        if (this->isMoving())
-        {
-            std::cout << "(" << x << "," << y << "),(" << width << "," << height << ")" << std::endl;
-            // try pick.
+            int width = window->getWidth();
+            int height = window->getHeight();
+            // 定义边缘区域（例如：10 像素）
+            int edgeSize = 10;
+            int x = evt.x;
+            int y = evt.y;
+            this->left = (x >= 0 && x <= edgeSize);
+            this->right = (x >= width - edgeSize && x <= width);
+            this->front = (y >= 0 && y <= edgeSize);
+            this->back = (y >= height - edgeSize && y <= height);
+            if (this->isMoving())
+            {
+                std::cout << "Moving:(" << x << "," << y << "),(" << width << "," << height << ")" << std::endl;
+                //  try pick.
+            }
+            else
+            {
+                std::cout << "Not Moving:(" << x << "," << y << "),(" << width << "," << height << ")" << std::endl;
+            }
+            return false;
         }
-        else
-        {
-        }
-        return false;
-    }
 
-    bool keyPressed(const OgreBites::KeyboardEvent &evt) 
-    {
-        if (evt.keysym.sym == OgreBites::SDLK_ESCAPE)
+        bool keyPressed(const OgreBites::KeyboardEvent &evt)
         {
-            Ogre::Root::getSingleton().queueEndRendering();
+            if (evt.keysym.sym == OgreBites::SDLK_ESCAPE)
+            {
+                Ogre::Root::getSingleton().queueEndRendering();
+            }
+            if (evt.keysym.sym == OgreBites::SDLK_LEFT)
+            {
+                this->left = true;
+            }
+            if (evt.keysym.sym == OgreBites::SDLK_RIGHT)
+            {
+                this->right = true;
+            }
+            if (evt.keysym.sym == OgreBites::SDLK_UP)
+            {
+                this->front = true;
+            }
+            if (evt.keysym.sym == OgreBites::SDLK_DOWN)
+            {
+                this->back = true;
+            }
+            return true;
         }
-        if (evt.keysym.sym == OgreBites::SDLK_LEFT)
+        bool keyReleased(const OgreBites::KeyboardEvent &evt)
         {
-            this->left = true;
-        }
-        if (evt.keysym.sym == OgreBites::SDLK_RIGHT)
-        {
-            this->right = true;
-        }
-        if (evt.keysym.sym == OgreBites::SDLK_UP)
-        {
-            this->front = true;
-        }
-        if (evt.keysym.sym == OgreBites::SDLK_DOWN)
-        {
-            this->back = true;
-        }
-        return true;
-    }
-    bool keyReleased(const OgreBites::KeyboardEvent &evt) 
-    {
 
-        if (evt.keysym.sym == OgreBites::SDLK_LEFT)
-        {
-            this->left = false;
+            if (evt.keysym.sym == OgreBites::SDLK_LEFT)
+            {
+                this->left = false;
+            }
+            if (evt.keysym.sym == OgreBites::SDLK_RIGHT)
+            {
+                this->right = false;
+            }
+            if (evt.keysym.sym == OgreBites::SDLK_UP)
+            {
+                this->front = false;
+            }
+            if (evt.keysym.sym == OgreBites::SDLK_DOWN)
+            {
+                this->back = false;
+            }
+            return true;
         }
-        if (evt.keysym.sym == OgreBites::SDLK_RIGHT)
-        {
-            this->right = false;
-        }
-        if (evt.keysym.sym == OgreBites::SDLK_UP)
-        {
-            this->front = false;
-        }
-        if (evt.keysym.sym == OgreBites::SDLK_DOWN)
-        {
-            this->back = false;
-        }
-        return true;
-    }
 
-    bool isLeft() override
-    {
-        return this->left;
-    }
-    bool isRight() override
-    {
-        return this->right;
-    }
-    bool isFront() override
-    {
-        return this->front;
-    }
-    bool isBack() override
-    {
-        return this->back;
-    }
-};
+        bool isLeft() override
+        {
+            return this->left;
+        }
+        bool isRight() override
+        {
+            return this->right;
+        }
+        bool isFront() override
+        {
+            return this->front;
+        }
+        bool isBack() override
+        {
+            return this->back;
+        }
+    };
 
-};//end of namespace
+}; // end of namespace

@@ -85,11 +85,24 @@ namespace fog
             }
         };
 
+        struct TextureCoord
+        {
+            float u;
+            float v;
+            TextureCoord() : TextureCoord(0, 0)
+            {
+            }
+            TextureCoord(float u, float v) : u(u), v(v)
+            {
+            }
+        };
+
         struct Vertex
         {
             Vector3 position;
             ColourValue colour;
             Vector3 normal;
+            TextureCoord textureCoord;
             bool isNormalInit = false;
             void addNormal(Vector3 norm)
             {
@@ -128,6 +141,12 @@ namespace fog
             void resetBaseIndex()
             {
                 this->baseIndex = obj->getCurrentVertexCount();
+            }
+
+            void textureCoord(float u, float v)
+            {
+                int size1 = vertices.size();
+                vertices[size1 - 1].textureCoord = {u, v};
             }
 
             void position(Vector3 pos)
@@ -208,6 +227,9 @@ namespace fog
                     }
 
                     obj->colour(vertices[i].colour);
+                    
+                    obj->textureCoord(vertices[i].textureCoord.u, vertices[i].textureCoord.v);
+                    
                 }
 
                 // flush index
@@ -235,7 +257,7 @@ namespace fog
                 int layerSize;
                 int preLayerSize;
                 int totalLayer = FG_SPIDER_TOTAL_LAYER; // settings global
-                
+
                 // to build the mesh, this context alive on the whole building operation.
                 // so it visits each cell and each points of cells.
                 int idx; // point index
@@ -248,6 +270,8 @@ namespace fog
                     // Vector3 pos = positionFunc(pointOnLayer);
                     Vector3 pos = positionFunc(pointOnCircle, layer, totalLayer);
                     obj->position(pos);
+                    // obj->textureCoord(pointOnCircle.x, pointOnCircle.y);
+                    obj->textureCoord(pos.x / 30.0f, -pos.z / 30.0f);
                     obj->colour(color);
 
                     //

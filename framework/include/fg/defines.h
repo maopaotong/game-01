@@ -11,6 +11,9 @@
 
 #include <Ogre.h>
 #include <OgreColourValue.h>
+
+#define FOG_CAM_SPEED 750
+
 namespace fog
 {
     using GOON = bool;

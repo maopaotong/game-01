@@ -39,8 +39,8 @@ namespace fog
         virtual ~ManualState()
         {
             Ogre::SceneManager *sceneMgr = Context<CoreMod>::get()->getSceneManager();
-            sceneMgr->getRootSceneNode()->removeChild(this->sceNode);
-            sceneMgr->destroyManualObject(this->obj);
+            sceneMgr->getRootSceneNode()->removeAndDestroyChild(sceNode);
+            this->sceNode = nullptr;
         }
 
         virtual void init() override

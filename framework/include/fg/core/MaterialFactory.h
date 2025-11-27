@@ -24,6 +24,7 @@
 #include <OgreRTShaderSystem.h>
 #include <OgreTechnique.h>
 #include "fg/MaterialNames.h"
+#include "stb_truetype.h"
 
 namespace fog
 {
@@ -36,6 +37,50 @@ namespace fog
     class MaterialFactory
     {
     private:
+        static void createTexture(RenderSystem *renderSystem)
+        {
+
+            // 加载字体文件（如 Roboto.ttf）
+            unsigned char *ttf_buffer = new unsigned char[1 << 20];
+            FILE *fontFile = fopen("Roboto.ttf", "rb");
+            fread(ttf_buffer, 1, 1 << 20, fontFile);
+            fclose(fontFile);
+
+            stbtt_fontinfo font;
+            stbtt_InitFont(&font, ttf_buffer, stbtt_GetFontOffsetForIndex(ttf_buffer, 0));
+
+            const char *text = "Building A";
+            int width = 256, height = 64;
+            unsigned char *pixels = new unsigned char[width * height];
+
+            // 渲染黑白文字（简化版）
+            //stbtt_BakeFontBitmap(ttf_buffer, 0, 32.0f, pixels, width, height, 32, 95, cdata);
+
+            // 转为 RGBA（白色文字 + alpha）
+            Ogre::uint8 *rgba = new Ogre::uint8[width * height * 4];
+            for (int i = 0; i < width * height; ++i)
+            {
+                rgba[i * 4 + 0] = 255;       // R
+                rgba[i * 4 + 1] = 255;       // G
+                rgba[i * 4 + 2] = 255;       // B
+                rgba[i * 4 + 3] = pixels[i]; // A
+            }
+
+            TextureManager *texMgr = TextureManager::getSingletonPtr();
+
+            // 上传到 GPU 纹理
+            TexturePtr tex = TextureManager::getSingleton().createManual(
+                "DynamicTextTex",
+                Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                Ogre::TEX_TYPE_2D,
+                width, height, 0,
+                Ogre::PF_BYTE_RGBA,
+                Ogre::TU_DYNAMIC_WRITE_ONLY_DISCARDABLE);
+
+            delete[] rgba;
+            delete[] pixels;
+            delete[] ttf_buffer;
+        }
         // 在你的 HexMapVisualizer 构造函数或初始化函数中调用
         static Ogre::MaterialPtr createVertexColourMaterialForSelected(MaterialManager *matMgr)
         {
@@ -99,12 +144,20 @@ namespace fog
 
             // 配置 Pass
             Pass *pass = tech->getPass(0);
-            pass->setLightingEnabled(true);
-            pass->setVertexColourTracking(TrackVertexColourEnum::TVC_DIFFUSE   // 漫反射
-                                          | TrackVertexColourEnum::TVC_AMBIENT // 环境光
+            pass->setLightingEnabled(false);
+            pass->setVertexColourTracking(TrackVertexColourEnum::TVC_NONE    // 漫反射
+                                          //| TrackVertexColourEnum::TVC_AMBIENT  // 环境光
+                                          //| TrackVertexColourEnum::TVC_EMISSIVE // 自发光
             );
             // pass->setVertexColourTracking(TrackVertexColourEnum::TVC_EMISSIVE);//自发光
             // pass->setVertexColourTracking(TrackVertexColourEnum::TVC_SPECULAR);//镜面反射
+            TextureUnitState * texState = pass->createTextureUnitState("Ground23_spec.png");
+            //TextureUnitState * texState = pass->createTextureUnitState("Dirt.jpg");
+            texState->setTextureAddressingMode(TextureUnitState::TAM_WRAP);
+            //texState->setTextureFiltering(Ogre::TFO_ANISOTROPIC);
+            //texState->setColourOperation(Ogre::LayerBlendOperation::LBO_MODULATE);
+           
+
             return mat;
         }
 

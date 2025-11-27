@@ -84,7 +84,7 @@ namespace fog
             Ogre::Vector3 right = Ogre::Vector3::UNIT_X;
             Ogre::Vector3 back = Ogre::Vector3::UNIT_Z;
 
-            float speed = 1000.0f;
+            float speed = FOG_CAM_SPEED;
             Vector3 position = node->getPosition();
             Vector3 step = Ogre::Vector3::ZERO;
 
