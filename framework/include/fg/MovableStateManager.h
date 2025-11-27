@@ -95,15 +95,15 @@ namespace fog
         }
         void init() override
         {
-            EntityState *actor1 = new Sinbad();
-            actor1->init();
-            this->addChild(actor1);
+           this->createSinbad();
+        }
 
+        void createSinbad(){
             EntityState *actor2 = new Sinbad();
             actor2->init();
             this->addChild(actor2);
-
         }
+
         bool step(float time) override
         {
             movingState.step(time);

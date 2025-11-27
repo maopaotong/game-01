@@ -33,8 +33,6 @@ namespace fog
                         this->state = nullptr;
                         this->setActive(false);
                     } });
-
-            
         }
 
         void doOpen() override
@@ -48,11 +46,19 @@ namespace fog
                 ImGui::SameLine();
                 ImGuiUtil::Text(sNode->getPosition());
                 counter++;
+                // Time Cost is the key: the building speed depends on the worker number and building type
                 //
-                if (ImGui::Button("Tower Building"))
+                if (ImGui::Button("Tower Building(1*120-Person-Month)"))
                 {
                     Context<BuildingStateManager>::get()->planToBuild();
                 }
+
+                if (ImGui::Button("Create Sinbad(1*10-Persen-Month)"))
+                {
+
+                    Context<MovableStateManager>::get()->createSinbad();
+                }
+                
             }
 
             if (!counter)
