@@ -9,6 +9,7 @@
 #include "fg/core/Tower.h"
 #include "fg/InventoryStateManager.h"
 #include "fg/core/Building.h"
+#include "fg/core/H0085.h"
 namespace fog
 {
 
@@ -52,8 +53,8 @@ namespace fog
         void moveToCell(CellKey cKey)
         {
             this->cKey = cKey;
-            Vector3 pos3 = Context<Cell::Center>::get()->getCell(cKey).getOrigin3D() ;//+ Vector3(0.0f, 10.0f, 0.0f);
-            
+            Vector3 pos3 = Context<Cell::Center>::get()->getCell(cKey).getOrigin3D(); //+ Vector3(0.0f, 10.0f, 0.0f);
+
             this->building->findSceneNode()->setPosition(pos3);
         }
     };
@@ -171,13 +172,17 @@ namespace fog
                 if (type == BuildingType::Tower)
                 {
                     building = new Tower();
-                    building->init();
+                }
+                else if (type == BuildingType::H0085)
+                {
+                    building = new H0085();
                 }
                 else
                 {
                     building = new Building(type);
-                    building->init();
                 }
+                building->init();
+                building->init();
 
                 this->plan = new BuildingPlan(building, invAmount);
             }
@@ -197,7 +202,7 @@ namespace fog
                 this->buildingsInCells[cKey].push_back(building);
             }
             else
-            {   //failed to build on the target cell.
+            { // failed to build on the target cell.
                 float invAmount = this->plan->getAmount();
                 Context<InventoryStateManager>::get()->returnInventory(InventoryType::BuildingPermit, invAmount);
             }

@@ -64,6 +64,11 @@ namespace fog
 
                     Context<BuildingStateManager>::get()->planToBuild(BuildingType::Farm);
                 }
+                if (ImGui::Button("Build H0085"))
+                {
+
+                    Context<BuildingStateManager>::get()->planToBuild(BuildingType::H0085);
+                }
             }
 
             if (!counter)

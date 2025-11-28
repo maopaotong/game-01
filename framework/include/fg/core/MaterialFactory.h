@@ -175,6 +175,52 @@ namespace fog
             return mat;
         }
 
+        static Ogre::MaterialPtr createVertexColourMaterialH0085(MaterialManager *matMgr)
+        {
+            using namespace Ogre;
+
+            // 创建材质，名称和资源组
+            MaterialPtr mat = matMgr->create(MaterialNames::materialNameH0085, "General");
+
+            // 禁用阴影接收
+            mat->setReceiveShadows(true);
+
+            // 获取默认技术（Ogre 2.x 默认会自动创建一个）
+            Technique *tech = mat->getTechnique(0);
+
+            // 配置 Pass
+            Pass *pass = tech->getPass(0);
+            pass->setLightingEnabled(true);
+            pass->setVertexColourTracking(TrackVertexColourEnum::TVC_NONE // 漫反射
+                                                                          //| TrackVertexColourEnum::TVC_AMBIENT  // 环境光
+                                                                          //| TrackVertexColourEnum::TVC_EMISSIVE // 自发光
+            );
+            // pass->setVertexColourTracking(TrackVertexColourEnum::TVC_EMISSIVE);//自发光
+            // pass->setVertexColourTracking(TrackVertexColourEnum::TVC_SPECULAR);//镜面反射
+            // TextureUnitState * texState = pass->createTextureUnitState("Ground23_spec.png");
+            //TextureUnitState *sandTex = pass->createTextureUnitState("tusk.jpg");
+            //sandTex->setTextureAddressingMode(TextureUnitState::TAM_WRAP);
+
+            TextureUnitState *grassTex = pass->createTextureUnitState("texture_diffuse.png");
+            grassTex->setTextureAddressingMode(TextureUnitState::TAM_WRAP);
+            //grassTex->setColourOperationEx(LayerBlendOperationEx::LBX_BLEND_CURRENT_ALPHA); // 与当前颜色相乘
+
+            // TextureUnitState * blendTex = pass->createTextureUnitState("grass_1024.png");
+            // blendTex->setTextureAddressingMode(TextureUnitState::TAM_WRAP);
+
+            // grassTex->setColourOperationEx(
+            //     LayerBlendOperationEx::LBX_BLEND_TEXTURE_ALPHA,
+            //     LayerBlendSource::LBS_TEXTURE, // 草地纹理
+            //     LayerBlendSource::LBS_CURRENT // 当前颜色（即沙地）
+            // );
+
+            // texState1->setColourOperationEx();
+            // texState->setTextureFiltering(Ogre::TFO_ANISOTROPIC);
+            // texState->setColourOperation(Ogre::LayerBlendOperation::LBO_MODULATE);
+
+            return mat;
+        }
+
         void update()
         {
         }

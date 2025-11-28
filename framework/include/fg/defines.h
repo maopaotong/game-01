@@ -81,6 +81,7 @@ namespace fog
         Barrack,
         Market,
         Tower,
+        H0085,
     };
     enum class BuildingEventType
     {
