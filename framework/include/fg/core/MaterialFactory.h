@@ -54,7 +54,7 @@ namespace fog
             unsigned char *pixels = new unsigned char[width * height];
 
             // 渲染黑白文字（简化版）
-            //stbtt_BakeFontBitmap(ttf_buffer, 0, 32.0f, pixels, width, height, 32, 95, cdata);
+            // stbtt_BakeFontBitmap(ttf_buffer, 0, 32.0f, pixels, width, height, 32, 95, cdata);
 
             // 转为 RGBA（白色文字 + alpha）
             Ogre::uint8 *rgba = new Ogre::uint8[width * height * 4];
@@ -144,19 +144,33 @@ namespace fog
 
             // 配置 Pass
             Pass *pass = tech->getPass(0);
-            pass->setLightingEnabled(false);
-            pass->setVertexColourTracking(TrackVertexColourEnum::TVC_NONE    // 漫反射
-                                          //| TrackVertexColourEnum::TVC_AMBIENT  // 环境光
-                                          //| TrackVertexColourEnum::TVC_EMISSIVE // 自发光
+            pass->setLightingEnabled(true);
+            pass->setVertexColourTracking(TrackVertexColourEnum::TVC_NONE // 漫反射
+                                                                          //| TrackVertexColourEnum::TVC_AMBIENT  // 环境光
+                                                                          //| TrackVertexColourEnum::TVC_EMISSIVE // 自发光
             );
             // pass->setVertexColourTracking(TrackVertexColourEnum::TVC_EMISSIVE);//自发光
             // pass->setVertexColourTracking(TrackVertexColourEnum::TVC_SPECULAR);//镜面反射
-            TextureUnitState * texState = pass->createTextureUnitState("Ground23_spec.png");
-            //TextureUnitState * texState = pass->createTextureUnitState("Dirt.jpg");
-            texState->setTextureAddressingMode(TextureUnitState::TAM_WRAP);
-            //texState->setTextureFiltering(Ogre::TFO_ANISOTROPIC);
-            //texState->setColourOperation(Ogre::LayerBlendOperation::LBO_MODULATE);
-           
+            // TextureUnitState * texState = pass->createTextureUnitState("Ground23_spec.png");
+            //TextureUnitState *sandTex = pass->createTextureUnitState("tusk.jpg");
+            //sandTex->setTextureAddressingMode(TextureUnitState::TAM_WRAP);
+
+            TextureUnitState *grassTex = pass->createTextureUnitState("11_13.jpg");
+            grassTex->setTextureAddressingMode(TextureUnitState::TAM_WRAP);
+            //grassTex->setColourOperationEx(LayerBlendOperationEx::LBX_BLEND_CURRENT_ALPHA); // 与当前颜色相乘
+
+            // TextureUnitState * blendTex = pass->createTextureUnitState("grass_1024.png");
+            // blendTex->setTextureAddressingMode(TextureUnitState::TAM_WRAP);
+
+            grassTex->setColourOperationEx(
+                LayerBlendOperationEx::LBX_BLEND_TEXTURE_ALPHA,
+                LayerBlendSource::LBS_TEXTURE, // 草地纹理
+                LayerBlendSource::LBS_CURRENT // 当前颜色（即沙地）
+            );
+
+            // texState1->setColourOperationEx();
+            // texState->setTextureFiltering(Ogre::TFO_ANISOTROPIC);
+            // texState->setColourOperation(Ogre::LayerBlendOperation::LBO_MODULATE);
 
             return mat;
         }

@@ -63,14 +63,18 @@ namespace fog
             this->right = (x >= width - edgeSize && x <= width);
             this->front = (y >= 0 && y <= edgeSize);
             this->back = (y >= height - edgeSize && y <= height);
-            if (this->isMoving())
+            if (DEBUG_COUT)
             {
-                std::cout << "Moving:(" << x << "," << y << "),(" << width << "," << height << ")" << std::endl;
-                //  try pick.
-            }
-            else
-            {
-                std::cout << "Not Moving:(" << x << "," << y << "),(" << width << "," << height << ")" << std::endl;
+
+                if (this->isMoving())
+                {
+                    std::cout << "Moving:(" << x << "," << y << "),(" << width << "," << height << ")" << std::endl;
+                    //  try pick.
+                }
+                else
+                {
+                    std::cout << "Not Moving:(" << x << "," << y << "),(" << width << "," << height << ")" << std::endl;
+                }
             }
             return false;
         }

@@ -30,17 +30,19 @@ namespace fog
     {
         const String FFP_Transform = "FFP_Transform";
         const float flatHight = 0.0f;
-        const float terrainScale = 25.0f; // height
+        const float terrainScale = 100.0f; // height
 
-        float minHeight0 = 40;
-        float fadeDist0 = 30;
-        float minHeight1 = 70;
-        float fadeDist1 = 30;
+        float minHeight0 = 15;
+        float fadeDist0 = 5;
+        float minHeight1 = 30;
+        float fadeDist1 = 5;
         bool flat = false; // for test.
     private:
         long terrainX = 1;
         long terrainY = 1;
+        // int terrainSize = 513;
         int terrainSize = 513;
+
         float worldSize = 2000.0f;
         Ogre::TerrainGroup *terrainGroup = nullptr;
         Ogre::TerrainGlobalOptions *options = nullptr;
@@ -99,7 +101,7 @@ namespace fog
             matProfile->setLayerParallaxOcclusionMappingEnabled(false);
 
             options->setLightMapDirection(light->getDerivedDirection());
-            options->setCompositeMapAmbient(sceMgr->getAmbientLight());
+            // options->setCompositeMapAmbient(sceMgr->getAmbientLight());
             options->setCompositeMapDiffuse(light->getDiffuseColour());
 
             Ogre::Terrain::ImportData &defaultimp = terrainGroup->getDefaultImportSettings();
@@ -107,20 +109,30 @@ namespace fog
             defaultimp.minBatchSize = 33;
             defaultimp.maxBatchSize = 65;
 
-            Ogre::Image combined;
-            combined.loadTwoImagesAsRGBA("Ground23_col.jpg", "Ground23_spec.png", "General");
-            TextureManager::getSingleton().loadImage("Ground23_diffspec", "General", combined);
+            // Ogre::Image combined;
+            // combined.loadTwoImagesAsRGBA("Ground23_col.jpg", "Ground23_spec.png", "General");
+            // TextureManager::getSingleton().loadImage("Ground23_diffspec", "General", combined);
 
             defaultimp.layerList.resize(3);
+
             defaultimp.layerList[0].worldSize = 200;
-            defaultimp.layerList[0].textureNames.push_back("Ground37_diffspec.dds");
-            defaultimp.layerList[0].textureNames.push_back("Ground37_normheight.dds");
             defaultimp.layerList[1].worldSize = 200;
-            defaultimp.layerList[1].textureNames.push_back("Ground23_diffspec"); // loaded from memory
-            defaultimp.layerList[1].textureNames.push_back("Ground23_normheight.dds");
             defaultimp.layerList[2].worldSize = 200;
-            defaultimp.layerList[2].textureNames.push_back("Rock20_diffspec.dds");
-            defaultimp.layerList[2].textureNames.push_back("Rock20_normheight.dds");
+            /*
+            defaultimp.layerList[0].textureNames.push_back("G1_col.png");
+            defaultimp.layerList[0].textureNames.push_back("G1_norm.png");
+            defaultimp.layerList[1].textureNames.push_back("G2_col.png");
+            defaultimp.layerList[1].textureNames.push_back("G2_norm.png");
+            defaultimp.layerList[2].textureNames.push_back("G3_col.png");
+            defaultimp.layerList[2].textureNames.push_back("G3_norm.png");
+            */
+            defaultimp.layerList[0].textureNames.push_back("G1_col.dds");
+            defaultimp.layerList[0].textureNames.push_back("G1_norm.dds");
+            defaultimp.layerList[1].textureNames.push_back("G2_col.jpg");
+            defaultimp.layerList[1].textureNames.push_back("G2_norm.dds");
+            defaultimp.layerList[2].textureNames.push_back("G3_col.dds");
+            defaultimp.layerList[2].textureNames.push_back("G3_norm.dds");
+            
 
             // Define =====================================
             for (long x = 0; x < terrainX; ++x)
@@ -151,27 +163,24 @@ namespace fog
 
             float *pBlend0 = blendMap0->getBlendPointer();
             float *pBlend1 = blendMap1->getBlendPointer();
-
-            for (Ogre::uint16 y = 0; y < terrain->getLayerBlendMapSize(); ++y)
+            int size = terrain->getLayerBlendMapSize();
+            for (Ogre::uint16 y = 0; y < size; ++y)
             {
-                for (Ogre::uint16 x = 0; x < terrain->getLayerBlendMapSize(); ++x)
+                for (Ogre::uint16 x = 0; x < size; ++x)
                 {
-                    float height = terrain->getHeightAtTerrainPosition(
-                        static_cast<float>(x) / (terrain->getLayerBlendMapSize() - 1),
-                        static_cast<float>(y) / (terrain->getLayerBlendMapSize() - 1));
+                    float u = static_cast<float>(x) / size;
+                    float v = 1 - static_cast<float>(y) / size;
+                    float height = terrain->getHeightAtTerrainPosition(u, v);
 
-                    // Layer 0
+                    // Layer 0                    
                     float val = (height - minHeight0) / fadeDist0;
                     val = Ogre::Math::Clamp(val, 0.0f, 1.0f);
-                    *pBlend0 = val;
+                    pBlend0[y * size + x] = val;
 
                     // Layer 1
                     val = (height - minHeight1) / fadeDist1;
                     val = Ogre::Math::Clamp(val, 0.0f, 1.0f);
-                    *pBlend1 = val;
-
-                    pBlend0++;
-                    pBlend1++;
+                    pBlend1[y * size + x] = val;
                 }
             }
 
@@ -226,15 +235,14 @@ namespace fog
             Image img;
             getTerrainImage(x % 2 != 0, y % 2 != 0, img);
             ModifyHeightImg modHeight(img);
-            modHeight.modifyHeight();
+            // modHeight.modifyHeight();
             terrainGroup->defineTerrain(x, y, &img);
         }
-        
 
         void getTerrainImage(bool flipX, bool flipY, Image &img)
         {
             //! [heightmap]
-            img.load("terrain.png", terrainGroup->getResourceGroup());
+            img.load("heightmap.png", terrainGroup->getResourceGroup());
 
             if (flipX)
                 img.flipAroundY();

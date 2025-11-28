@@ -271,7 +271,7 @@ namespace fog
                     Vector3 pos = positionFunc(pointOnCircle, layer, totalLayer);
                     obj->position(pos);
                     // obj->textureCoord(pointOnCircle.x, pointOnCircle.y);
-                    obj->textureCoord(pos.x / 30.0f, -pos.z / 30.0f);
+                    obj->textureCoord(pos.x / TEXTURE_COORD_SCALE, -pos.z / TEXTURE_COORD_SCALE);
                     obj->colour(color);
 
                     //
