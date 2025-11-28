@@ -32,10 +32,13 @@ namespace fog
         const float flatHight = 0.0f;
         const float terrainScale = 100.0f; // height
 
-        float minHeight0 = 15;
-        float fadeDist0 = 5;
-        float minHeight1 = 30;
-        float fadeDist1 = 5;
+        float minHeight0 = 10;
+        float fadeDist0 = 1;
+        float minHeight1 = 35;
+        float fadeDist1 = 2;
+        float minHeight2 = 55;
+        float fadeDist2 = 5;
+        
         bool flat = false; // for test.
     private:
         long terrainX = 1;
@@ -113,11 +116,13 @@ namespace fog
             // combined.loadTwoImagesAsRGBA("Ground23_col.jpg", "Ground23_spec.png", "General");
             // TextureManager::getSingleton().loadImage("Ground23_diffspec", "General", combined);
 
-            defaultimp.layerList.resize(3);
+            defaultimp.layerList.resize(4);
 
             defaultimp.layerList[0].worldSize = 200;
             defaultimp.layerList[1].worldSize = 200;
             defaultimp.layerList[2].worldSize = 200;
+            defaultimp.layerList[3].worldSize = 200;
+            
             /*
             defaultimp.layerList[0].textureNames.push_back("G1_col.png");
             defaultimp.layerList[0].textureNames.push_back("G1_norm.png");
@@ -126,13 +131,15 @@ namespace fog
             defaultimp.layerList[2].textureNames.push_back("G3_col.png");
             defaultimp.layerList[2].textureNames.push_back("G3_norm.png");
             */
-            defaultimp.layerList[0].textureNames.push_back("G1_col.dds");
-            defaultimp.layerList[0].textureNames.push_back("G1_norm.dds");
-            defaultimp.layerList[1].textureNames.push_back("G2_col.jpg");
-            defaultimp.layerList[1].textureNames.push_back("G2_norm.dds");
+            
+            defaultimp.layerList[0].textureNames.push_back("G0_col.dds");
+            defaultimp.layerList[0].textureNames.push_back("G0_norm.dds");
+            defaultimp.layerList[1].textureNames.push_back("G1_col.dds");
+            defaultimp.layerList[1].textureNames.push_back("G1_norm.dds");
             defaultimp.layerList[2].textureNames.push_back("G3_col.dds");
             defaultimp.layerList[2].textureNames.push_back("G3_norm.dds");
-            
+            defaultimp.layerList[3].textureNames.push_back("G2_col.jpg");
+            defaultimp.layerList[3].textureNames.push_back("G2_norm.dds");
 
             // Define =====================================
             for (long x = 0; x < terrainX; ++x)
@@ -160,9 +167,12 @@ namespace fog
         {
             Ogre::TerrainLayerBlendMap *blendMap0 = terrain->getLayerBlendMap(1);
             Ogre::TerrainLayerBlendMap *blendMap1 = terrain->getLayerBlendMap(2);
+            Ogre::TerrainLayerBlendMap *blendMap2 = terrain->getLayerBlendMap(2);
 
             float *pBlend0 = blendMap0->getBlendPointer();
             float *pBlend1 = blendMap1->getBlendPointer();
+            float *pBlend2 = blendMap2->getBlendPointer();
+            
             int size = terrain->getLayerBlendMapSize();
             for (Ogre::uint16 y = 0; y < size; ++y)
             {
@@ -172,7 +182,7 @@ namespace fog
                     float v = 1 - static_cast<float>(y) / size;
                     float height = terrain->getHeightAtTerrainPosition(u, v);
 
-                    // Layer 0                    
+                    // Layer 0 
                     float val = (height - minHeight0) / fadeDist0;
                     val = Ogre::Math::Clamp(val, 0.0f, 1.0f);
                     pBlend0[y * size + x] = val;
@@ -181,13 +191,22 @@ namespace fog
                     val = (height - minHeight1) / fadeDist1;
                     val = Ogre::Math::Clamp(val, 0.0f, 1.0f);
                     pBlend1[y * size + x] = val;
+                    // Layer 2
+                    val = (height - minHeight2) / fadeDist2;
+                    val = Ogre::Math::Clamp(val, 0.0f, 1.0f);
+                    pBlend2[y * size + x] = val;
+                    
                 }
             }
 
             blendMap0->dirty();
             blendMap1->dirty();
+            blendMap2->dirty();
+            
             blendMap0->update();
             blendMap1->update();
+            blendMap2->update();
+            
         }
 
         float getHeightWithNormalAtWorldPosition(Vector3 posInWld, Vector3 *norm) override
