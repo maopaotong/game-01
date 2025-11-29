@@ -335,7 +335,7 @@ namespace fog
             {
                 operator()([&cell, this](Vector2 & pointOnCircle, int layer, int totalLayer)
                            {
-                               Vector2 pointOnLayer = pointOnCircle * ((float)layer / (float)totalLayer);
+                               Vector2 pointOnLayer = pointOnCircle * (float)layer / ((float)totalLayer -1);
                                return cell.node->to3D(cell.getOrigin2D(), pointOnLayer, useDefaultNorm ? &defaultNorm : nullptr); //
                            },
                            color //

@@ -52,16 +52,25 @@ namespace fog
                             {
                                 ColourValue color;
                                 bool build = this->getCostColor(cell, color);
-                                if(build){
-                                    buildMesh(cell, color); //
-                                } });
+                                if (build)
+                                {
+                                    buildMesh([&cell, this](Vector2 &pointOnCircle, int layer, int totalLayer)
+                                              {
+                                                  Vector2 pointOnLayer = pointOnCircle * (float)layer / ((float)totalLayer - 1);
+                                                  Vector3 pos = cell.node->to3D(cell.getOrigin2D(), pointOnLayer, nullptr); //
+                                                  pos.y += 1.f;
+                                                  return pos;
+                                              },
+                                              color); //
+                                } // end if
+                            });
             buildMesh.end();
         }
 
         // Get color based on cost
         bool getCostColor(Cell::Instance &cell, Ogre::ColourValue &color) const
         {
-            CostMap* costMap = Context<CostMap>::get();
+            CostMap *costMap = Context<CostMap>::get();
             const int cost = costMap->getCost(cell.cKey.first, cell.cKey.second);
             switch (cost)
             {

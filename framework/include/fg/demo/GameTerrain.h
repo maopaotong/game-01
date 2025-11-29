@@ -123,15 +123,16 @@ namespace fog
             defaultimp.layerList[2].worldSize = 200;
             defaultimp.layerList[3].worldSize = 200;
             
-            /*
-            defaultimp.layerList[0].textureNames.push_back("G1_col.png");
-            defaultimp.layerList[0].textureNames.push_back("G1_norm.png");
-            defaultimp.layerList[1].textureNames.push_back("G2_col.png");
-            defaultimp.layerList[1].textureNames.push_back("G2_norm.png");
-            defaultimp.layerList[2].textureNames.push_back("G3_col.png");
-            defaultimp.layerList[2].textureNames.push_back("G3_norm.png");
-            */
+            defaultimp.layerList[0].textureNames.push_back("G0_col.png");
+            defaultimp.layerList[0].textureNames.push_back("G0_norm.png");
+            defaultimp.layerList[1].textureNames.push_back("G1_col.png");
+            defaultimp.layerList[1].textureNames.push_back("G1_norm.png");
+            defaultimp.layerList[2].textureNames.push_back("G2_col.png");
+            defaultimp.layerList[2].textureNames.push_back("G2_norm.png");
+            defaultimp.layerList[3].textureNames.push_back("G3_col.png");
+            defaultimp.layerList[3].textureNames.push_back("G3_norm.png");
             
+            /*
             defaultimp.layerList[0].textureNames.push_back("G0_col.dds");
             defaultimp.layerList[0].textureNames.push_back("G0_norm.dds");
             defaultimp.layerList[1].textureNames.push_back("G1_col.dds");
@@ -140,6 +141,7 @@ namespace fog
             defaultimp.layerList[2].textureNames.push_back("G3_norm.dds");
             defaultimp.layerList[3].textureNames.push_back("G2_col.jpg");
             defaultimp.layerList[3].textureNames.push_back("G2_norm.dds");
+            */
 
             // Define =====================================
             for (long x = 0; x < terrainX; ++x)
