@@ -18,6 +18,7 @@ namespace fog
 {
     constexpr bool DEBUG_COUT = false;
     constexpr float TEXTURE_COORD_SCALE = 30.0f;
+    constexpr bool DEBUG_CHECK_IMPOSSIBLE_ERROR = false;
 
     using GOON = bool;
 

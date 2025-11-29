@@ -23,9 +23,8 @@ namespace fog
 
     protected:
     public:
-        H0085() : EntityState("h0085.mesh", ACTOR_SCALE, ACTOR_HEIGHT, {})
+        H0085() : EntityState("hc28c.mesh", ACTOR_SCALE, ACTOR_HEIGHT, {})
         {
-            
         }
 
         virtual ~H0085()
@@ -35,7 +34,9 @@ namespace fog
         virtual void init() override
         {
             EntityState::init();
-            //this->sceNode->setOrientation();
+            // this->sceNode->setOrientation();
+            entity->getSubEntity(0)->setMaterialName("hc28c");
+            this->sceNode->setOrientation(Ogre::Vector3(0, 0, 1).getRotationTo(Vector3(0, -1, 0)));
         }
     };
 }; // end of namespace

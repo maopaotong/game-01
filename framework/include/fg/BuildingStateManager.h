@@ -182,7 +182,6 @@ namespace fog
                     building = new Building(type);
                 }
                 building->init();
-                building->init();
 
                 this->plan = new BuildingPlan(building, invAmount);
             }

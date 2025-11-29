@@ -44,6 +44,13 @@ namespace fog
         virtual void init() override
         {
 
+            if (DEBUG_CHECK_IMPOSSIBLE_ERROR)
+            {
+                if (this->entity)
+                {
+                    throw std::runtime_error("entity already exists,entity state cannot init twice.");
+                }
+            }
             SceneManager *sMgr = Context<CoreMod>::get()->getSceneManager();
 
             entity = sMgr->createEntity(mesh);
