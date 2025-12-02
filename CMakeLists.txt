@@ -1,8 +1,8 @@
 # game-01/CMakeLists.txt
 cmake_minimum_required(VERSION 3.16)
 option(BUILD_FRAMEWORK "Build framework" ON)
-option(BUILD_DEMO "Build framework" OFF)
-option(BUILD_GAME "Build framework" ON)
+option(BUILD_DEMO "Build framework" ON)
+option(BUILD_GAME "Build framework" OFF)
 option(BUILD_TOOLS "Build framework" OFF)
 
 project(Game01 LANGUAGES CXX)
@@ -29,3 +29,4 @@ endif()
 if(BUILD_TOOLS)
     add_subdirectory(tools)
 endif()
+

@@ -1,60 +1,35 @@
-// main.cpp - Complete Ogre A* Hex Grid Visualization System
-#define SDL_MAIN_HANDLED
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <unordered_map>
-#include <unordered_set>
-#include <cmath>
-#include <utility>
-#include <algorithm>
-#include <functional>
 
-#include "fg/demo/Demo.h"
-#include "fg/core/SimpleApp.h"
-// === Custom hash function ===
-//
-using namespace fog;
-// === Main function ===
+#include "fg/demo/DiamondSquareMapGenerator.h"
+// 示例：生成 65x65 高度图并打印部分值
 int main()
 {
-    std::cout << "OGRE Version: "
-              << OGRE_VERSION_MAJOR << "."
-              << OGRE_VERSION_MINOR << "."
-              << OGRE_VERSION_PATCH << std::endl;
-    try
-    {
-        std::cout << "Weighted Hexagonal Grid Navigation System\n";
-        std::cout << "=========================================\n\n";
+    auto heightmap = DiamondSquare::generate(65, 0.45f, 12345);
 
-        // Initialize Ogre application context
-        auto app = std::make_unique<SimpleApp>();
-        app->add(new Demo::CostMapMod());
-        app->add(new Demo::WorldStateMod());
-        app->add(new Demo::UIMod());
+    // 归一化到 [0, 1]（可选）
+    float min_val = heightmap[0][0], max_val = heightmap[0][0];
+    for (const auto &row : heightmap)
+    {
+        for (float h : row)
+        {
+            if (h < min_val)
+                min_val = h;
+            if (h > max_val)
+                max_val = h;
+        }
+    }
+    float range = max_val - min_val;
+    if (range == 0)
+        range = 1;
 
-        app->setup();
-        app->startRendering();
-        app->close();
-    }
-    catch (Ogre::Exception &e)
+    // 打印归一化后的前10行前10列（用于调试）
+    for (int i = 0; i < 10; ++i)
     {
-        std::cerr << "Error: " << e.what() << "\n";
-        return 1;
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << "Error: " << e.what() << "\n";
-        return 1;
-    }
-    catch (const char *&e)
-    {
-        std::cerr << "Error: " << e << "\n";
-        return 1;
-    }
-    catch (...)
-    {
-        std::cerr << "Unknown Error." << std::endl;
+        for (int j = 0; j < 10; ++j)
+        {
+            float norm = (heightmap[i][j] - min_val) / range;
+            printf("%.2f ", norm);
+        }
+        std::cout << "\n";
     }
 
     return 0;
