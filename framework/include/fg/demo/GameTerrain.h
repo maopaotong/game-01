@@ -13,6 +13,8 @@
 #include "fg/Terrains.h"
 #include "fg/util/OgreCode.h"
 #include "fg/demo/ModifyHeightImg.h"
+#include "fg/demo/DiamondSquare.h"
+
 namespace fog
 {
     using namespace Ogre;
@@ -32,12 +34,12 @@ namespace fog
         const float flatHight = 0.0f;
         const float terrainScale = 100.0f; // height
 
-        float minHeight0 = 10;
-        float fadeDist0 = 1;
-        float minHeight1 = 35;
-        float fadeDist1 = 2;
+        float minHeight1 = 50;
+        float fadeDist1 = 1;
         float minHeight2 = 55;
-        float fadeDist2 = 5;
+        float fadeDist2 = 1;
+        float minHeight3 = 85;
+        float fadeDist3 = 1;
         
         bool flat = false; // for test.
     private:
@@ -169,7 +171,7 @@ namespace fog
         {
             Ogre::TerrainLayerBlendMap *blendMap0 = terrain->getLayerBlendMap(1);
             Ogre::TerrainLayerBlendMap *blendMap1 = terrain->getLayerBlendMap(2);
-            Ogre::TerrainLayerBlendMap *blendMap2 = terrain->getLayerBlendMap(2);
+            Ogre::TerrainLayerBlendMap *blendMap2 = terrain->getLayerBlendMap(3);
 
             float *pBlend0 = blendMap0->getBlendPointer();
             float *pBlend1 = blendMap1->getBlendPointer();
@@ -185,16 +187,16 @@ namespace fog
                     float height = terrain->getHeightAtTerrainPosition(u, v);
 
                     // Layer 0 
-                    float val = (height - minHeight0) / fadeDist0;
+                    float val = (height - minHeight1) / fadeDist1;
                     val = Ogre::Math::Clamp(val, 0.0f, 1.0f);
                     pBlend0[y * size + x] = val;
 
                     // Layer 1
-                    val = (height - minHeight1) / fadeDist1;
+                    val = (height - minHeight2) / fadeDist2;
                     val = Ogre::Math::Clamp(val, 0.0f, 1.0f);
                     pBlend1[y * size + x] = val;
                     // Layer 2
-                    val = (height - minHeight2) / fadeDist2;
+                    val = (height - minHeight3) / fadeDist3;
                     val = Ogre::Math::Clamp(val, 0.0f, 1.0f);
                     pBlend2[y * size + x] = val;
                     
@@ -257,6 +259,7 @@ namespace fog
             getTerrainImage(x % 2 != 0, y % 2 != 0, img);
             ModifyHeightImg modHeight(img);
             // modHeight.modifyHeight();
+            DiamondSquare::generateImg(img);
             terrainGroup->defineTerrain(x, y, &img);
         }
 
