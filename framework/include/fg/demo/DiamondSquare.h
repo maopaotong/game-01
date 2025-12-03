@@ -18,6 +18,7 @@ namespace fog
             size = 513;
             std::vector<std::vector<float>> heightmap(size, std::vector<float>(size, 0.0f));
             generateAndNormalise(heightmap, size, 0.6, 8151245);
+            eraseDetailWithinTerrainTypes(heightmap, size);
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
@@ -28,34 +29,96 @@ namespace fog
                 }
             }
         }
+
+        //
+        // hide the detail within each type of terrain.
+        static void eraseDetailWithinTerrainTypes(std::vector<std::vector<float>> &heightmap, int size)
+        {
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    float h = heightmap[i][j];
+                    if (h < 0.50f)
+                    {
+                        h = 0.0f; // ocean.
+                    }
+                    else if (h < 0.55f)
+                    {
+                        h = 0.55f; // shore
+                    }
+                    else if (h < 0.9)
+                    {
+                        h = 0.9f; // land.
+                    }
+                    else
+                    {
+                        h = 1.0f; // mountains.
+                    }
+                    heightmap[i][j] = h;
+                }
+            }
+        }
+
+        //
+
         static void generateAndNormalise(std::vector<std::vector<float>> &heightmap, int size, float roughness, unsigned int seed)
         {
 
             generate(heightmap, size, roughness, seed);
-            // 归一化到 [0, 1]（可选）
+            // determine the max and min val;
             float min_val = heightmap[0][0], max_val = heightmap[0][0];
+            float total = 0.0f;
             for (const auto &row : heightmap)
             {
                 for (float h : row)
                 {
                     if (h < min_val)
+                    {
                         min_val = h;
+                    }
                     if (h > max_val)
+                    {
+
                         max_val = h;
+                    }
+                    total += 1.0f;
                 }
             }
-            float range = max_val - min_val;
-            if (range == 0)
-                range = 1;
+
+            float rangeFloat = max_val - min_val + 1;
+            // counting the samples scatter on [0..1000]
+            int length = 1000;
+            float *percentage = new float[length]{0.0f};
 
             for (int i = 0; i < size; ++i)
             {
                 for (int j = 0; j < size; ++j)
                 {
-                    float norm = (heightmap[i][j] - min_val) / range;
-                    heightmap[i][j] = norm;
+                    int idx = static_cast<int>(std::floor((heightmap[i][j] - min_val) / rangeFloat * length));
+                    percentage[idx]++;
                 }
             }
+
+            // incremental percentage scatter on [0..1000]
+            float count = 0.0f;
+            for (int i = 0; i < length; i++)
+            {
+                count += percentage[i];
+                percentage[i] = count / total; // percentage,
+            }
+
+            // incremental percentage as the height of position.
+            for (int i = 0; i < size; ++i)
+            {
+                for (int j = 0; j < size; ++j)
+                {
+                    // height as index of incremental histogram.
+                    int hAsIdx = static_cast<int>(std::floor((heightmap[i][j] - min_val) / rangeFloat * length));
+                    heightmap[i][j] = percentage[hAsIdx];
+                }
+            }
+            delete[] percentage;
         }
 
         static void generate(std::vector<std::vector<float>> &heightmap, int size, float roughness = 0.5f, unsigned int seed = 0)
@@ -67,7 +130,7 @@ namespace fog
 
             // 初始化随机数生成器
             std::mt19937 rng(seed);
-            std::uniform_real_distribution<float> rand(-1.0f, 1.0f);
+            std::uniform_real_distribution<float> rand(0.0f, 1.0f);
 
             // 初始化四个角（可设为 0 或小随机值）
             heightmap[0][0] = rand(rng);
