@@ -34,9 +34,9 @@ namespace fog
         const float flatHight = 0.0f;
         const float terrainScale = 10.0f; // height
 
-        float minHeight1 = 0.50f * terrainScale;//shore
+        float minHeight1 = 0.35f * terrainScale;//shore
         float fadeDist1 = 1;
-        float minHeight2 = 0.545f * terrainScale;//land
+        float minHeight2 = 0.50f * terrainScale;//land
         float fadeDist2 = 1;
         float minHeight3 = 0.91f * terrainScale;//mountains
         float fadeDist3 = 1;

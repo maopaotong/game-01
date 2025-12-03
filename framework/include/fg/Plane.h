@@ -10,11 +10,12 @@ namespace fog
 
     struct Height
     {
-        Terrains *terrains;
-        Height(Terrains *terrains) : terrains(terrains) {}
+        // Terrains *terrains;
+        // Height(Terrains *terrains) : terrains(terrains) {}
         float operator()(Vector3 &pos, Vector3 *pNorm)
         {
-            return terrains->getHeightWithNormalAtWorldPosition(pos, pNorm);
+            //return terrains->getHeightWithNormalAtWorldPosition(pos, pNorm);
+            return 0.0f;
         }
     };
 
@@ -28,7 +29,7 @@ namespace fog
         Vector3 forwardDirection = Vector3::UNIT_Z;
 
     public:
-        Plane(Terrains *terrains) : height(Height(terrains)), origin(Vector3(0, 0, 0))
+        Plane() : height(Height()), origin(Vector3(0, 0, 0))
         {
         }
         Vector3 getOrigin()

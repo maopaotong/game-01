@@ -9,12 +9,15 @@
 #include "fg/MovableStateManager.h"
 #include "fg/BuildingStateManager.h"
 #include "fg/InventoryStateManager.h"   
+#include "fg/core/TilesState.h"
 namespace fog
 {
     class WorldState : public State
     {
     protected:
-        CellStateControl *cells;
+        //CellStateControl *cells;
+        TilesState* tiles;
+
 
     public:
         WorldState()
@@ -24,9 +27,9 @@ namespace fog
             Ogre::Root *root = core->getRoot();
 
             // Create frame listener for main loop
-            this->cells = new CellStateControl();
-            this->cells->init();
-            this->addChild(this->cells);
+            this->tiles = new TilesState();
+            this->tiles->init();
+            this->addChild(this->tiles);
             //
             MovableStateManager *movableStateMgr = Context<MovableStateManager >::get();
             movableStateMgr->init();

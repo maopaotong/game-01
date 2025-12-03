@@ -39,13 +39,13 @@ namespace fog
                 for (int j = 0; j < size; j++)
                 {
                     float h = heightmap[i][j];
-                    if (h < 0.50f)
+                    if (h < 0.35f)
                     {
                         h = 0.0f; // ocean.
                     }
-                    else if (h < 0.55f)
+                    else if (h < 0.50f)
                     {
-                        h = 0.55f; // shore
+                        h = 0.50f; // ocean
                     }
                     else if (h < 0.9)
                     {

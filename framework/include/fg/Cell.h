@@ -105,6 +105,11 @@ namespace fog
                 return Cell::Instance(cKey, root);
             }
 
+            Cell::Instance getCell(int x, int y)
+            {
+                return Cell::Instance(x, y, root);
+            }
+
             Cell::Instance getAnyCell()
             {
                 return Cell::Instance(0, 0, root);
@@ -186,6 +191,15 @@ namespace fog
                         visit(cell);
                     }
                 }
+            }
+
+            int getWidth()
+            {
+                return this->costMap->getWidth();
+            }
+            int getHeight()
+            {
+                return this->costMap->getHeight();
             }
         };
     };

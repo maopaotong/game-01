@@ -60,13 +60,13 @@ namespace fog
             // Create materials before buding mesh?
             MaterialFactory::createMaterials(core->getMaterialManager());
             //
-            GameTerrains *terrains = new GameTerrains();
             RenderSystem *rSys = core->getRoot()->getRenderSystem();
             Light *light = core->getLight();
-            terrains->load(rSys, sceMgr, light);
-            Context<Terrains>::set(terrains);
-            //
-            fog::Plane *p = new fog::Plane(terrains);
+            // GameTerrains *terrains = new GameTerrains();
+            // terrains->load(rSys, sceMgr, light);
+            // Context<Terrains>::set(terrains);
+            // //
+            fog::Plane *p = new fog::Plane();
             Context<Plane>::set(p);
 
             float scale = 30.0f;
@@ -113,8 +113,8 @@ namespace fog
         }
         CostMap *createCostMap()
         {
-            int width = 30;
-            int height = 25;
+            int width = 128 + 1;
+            int height = 128 + 1;
             CostMap *cm = new CostMap(width, height);
             std::random_device rd;
             std::mt19937 gen(rd());
