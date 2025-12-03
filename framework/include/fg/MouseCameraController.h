@@ -74,10 +74,10 @@ namespace fog
 
             Context<Var<Vector3>::Bag>::get()->setVar(".camera.position", posTarget);
             float distance = this->cameraTopDistance;
-            if (distance < posTarget.y)
-            {
-                distance = posTarget.y + 10;
-            }
+            // if (distance < posTarget.y)
+            // {
+            //     distance = posTarget.y + 10;
+            // }
             alignHorizonToTop(node, cam, distance);
 
             return false;
@@ -93,9 +93,11 @@ namespace fog
 
             // 计算相机到目标点的俯角（从水平线向下）
             Ogre::Radian depressionAngle = Ogre::Math::ATan(camHeight / distance);
-
             // 目标 pitch：向下转 (depressionAngle + fovY/2)
             Ogre::Radian targetPitch = -(depressionAngle + fovY / 2);
+
+            const Ogre::Radian PITCH_LIMIT = Ogre::Degree(89.9);
+            targetPitch = Ogre::Math::Clamp(targetPitch, -PITCH_LIMIT, PITCH_LIMIT);
 
             // 保持当前 yaw
             Ogre::Radian currentYaw = camNode->getOrientation().getYaw();
