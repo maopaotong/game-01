@@ -34,7 +34,6 @@
 #include "fg/demo/InputStateController.h"
 #include "fg/MovingStateManager.h"
 #include "fg/BuildingStateManager.h"
-#include "fg/MouseCameraController.h"
 namespace fog
 {
     using namespace OgreBites;
@@ -52,7 +51,7 @@ namespace fog
         }
         bool mouseWheelRolled(const MouseWheelEvent &evt)
         {
-            Context<MouseCameraController>::get()->mouseWheelRolled(evt);
+            Context<CameraState>::get()->mouseWheelRolled(evt);
             return false;
         }
         bool mousePressed(const MouseButtonEvent &evt) override

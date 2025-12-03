@@ -37,11 +37,25 @@ namespace fog
     // === Frame Listener class for main loop ===
     class CameraState : public State, public Stairs
     {
+        static constexpr float DEFAULT_CAMERA_TOP_DISTANCE = 2 * 1000.0f;
+        static constexpr float DEFAULT_CAMERA_HIGH_MIN = 100.0f;
+        static constexpr float DEFAULT_CAMERA_HITH_MAX = 1000.0f * 5;
+        static constexpr float DEFAULT_CAMERA_ROLL_SPEED = (DEFAULT_CAMERA_HITH_MAX - DEFAULT_CAMERA_HIGH_MIN) / 10.0f;
+
+    private:
+        float cameraTopDistance;
+        float cameraHighMin;
+        float cameraHighMax;
+        float cameraRollSpeed;
+
     private:
         bool quit;
 
     public:
-        CameraState() : quit(false)
+        CameraState() : quit(false),cameraTopDistance(DEFAULT_CAMERA_TOP_DISTANCE),
+                                  cameraHighMin(DEFAULT_CAMERA_HIGH_MIN),
+                                  cameraHighMax(DEFAULT_CAMERA_HITH_MAX),
+                                  cameraRollSpeed(DEFAULT_CAMERA_ROLL_SPEED)
         {
 
         }
@@ -120,6 +134,57 @@ namespace fog
             }
 
             return true; // Continue rendering
+        }
+
+        bool mouseWheelRolled(const MouseWheelEvent &evt)
+        {
+            Camera *cam = Context<CoreMod>::get()->getCamera();
+            Ogre::SceneNode *node = cam->getParentSceneNode();
+            Vector3 translate = Ogre::Vector3::NEGATIVE_UNIT_Y * evt.y * cameraRollSpeed;
+            Vector3 posTarget = node->getPosition() + translate;
+            if (posTarget.y < this->cameraHighMin)
+            {
+                posTarget.y = this->cameraHighMin;
+            }
+
+            node->setPosition(posTarget);
+
+            Context<Var<Vector3>::Bag>::get()->setVar(".camera.position", posTarget);
+            float distance = this->cameraTopDistance;
+            // if (distance < posTarget.y)
+            // {
+            //     distance = posTarget.y + 10;
+            // }
+            alignHorizonToTop(node, cam, distance);
+
+            return false;
+        }
+        void alignHorizonToTop(Ogre::SceneNode *camNode, Ogre::Camera *cam, Ogre::Real distance)
+        {
+            Ogre::Radian fovY = cam->getFOVy();
+            Ogre::Real camHeight = camNode->getPosition().y; // 假设地面 Y=0
+
+            // 防止高度 <= 0
+            if (camHeight <= 0.1f)
+                camHeight = 0.1f;
+
+            // 计算相机到目标点的俯角（从水平线向下）
+            Ogre::Radian depressionAngle = Ogre::Math::ATan(camHeight / distance);
+            // 目标 pitch：向下转 (depressionAngle + fovY/2)
+            Ogre::Radian targetPitch = -(depressionAngle + fovY / 2);
+
+            const Ogre::Radian PITCH_LIMIT = Ogre::Degree(89.9);
+            targetPitch = Ogre::Math::Clamp(targetPitch, -PITCH_LIMIT, PITCH_LIMIT);
+
+            // 保持当前 yaw
+            Ogre::Radian currentYaw = camNode->getOrientation().getYaw();
+
+            // 设置新朝向
+            Ogre::Quaternion newOri =
+                Ogre::Quaternion(currentYaw, Ogre::Vector3::UNIT_Y) *
+                Ogre::Quaternion(targetPitch, Ogre::Vector3::UNIT_X);
+
+            camNode->setOrientation(newOri);
         }
     };
 }; // end of namespace
