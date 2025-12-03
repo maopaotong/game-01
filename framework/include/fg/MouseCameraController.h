@@ -29,6 +29,7 @@
 #include "fg/util/CellUtil.h"
 #include "fg/CoreMod.h"
 #include "fg/core/MoveToCellTask.h"
+#include <OgreMath.h>
 
 namespace fog
 {
@@ -41,7 +42,7 @@ namespace fog
     {
         static constexpr float DEFAULT_CAMERA_TOP_DISTANCE = 2 * 1000.0f;
         static constexpr float DEFAULT_CAMERA_HIGH_MIN = 100.0f;
-        static constexpr float DEFAULT_CAMERA_HITH_MAX = 1000.0f;
+        static constexpr float DEFAULT_CAMERA_HITH_MAX = 1000.0f * 5;
         static constexpr float DEFAULT_CAMERA_ROLL_SPEED = (DEFAULT_CAMERA_HITH_MAX - DEFAULT_CAMERA_HIGH_MIN) / 10.0f;
 
     private:
@@ -68,16 +69,17 @@ namespace fog
             {
                 posTarget.y = this->cameraHighMin;
             }
-            if (posTarget.y > this->cameraHighMax)
-            {
-                posTarget.y = this->cameraHighMax;
-            }
 
             node->setPosition(posTarget);
 
             Context<Var<Vector3>::Bag>::get()->setVar(".camera.position", posTarget);
+            float distance = this->cameraTopDistance;
+            if (distance < posTarget.y)
+            {
+                distance = posTarget.y + 10;
+            }
+            alignHorizonToTop(node, cam, distance);
 
-            alignHorizonToTop(node, cam, this->cameraTopDistance);
             return false;
         }
         void alignHorizonToTop(Ogre::SceneNode *camNode, Ogre::Camera *cam, Ogre::Real distance)
