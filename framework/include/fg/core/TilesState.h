@@ -27,6 +27,7 @@ namespace fog
     public:
         TilesState() : ManualState()
         {
+            this->material = "Tiles";
         }
         void init() override
         {
@@ -40,7 +41,7 @@ namespace fog
             int h = Context<Cell::Center>::get()->getHeight();
             int size = w;
             std::vector<std::vector<float>> heightmap(size, std::vector<float>(size, 0.0f));
-            DiamondSquare::generateAndNormalise(heightmap, size, 0.6, 8151245);
+            DiamondSquare::generateAndNormalise(heightmap, size, 0.45, 8151245);
             DiamondSquare::eraseDetailWithinTerrainTypes(heightmap, size);
 
             obj->clear();
@@ -66,61 +67,11 @@ namespace fog
             int neibersX[6] = {-1};
             int neibersY[6] = {-1};
 
-            /**
-             *
-             *    * * *     [0,3]     [1,3]    [2,3]
-             *   * * *    [0,2]   [1,2]    [2,2]
-             *    * * *     [0,1]     [1,1]    [2,1]
-             *   * * *    [0,0]   [1,0]    [2,0]
-             *
-             */
             for (int x = 0; x < w; x++)
             {
                 for (int y = 0; y < h; y++)
                 {
-                    // e.g. :[1,2]
-                    if (y % 2 == 0)
-                    {
-
-                        neibersX[0] = x; //[1,1]
-                        neibersY[0] = y - 1;
-
-                        neibersX[1] = x + 1; //[2,2]
-                        neibersY[1] = y;
-
-                        neibersX[2] = x; //[1,3]
-                        neibersY[2] = y + 1;
-
-                        neibersX[3] = x - 1; //[0,3]
-                        neibersY[3] = y + 1;
-
-                        neibersX[4] = x - 1; //[0,2]
-                        neibersY[4] = y;
-
-                        neibersX[5] = x - 1; //[0,1]
-                        neibersY[5] = y - 1;
-                    }
-                    else
-                    { // e.g. [1,1]
-
-                        neibersX[0] = x + 1; //[2,0]
-                        neibersY[0] = y - 1;
-
-                        neibersX[1] = x + 1; //[2,1]
-                        neibersY[1] = y;
-
-                        neibersX[2] = x + 1; //[2,2]
-                        neibersY[2] = y + 1;
-
-                        neibersX[3] = x; //[1,2]
-                        neibersY[3] = y + 1;
-
-                        neibersX[4] = x - 1; //[0,1]
-                        neibersY[4] = y;
-
-                        neibersX[5] = x; //[1,0]
-                        neibersY[5] = y - 1;
-                    }
+                    Cell::getNeibers(x, y, neibersX, neibersY);
                     //
                     Vector3 neibersP[6];
                     int neibersCount = 0;
@@ -148,8 +99,10 @@ namespace fog
                         normNs += normN;
                         normNs.normalise();
                     }
+                    
                     obj->position(p1);
                     obj->normal(normNs);
+                    //obj->textureCoord();//
                     if (p1.y < 5.0f)
                     {
                         obj->colour(ColourValue::Blue);
@@ -162,8 +115,8 @@ namespace fog
                     {
                         obj->colour(ColourValue::White);
                     }
-                }
-            }
+                }//end of for
+            }//end of for
 
             // triangle
             for (int x = 0; x < w - 1; x++)
