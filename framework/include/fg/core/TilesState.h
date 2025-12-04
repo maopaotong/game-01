@@ -45,7 +45,7 @@ namespace fog
             int h = Context<Cell::Center>::get()->getHeight();
             int size = w;
             std::vector<std::vector<float>> heightmap(size, std::vector<float>(size, 0.0f));
-            DiamondSquare::generateAndNormalise(heightmap, size, 0.75, 8151245);
+            DiamondSquare::generateAndNormalise(heightmap, size, 0.45, 8151245);
             DiamondSquare::eraseDetailWithinTerrainTypes(heightmap, size);
 
             obj->clear();

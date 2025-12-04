@@ -37,33 +37,19 @@ namespace fog
     // === Frame Listener class for main loop ===
     class CameraState : public State, public Stairs
     {
-        static constexpr float DEFAULT_CAMERA_TOP_DISTANCE = 2 * 1000.0f;
-        static constexpr float DEFAULT_CAMERA_HIGH_MIN = 100.0f;
-        static constexpr float DEFAULT_CAMERA_HITH_MAX = 1000.0f * 5;
-        static constexpr float DEFAULT_CAMERA_ROLL_SPEED = (DEFAULT_CAMERA_HITH_MAX - DEFAULT_CAMERA_HIGH_MIN) / 10.0f;
-
-    private:
-        float cameraTopDistance;
-        float cameraHighMin;
-        float cameraHighMax;
-        float cameraRollSpeed;
 
     private:
         bool quit;
 
     public:
-        CameraState() : quit(false),cameraTopDistance(DEFAULT_CAMERA_TOP_DISTANCE),
-                                  cameraHighMin(DEFAULT_CAMERA_HIGH_MIN),
-                                  cameraHighMax(DEFAULT_CAMERA_HITH_MAX),
-                                  cameraRollSpeed(DEFAULT_CAMERA_ROLL_SPEED)
+        CameraState() : quit(false)
         {
-
         }
 
         // position and orientation of the camera
         bool isViewportInsideGround(Vector3 &position, Quaternion &orientation)
         {
-           
+
             Ogre::Plane gPlane(Ogre::Vector3::UNIT_Y, 0);
             // Ray ray = state->camera->getCameraToViewportRay(0.5f, 0.5f);
 
@@ -77,11 +63,18 @@ namespace fog
             }
             Vector3 viewCenterOnGround = ray.getPoint(hitGrd.second);
             Cell::Instance cell;
-            if(Context<Cell::Center>::get()->findCellByWorldPosition(viewCenterOnGround, cell)){
+            if (Context<Cell::Center>::get()->findCellByWorldPosition(viewCenterOnGround, cell))
+            {
                 return true;
             }
 
             return false;
+        }
+
+        static float map(float fValue, float minValue, float maxValue, float outMin, float outMax)
+        {
+
+            return (fValue - minValue) / (maxValue - minValue) * (outMax - outMin) + outMin;
         }
 
         bool step(float timeSinceLastFrame) override
@@ -97,12 +90,15 @@ namespace fog
             // 计算右向量（X轴）
             Ogre::Vector3 right = Ogre::Vector3::UNIT_X;
             Ogre::Vector3 back = Ogre::Vector3::UNIT_Z;
+            float height = node->getPosition().y;
 
-            float speed = FOG_CAM_SPEED;
+            float speed = map(height, DEFAULT_CAMERA_HEIGHT_MIN, DEFAULT_CAMERA_HEIGHT_MAX, FOG_CAM_SPEED_MIN, FOG_CAM_SPEED_MAX);
+            //
+
             Vector3 position = node->getPosition();
             Vector3 step = Ogre::Vector3::ZERO;
 
-            InputStateController * inputState = Context<InputStateController>::get();
+            InputStateController *inputState = Context<InputStateController>::get();
 
             if (inputState->isFront())
             {
@@ -135,22 +131,34 @@ namespace fog
 
             return true; // Continue rendering
         }
-
+        /**
+         * Move and rotate the camera according to the height of the camera.
+         * Lower position with a heigher pitch : look forward.
+         * Heighest position let camera to look more like downward.
+         */
         bool mouseWheelRolled(const MouseWheelEvent &evt)
         {
             Camera *cam = Context<CoreMod>::get()->getCamera();
             Ogre::SceneNode *node = cam->getParentSceneNode();
+
+            float height = node->getPosition().y;
+
+            float cameraRollSpeed = map(height, DEFAULT_CAMERA_HEIGHT_MIN, DEFAULT_CAMERA_HEIGHT_MAX, DEFAULT_CAMERA_ROLL_SPEED_MIN, DEFAULT_CAMERA_ROLL_SPEED_MAX);
+
             Vector3 translate = Ogre::Vector3::NEGATIVE_UNIT_Y * evt.y * cameraRollSpeed;
+
             Vector3 posTarget = node->getPosition() + translate;
-            if (posTarget.y < this->cameraHighMin)
+            if (posTarget.y < DEFAULT_CAMERA_HEIGHT_MIN)
             {
-                posTarget.y = this->cameraHighMin;
+                posTarget.y = DEFAULT_CAMERA_HEIGHT_MIN;
             }
 
             node->setPosition(posTarget);
 
             Context<Var<Vector3>::Bag>::get()->setVar(".camera.position", posTarget);
-            float distance = this->cameraTopDistance;
+
+             
+            float distance = map(height, DEFAULT_CAMERA_HEIGHT_MIN, DEFAULT_CAMERA_HEIGHT_MAX, CAMERA_FAR_DISTANCE_MIN,CAMERA_FAR_DISTANCE_MAX);
             // if (distance < posTarget.y)
             // {
             //     distance = posTarget.y + 10;
@@ -159,6 +167,9 @@ namespace fog
 
             return false;
         }
+        /**
+         * Adjust the pitch according to the new height of camera.
+         */
         void alignHorizonToTop(Ogre::SceneNode *camNode, Ogre::Camera *cam, Ogre::Real distance)
         {
             Ogre::Radian fovY = cam->getFOVy();

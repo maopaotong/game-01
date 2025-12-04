@@ -69,8 +69,8 @@ void main() {
 
         vec3 N = normalize(normal);           // ← 关键！
         vec3 L = normalize(vec3(0.75, 1.0, 0.0)); // 光从右上方来
-        float ambient = 0.58;
-        float diffuse = 1.6 * max(dot(N, L), 0.0);
+        float ambient = 0.68;
+        float diffuse = 1.2 * max(dot(N, L), 0.0);
         float diff = ambient + diffuse;
 
         //float shade_factor = 0.58 + 1.60 * max(0., dot(vNormal, normalize(light)));

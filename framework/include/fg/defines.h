@@ -13,13 +13,25 @@
 #include <Ogre.h>
 #include <OgreColourValue.h>
 
-#define FOG_CAM_SPEED 750
-
 namespace fog
 {
     constexpr bool DEBUG_COUT = false;
     constexpr float TEXTURE_COORD_SCALE = 30.0f;
     constexpr bool DEBUG_CHECK_IMPOSSIBLE_ERROR = false;
+
+    static constexpr float DEFAULT_CAMERA_HEIGHT_MIN = 100.0f;
+    static constexpr float DEFAULT_CAMERA_HEIGHT_MAX = 1000.0f * 5;
+    
+    static constexpr float DEFAULT_CAMERA_ROLL_SPEED_MIN = 30;
+    static constexpr float DEFAULT_CAMERA_ROLL_SPEED_MAX = 300;
+    
+    static constexpr float CAMERA_FAR_DISTANCE_MIN = 2000;//
+    static constexpr float CAMERA_FAR_DISTANCE_MAX = 5000;//
+    
+
+    // camera speed when move within x-z plane.
+    static constexpr float FOG_CAM_SPEED_MIN = 750;
+    static constexpr float FOG_CAM_SPEED_MAX = FOG_CAM_SPEED_MIN * 5;
 
     using GOON = bool;
 
@@ -55,14 +67,16 @@ namespace fog
             return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
         }
     };
-    
-    enum class MouseCellEventType{
+
+    enum class MouseCellEventType
+    {
         MouseLeaveCell,
         MouseEnterCell,
-        
+
     };
 
-    enum class CellEventType{
+    enum class CellEventType
+    {
         CellAsTarget,
         CellEntered,
         CellLeft,
@@ -108,10 +122,9 @@ namespace fog
         {InventoryType::Population, "Population"},
         {InventoryType::Food, "Food"},
         {InventoryType::Building, "Building"},
-        {InventoryType::LandScape, "LandScape"},  
-        {InventoryType::WaterSource, "WaterSource"},  
-              
-    };
+        {InventoryType::LandScape, "LandScape"},
+        {InventoryType::WaterSource, "WaterSource"},
 
+    };
 
 };
