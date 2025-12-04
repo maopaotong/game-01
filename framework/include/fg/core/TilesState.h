@@ -100,10 +100,10 @@ namespace fog
                         std::cout << fmt::format("p1:({:>8.1f},{:>8.1f},{:>8.1f})", p1.x, p1.y, p1.z) << std::endl;
                         std::cout << fmt::format("neibersCount:{}", neibersCount) << std::endl;
                     }
-                    if (neibersCount >= 2)
+                    if (neibersCount == 6)
                     {
                         normNs = Vector3(0, 0, 0);
-                        for (int i = 0; i < neibersCount - 1; i++)
+                        for (int i = 0; i < neibersCount; i++)
                         {
                             Vector3 p2 = neibersP[i];
                             Vector3 p3 = neibersP[(i + 1) % neibersCount];
@@ -134,6 +134,7 @@ namespace fog
                     obj->position(p1);
 
                     obj->normal(normNs);
+                    obj->textureCoord(p1.x, p1.z);
                     // std::cout << normNs << std::endl;
                     // obj->textureCoord();//
                     // if (p1.y < 5.0f)

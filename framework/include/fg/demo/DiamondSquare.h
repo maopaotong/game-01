@@ -50,9 +50,9 @@ namespace fog
                     {
                         h = .50;
                     }
-                    else if (h <= .75)
+                    else if (h <= .85)
                     {
-                        h = .75;
+                        h = .85;
                     }
                     else if (h <= 100)
                     {
