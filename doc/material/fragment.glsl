@@ -17,36 +17,35 @@ bool fEquals(float a, float b) {
     return abs(a - b) < 0.001;
 }
 
-bool isOcean(float height){    
-    return height > -1 && height < 45;
+bool isOcean(float height) {
+    return height > 0 && height <= 35;
 }
 
-bool isShore(float height){    
-    return height > 1 && height < 51;
+bool isShore(float height) {
+    return height > 35 && height <= 50;
 }
 
-bool isLand(float height){
+bool isLand(float height) {
 
-    return height > 50 && height < 76;
+    return height > 50 && height <= 75;
 }
 
-bool isMountain(float height){
-    return height > 75;
+bool isMountain(float height) {
+    return height > 75 && height <= 100;
 }
-
 
 void main() {
 
 //outFragColor = vec4(1.0, 0.0, 1.0, 1.0); // 亮品红
 //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
     vec4 color;
-    if(isOcean(fPosition.y)){
+    if(isOcean(fPosition.y)) {
         color = texture(texOcean, fUV);
-    }else if(isShore(fPosition.y)){
-        color = texture(texShore, fUV);        
-    }else if(isLand(fPosition.y)){
+    } else if(isShore(fPosition.y)) {
+        color = texture(texShore, fUV);
+    } else if(isLand(fPosition.y)) {
         color = texture(texLand, fUV);
-    }else if(isMountain(fPosition.y)){
+    } else if(isMountain(fPosition.y)) {
         color = texture(texMountain, fUV);
     }
 
@@ -57,7 +56,7 @@ void main() {
 //outFColor = vec4(normalize(fNormal)*0.5+0.5, 1);
 
     vec3 N = normalize(fNormal);           // ← 关键！
-    vec3 L = normalize(vec3(0.5, 1.0, 0.5)); // 光从右上方来
+    vec3 L = normalize(vec3(0.75, 1.0, 0.0)); // 光从右上方来
     float diff = max(dot(N, L), 0.0);
 
     outFColor = vec4(color.rgb * (diff + 0.2), 1.0); // +0.2 防全黑

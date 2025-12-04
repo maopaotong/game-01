@@ -18,6 +18,10 @@ namespace fog
 {
     class Game01 : public Mod, public FrameListener
     {
+
+        int width = 256 + 1;
+        int height = width;
+
         bool breakRenderRequested = false;
         RenderWindow *window;
         Viewport *vp;
@@ -113,8 +117,7 @@ namespace fog
         }
         CostMap *createCostMap()
         {
-            int width = 128 + 1;
-            int height = 128 + 1;
+            
             CostMap *cm = new CostMap(width, height);
             std::random_device rd;
             std::mt19937 gen(rd());

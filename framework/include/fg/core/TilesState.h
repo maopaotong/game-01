@@ -13,6 +13,7 @@
 #include "fg/Property.h"
 #include "fg/core/ManualState.h"
 #include "fg/demo/DiamondSquare.h"
+#include "fg/defines.h"
 
 namespace fog
 {
@@ -92,10 +93,17 @@ namespace fog
 
                     Vector3 normNs; //
                     Vector3 p1 = positions[x][y];
-                    if (neibersCount > 0)
+                    if (DEBUG_COUT)
+                    {
+
+                        std::cout << fmt::format("======[{},{}]==================", x, y) << std::endl;
+                        std::cout << fmt::format("p1:({:>8.1f},{:>8.1f},{:>8.1f})", p1.x, p1.y, p1.z) << std::endl;
+                        std::cout << fmt::format("neibersCount:{}", neibersCount) << std::endl;
+                    }
+                    if (neibersCount >= 2)
                     {
                         normNs = Vector3(0, 0, 0);
-                        for (int i = 0; i < neibersCount; i++)
+                        for (int i = 0; i < neibersCount - 1; i++)
                         {
                             Vector3 p2 = neibersP[i];
                             Vector3 p3 = neibersP[(i + 1) % neibersCount];
@@ -103,7 +111,20 @@ namespace fog
                             Vector3 normN(plane.x, plane.y, plane.z);
                             normN.normalise();
                             normNs += normN;
-                            normNs.normalise();
+                            if (DEBUG_COUT)
+                            {
+                                std::cout << fmt::format("neibers   [{}]-----------------------------------------", i) << std::endl;
+                                std::cout << fmt::format("neibers   [{:>3}]p1:({:>8.1f},{:>8.1f},{:>8.1f})", i, p1.x, p1.y, p1.z) << std::endl;
+                                std::cout << fmt::format("neibers   [{:>3}]p2:({:>8.1f},{:>8.1f},{:>8.1f})", i, p2.x, p2.y, p2.z) << std::endl;
+                                std::cout << fmt::format("neibers   [{:>3}]p3:({:>8.1f},{:>8.1f},{:>8.1f})", i, p3.x, p3.y, p3.z) << std::endl;
+                                std::cout << fmt::format("normN     [{:>3}]  :({:>8.1f},{:>8.1f},{:>8.1f})", i, normN.x, normN.y, normN.z) << std::endl;
+                                std::cout << fmt::format("normNsRaw [{:>3}]  :({:>8.1f},{:>8.1f},{:>8.1f})", i, normNs.x, normNs.y, normNs.z) << std::endl;
+                            }
+                        }
+                        normNs.normalise();
+                        if (DEBUG_COUT)
+                        {
+                            std::cout << fmt::format("normNsNormalised [{},{}]({:>8.1f},{:>8.1f},{:>8.1f})", x, y, normNs.x, normNs.y, normNs.z) << std::endl;
                         }
                     }
                     else

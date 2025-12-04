@@ -40,8 +40,27 @@ namespace fog
                 for (int j = 0; j < size; j++)
                 {
                     float h = heightmap[i][j];
-                    h = std::floor(h * 10) / 10.0f;
+
+                    // h = std::floor(h * 10) / 10.0f;
+                    if (h <= .35)
+                    {
+                        h = 0.35;
+                    }
+                    else if (h <= .50)
+                    {
+                        h = .50;
+                    }
+                    else if (h <= .75)
+                    {
+                        h = .75;
+                    }
+                    else if (h <= 100)
+                    {
+                        h = 1.0;
+                    }
+
                     heightmap[i][j] = h;
+                    // heightmap[i][j] = 0;
                 }
             }
         }

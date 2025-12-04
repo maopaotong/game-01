@@ -8,6 +8,7 @@
 #include <tuple>
 #include <memory>
 #include <optional>
+#include <fmt/format.h>
 
 #include <Ogre.h>
 #include <OgreColourValue.h>
