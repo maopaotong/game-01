@@ -217,6 +217,11 @@ namespace fog
                 return forCellByPoint(positionIn3D, [&cell](Cell::Instance &cell2)
                                       { cell = cell2; });
             }
+            
+            CellKey getCellKeyByPoint(Vector2 pointIn2D){
+                return Cell::getCellKey(pointIn2D, root->scale);
+            }
+
             template <typename F>
             bool forCellByPoint(Vector3 positionIn3D, F &&visit)
             {

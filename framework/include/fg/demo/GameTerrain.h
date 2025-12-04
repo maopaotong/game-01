@@ -13,7 +13,7 @@
 #include "fg/Terrains.h"
 #include "fg/util/OgreCode.h"
 #include "fg/demo/ModifyHeightImg.h"
-#include "fg/demo/DiamondSquare.h"
+#include "fg/util/DiamondSquare.h"
 
 namespace fog
 {

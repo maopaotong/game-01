@@ -19,7 +19,7 @@ namespace fog
     class Game01 : public Mod, public FrameListener
     {
 
-        int width = 256 + 1;
+        int width = 128 + 1;
         int height = width;
 
         bool breakRenderRequested = false;

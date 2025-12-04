@@ -14,10 +14,12 @@
 #include "fg/core/ManualState.h"
 #include "fg/util/DiamondSquare.h"
 #include "fg/defines.h"
-#include "fg/core/Tiles.h"
+
 namespace fog
 {
     using namespace Ogre;
+
+    typedef Property::Ref<bool> boolRef;
 
     //
     class TilesState : public ManualState
@@ -37,72 +39,52 @@ namespace fog
         }
         void rebuildMesh() override
         {
-
             Cell::Center *cc = Context<Cell::Center>::get();
 
-            int tWidth = Context<Cell::Center>::get()->getWidth();
-            int tHeight = Context<Cell::Center>::get()->getHeight();
+            int w = Context<Cell::Center>::get()->getWidth();
+            int h = Context<Cell::Center>::get()->getHeight();
+            int size = w;
+            std::vector<std::vector<float>> heightmap(size, std::vector<float>(size, 0.0f));
+            DiamondSquare::generateAndNormalise(heightmap, size, 0.45, 8151245);
+            DiamondSquare::eraseDetailWithinTerrainTypes(heightmap, size);
 
-            std::vector<std::vector<Tiles::Tile>> tiles(tWidth, std::vector<Tiles::Tile>(tHeight, Tiles::Tile()));
-            Tiles::Generator::generateTiles(tiles, tWidth, tHeight);
-            int quality = 2;
-
-            int qWidth = tWidth * quality;
-            int qHeight = tHeight * quality;
-            Tiles::Terrains terrains(qWidth, qHeight);
-            terrains.init(tiles, tWidth, tHeight);
-
-            std::vector<std::vector<Tiles::Vertex>> &heightmap = terrains.hMap;
             obj->clear();
             obj->begin(material, Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
             int baseIdx = obj->getCurrentVertexCount();
 
-            std::vector<std::vector<Vector3>> positions(qWidth, std::vector<Vector3>(qWidth, Vector3::ZERO));
-            std::vector<std::vector<Vector3>> norms(qWidth, std::vector<Vector3>(qWidth, Vector3::UNIT_Y));
+            std::vector<std::vector<Vector3>> positions(size, std::vector<Vector3>(size, Vector3::ZERO));
+            std::vector<std::vector<Vector3>> norms(size, std::vector<Vector3>(size, Vector3::UNIT_Y));
 
             // collect position.
-            for (int qx = 0; qx < qWidth; qx++)
+            for (int x = 0; x < w; x++)
             {
-                for (int qy = 0; qy < qHeight; qy++)
+                for (int y = 0; y < h; y++)
                 {
-
-                    CellKey cKey = heightmap[qx][qy].cKey;
-
-                    Cell::Instance cis = cc->getCell(cKey);
-
-                    Vector2 tP = cis.getOrigin2D();
-                    float scale = cis.node->getScale();
-                    Vector2 qP = tP + heightmap[qx][qy].originInTile * scale;
-                    // scale
-                    float h = heightmap[qx][qy].height * HEIGHT_SCALE;
-                    Vector3 position = cis.node->to3D(qP);
-                    position.y = h;
-                    positions[qx][qy] = position;
+                    Cell::Instance a = cc->getCell(x, y);
+                    Vector3 pA = a.getOrigin3D();
+                    pA.y = heightmap[x][y] * HEIGHT_SCALE;
+                    positions[x][y] = pA;
                 }
             }
             // calculate norms
 
-            for (int qx = 0; qx < qWidth; qx++)
+            for (int x = 0; x < w; x++)
             {
-                for (int qy = 0; qy < qHeight; qy++)
+                for (int y = 0; y < h; y++)
                 {
-                    const int N = 4;
-                    // South,East,North,West
-                    int neibersX[N] = {qx, qx + 1, qx, qx - 1};
-                    int neibersY[N] = {qy - 1, qy, qy + 1, qy};
-
-                    // Cell::getNeibers(qx, qy, neibersX, neibersY); // TODO
+                    int neibersX[6] = {-1};
+                    int neibersY[6] = {-1};
+                    Cell::getNeibers(x, y, neibersX, neibersY);
                     //
-
-                    Vector3 neibersP[N];
+                    Vector3 neibersP[6];
                     int neibersCount = 0;
-                    for (int i = 0; i < N; i++)
+                    for (int i = 0; i < 6; i++)
                     {
                         int nX = neibersX[i];
                         int nY = neibersY[i];
 
-                        if (nX >= 0 && nX < qWidth && nY >= 0 && nY < qWidth) // TODO
+                        if (nX >= 0 && nX < size && nY >= 0 && nY < size)
                         {
                             neibersP[neibersCount] = positions[nX][nY];
                             neibersCount++;
@@ -110,15 +92,15 @@ namespace fog
                     }
 
                     Vector3 normNs; //
-                    Vector3 p1 = positions[qx][qy];
+                    Vector3 p1 = positions[x][y];
                     if (DEBUG_COUT)
                     {
 
-                        std::cout << fmt::format("======[{},{}]==================", qx, qy) << std::endl;
+                        std::cout << fmt::format("======[{},{}]==================", x, y) << std::endl;
                         std::cout << fmt::format("p1:({:>8.1f},{:>8.1f},{:>8.1f})", p1.x, p1.y, p1.z) << std::endl;
                         std::cout << fmt::format("neibersCount:{}", neibersCount) << std::endl;
                     }
-                    if (neibersCount == N)
+                    if (neibersCount == 6)
                     {
                         normNs = Vector3(0, 0, 0);
                         for (int i = 0; i < neibersCount; i++)
@@ -142,7 +124,7 @@ namespace fog
                         normNs.normalise();
                         if (DEBUG_COUT)
                         {
-                            std::cout << fmt::format("normNsNormalised [{},{}]({:>8.1f},{:>8.1f},{:>8.1f})", qx, qy, normNs.x, normNs.y, normNs.z) << std::endl;
+                            std::cout << fmt::format("normNsNormalised [{},{}]({:>8.1f},{:>8.1f},{:>8.1f})", x, y, normNs.x, normNs.y, normNs.z) << std::endl;
                         }
                     }
                     else
@@ -171,15 +153,15 @@ namespace fog
             } // end of for
 
             // triangle
-            for (int qx = 0; qx < qWidth - 1; qx++)
+            for (int x = 0; x < w - 1; x++)
             {
-                for (int qy = 0; qy < qHeight - 1; qy++)
+                for (int y = 0; y < h - 1; y++)
                 {
 
-                    int a = baseIdx + qx * qWidth + qy;
-                    int b = baseIdx + (qx + 1) * qWidth + qy;
-                    int c = baseIdx + (qx + 1) * qWidth + (qy + 1);
-                    int d = baseIdx + qx * qWidth + (qy + 1);
+                    int a = baseIdx + x * w + y;
+                    int b = baseIdx + (x + 1) * w + y;
+                    int c = baseIdx + (x + 1) * w + (y + 1);
+                    int d = baseIdx + x * w + (y + 1);
 
                     //
                     obj->triangle(a, b, c);

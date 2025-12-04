@@ -18,20 +18,20 @@ bool fEquals(float a, float b) {
 }
 
 bool isOcean(float height) {
-    return height > -0.001 && height <= 35 + (50 - 35) / 2;
+    return height > -0.001 && height <= 49.5;
 }
 
 bool isShore(float height) {
-    return height > 35 + (50 - 35) / 2 && height <= 50 + (85 - 50) / 2;
+    return height > 49.5 && height <= 50.5 ;
 }
 
 bool isLand(float height) {
 
-    return height > 50 + (85 - 50) / 2 && height <= 85 + (100 - 85) / 2;
+    return height > 50.5 && height <= 51.5;
 }
 
 bool isMountain(float height) {
-    return height > 85 && height <= 100;
+    return height > 51.5 && height <= 100;
 }
 
 void main() {
