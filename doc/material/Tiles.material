@@ -1,11 +1,7 @@
 
 vertex_program vertexShader glsl
 {
-    source vertex.glsl
-	default_params
-	{
-	 	param_named_auto worldviewproj_matrix worldviewproj_matrix
-	}
+    source vertex.glsl	
 }
 fragment_program fragmentShader glsl
 {
@@ -21,14 +17,22 @@ material Tiles
 			
 			vertex_program_ref vertexShader
 			{
-			
+				param_named_auto world_matrix world_matrix
+	 			param_named_auto worldviewproj_matrix worldviewproj_matrix
 			}
 			fragment_program_ref fragmentShader
-			{
-				param_named tex0 int 0  
-				param_named tex1 int 1
+			{				
+				param_named texTitles 	int 0
+				param_named texOcean 	int 1  
+				param_named texShore 	int 2
+				param_named texLand 	int 3
+				param_named texMountain int 4
+
 			}
-					
+			texture_unit
+			{
+				texture tileTypes	//
+			}					
 			texture_unit
 			{
 				texture G0_col.png
@@ -45,6 +49,7 @@ material Tiles
 			{
 				texture G3_col.png
 			}
+			
 		}
 	}
 }

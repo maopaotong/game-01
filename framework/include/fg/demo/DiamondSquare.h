@@ -40,22 +40,7 @@ namespace fog
                 for (int j = 0; j < size; j++)
                 {
                     float h = heightmap[i][j];
-                    if (h < 0.35f)
-                    {
-                        h = 0.0f; // ocean.
-                    }
-                    else if (h < 0.50f)
-                    {
-                        h = 0.50f; // ocean
-                    }
-                    else if (h < 0.9)
-                    {
-                        h = 0.9f; // land.
-                    }
-                    else
-                    {
-                        h = 1.0f; // mountains.
-                    }
+                    h = std::floor(h * 10) / 10.0f;
                     heightmap[i][j] = h;
                 }
             }

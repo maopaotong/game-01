@@ -23,7 +23,10 @@ namespace fog
     //
     class TilesState : public ManualState
     {
+
     public:
+        static constexpr float HEIGHT_SCALE = 100.0f;
+
     public:
         TilesState() : ManualState()
         {
@@ -41,7 +44,7 @@ namespace fog
             int h = Context<Cell::Center>::get()->getHeight();
             int size = w;
             std::vector<std::vector<float>> heightmap(size, std::vector<float>(size, 0.0f));
-            DiamondSquare::generateAndNormalise(heightmap, size, 0.45, 8151245);
+            DiamondSquare::generateAndNormalise(heightmap, size, 0.75, 8151245);
             DiamondSquare::eraseDetailWithinTerrainTypes(heightmap, size);
 
             obj->clear();
@@ -59,18 +62,18 @@ namespace fog
                 {
                     Cell::Instance a = cc->getCell(x, y);
                     Vector3 pA = a.getOrigin3D();
-                    pA.y = heightmap[x][y] * 10;
+                    pA.y = heightmap[x][y] * HEIGHT_SCALE;
                     positions[x][y] = pA;
                 }
             }
             // calculate norms
-            int neibersX[6] = {-1};
-            int neibersY[6] = {-1};
 
             for (int x = 0; x < w; x++)
             {
                 for (int y = 0; y < h; y++)
                 {
+                    int neibersX[6] = {-1};
+                    int neibersY[6] = {-1};
                     Cell::getNeibers(x, y, neibersX, neibersY);
                     //
                     Vector3 neibersP[6];
@@ -87,36 +90,45 @@ namespace fog
                         }
                     }
 
-                    Vector3 normNs(0, 1, 0); //
+                    Vector3 normNs; //
                     Vector3 p1 = positions[x][y];
-                    for (int i = 0; i < neibersCount; i++)
+                    if (neibersCount > 0)
                     {
-                        Vector3 p2 = neibersP[i];
-                        Vector3 p3 = neibersP[(i + 1) % neibersCount];
-                        Vector4 plane = Math::calculateFaceNormalWithoutNormalize(p1, p2, p3);
-                        Vector3 normN(plane.x, plane.y, plane.z);
-                        normN.normalise();
-                        normNs += normN;
-                        normNs.normalise();
-                    }
-                    
-                    obj->position(p1);
-                    obj->normal(normNs);
-                    //obj->textureCoord();//
-                    if (p1.y < 5.0f)
-                    {
-                        obj->colour(ColourValue::Blue);
-                    }
-                    else if (p1.y < 7.5f)
-                    {
-                        obj->colour(ColourValue::Green);
+                        normNs = Vector3(0, 0, 0);
+                        for (int i = 0; i < neibersCount; i++)
+                        {
+                            Vector3 p2 = neibersP[i];
+                            Vector3 p3 = neibersP[(i + 1) % neibersCount];
+                            Vector4 plane = Math::calculateFaceNormalWithoutNormalize(p1, p2, p3);
+                            Vector3 normN(plane.x, plane.y, plane.z);
+                            normN.normalise();
+                            normNs += normN;
+                            normNs.normalise();
+                        }
                     }
                     else
                     {
-                        obj->colour(ColourValue::White);
+                        normNs = Vector3(0, 1, 0);
                     }
-                }//end of for
-            }//end of for
+                    obj->position(p1);
+
+                    obj->normal(normNs);
+                    // std::cout << normNs << std::endl;
+                    // obj->textureCoord();//
+                    // if (p1.y < 5.0f)
+                    // {
+                    //     obj->colour(ColourValue::Blue);
+                    // }
+                    // else if (p1.y < 7.5f)
+                    // {
+                    //     obj->colour(ColourValue::Green);
+                    // }
+                    // else
+                    // {
+                    //     obj->colour(ColourValue::White);
+                    // }
+                } // end of for
+            } // end of for
 
             // triangle
             for (int x = 0; x < w - 1; x++)
