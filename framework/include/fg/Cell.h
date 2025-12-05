@@ -100,6 +100,12 @@ namespace fog
             return Ogre::Vector2(centerX, centerY);
         }
 
+        /**
+         * rad: inner circle radius.
+         * 
+         * Translate the position(with scale applied) to the index of the cell.
+         *  
+         */
         static CellKey getCellKey(Ogre::Vector2 origin2D, float rad)
         {
 
