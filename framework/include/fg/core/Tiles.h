@@ -145,7 +145,16 @@ namespace fog
                             {
                                 int tx = hMap[x][y].cKey.first;
                                 int ty = hMap[x][y].cKey.second;
-                                hMap[x][y].height = tileCentreMap[tx][ty]->height; // use the same height as the centre rect.
+                                Vertex *centreRect = tileCentreMap[tx][ty];
+
+                                if (!centreRect)
+                                {
+                                    // bug? no centre found for some tile.
+                                }
+                                if (centreRect)
+                                {
+                                    hMap[x][y].height = centreRect->height; // use the same height as the centre rect.
+                                }
                             }
                         }
                     }
@@ -171,7 +180,8 @@ namespace fog
                                 if (nTileCentre)
                                 { // if centre rect exist for this current neiber.
                                     float distance = vertex.distance(nTileCentre->cKey);
-                                    float weight = 1.0f / (distance * distance + 1e-6);
+                                    float weight = 1.0f / (distance + 1e-6);
+                                    weight = 1.0f;
                                     sumHeight += nTileCentre->height * weight;
                                     validNeibers++;
                                     sumWeight += weight;

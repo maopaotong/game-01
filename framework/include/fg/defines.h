@@ -19,7 +19,7 @@ namespace fog
     // graphics
     static constexpr float HEIGHT_SCALE = 100.0f;
     static constexpr int TILES_WIDTH = 128 + 1;
-    static constexpr int TILE_SUBDIVISION_QUALITY = 16;
+    static constexpr int TILE_SUBDIVISION_QUALITY = 8;
     static constexpr float HEIGHT_OCEAN = 0.49f * 0.8f;
     static constexpr float HEIGHT_SHORE = 0.50f * 0.8f;
     static constexpr float HEIGHT_PLAIN = 0.51f * 1.2f;

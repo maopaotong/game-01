@@ -7,6 +7,8 @@
 #include <OgreManualObject.h>
 #include <OgreColourValue.h>
 #include "fg/Terrains.h"
+#include <cmath>
+#include <algorithm>
 using namespace Ogre;
 
 namespace fog
@@ -16,7 +18,6 @@ namespace fog
     {
 
     public:
-
         template <typename F>
         static int forEachNeibers(int x, int y, int width, int height, F &&visit)
         {
@@ -36,7 +37,7 @@ namespace fog
                     count++;
                 }
             }
-            
+
             return count;
         }
         /**
@@ -130,16 +131,69 @@ namespace fog
          * Translate the position(with scale applied) to the index of the cell.
          *
          */
-        static CellKey getCellKey(Ogre::Vector2 origin2D, float rad)
+        static CellKey getCellKey2(Ogre::Vector2 origin2D, float rad)
         {
-
-            // 从 y 解出整数 y
+            // rad = rad * 2 / std::sqrt(3);
+            //  从 y 解出整数 y
             int y = static_cast<int>(std::round(origin2D.y / (rad * std::sqrt(3.0f))));
 
             // 根据 y 的奇偶性，还原 x
             float xOffset = (y % 2 == 0) ? 0.0f : rad;
             int x = static_cast<int>(std::round((origin2D.x - xOffset) / (2.0f * rad)));
             return CellKey(x, y);
+        }
+
+
+        static CellKey getCellKey(Ogre::Vector2 origin2D, float rad)
+        {
+            
+            // Step 1: 将 pixel 坐标转换为 axial 坐标 (q, r) —— 浮点
+            // 对于 flat-topped hex，使用标准公式：
+            //   q = (sqrt(3)/3 * x - 1/3 * y) / R
+            //   r = (2/3 * y) / R
+            // 其中 R 是外接圆半径（中心到顶点）
+            // 已知：rad = apothem = R * cos(30°) = R * sqrt(3)/2
+            // => R = (2 / sqrt(3)) * rad
+
+            const float sqrt3 = std::sqrt(3.0f);
+            const float R = (2.0f / sqrt3) * rad; // 外接圆半径
+
+            float q = ((sqrt3 / 3.0f) * origin2D.x - (1.0f / 3.0f) * origin2D.y) / R;
+            float r = ((2.0f / 3.0f) * origin2D.y) / R;
+
+            // Step 2: axial -> cube
+            float x = q;
+            float z = r;
+            float y = -x - z;
+
+            // Step 3: cube rounding to nearest hex
+            int rx = std::lround(x);
+            int ry = std::lround(y);
+            int rz = std::lround(z);
+
+            float dx = std::abs(rx - x);
+            float dy = std::abs(ry - y);
+            float dz = std::abs(rz - z);
+
+            if (dx > dy && dx > dz)
+            {
+                rx = -ry - rz;
+            }
+            else if (dy > dz)
+            {
+                ry = -rx - rz;
+            }
+            else
+            {
+                rz = -rx - ry;
+            }
+
+            // Step 4: cube -> odd-r offset coordinates
+            // 在 odd-r 中：row = z, col = x + (row - (row & 1)) / 2
+            int row = rz;
+            int col = rx + (row - (row & 1)) / 2;
+
+            return CellKey(col, row);
         }
 
     public:
