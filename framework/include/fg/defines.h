@@ -15,9 +15,10 @@
 
 namespace fog
 {
-    constexpr bool DEBUG_COUT = false;
-    constexpr float TEXTURE_COORD_SCALE = 30.0f;
-    constexpr bool DEBUG_CHECK_IMPOSSIBLE_ERROR = false;
+    static constexpr int TILE_SUBDIVISION_QUALITY = 4;
+    static constexpr bool DEBUG_COUT = false;
+    static constexpr float TEXTURE_COORD_SCALE = 30.0f;
+    static constexpr bool DEBUG_CHECK_IMPOSSIBLE_ERROR = false;
 
     static constexpr float DEFAULT_CAMERA_HEIGHT_MIN = 100.0f;
     static constexpr float DEFAULT_CAMERA_HEIGHT_MAX = 1000.0f * 5;
@@ -33,7 +34,6 @@ namespace fog
     static constexpr float FOG_CAM_SPEED_MIN = 750;
     static constexpr float FOG_CAM_SPEED_MAX = FOG_CAM_SPEED_MIN * 5;
 
-    static constexpr int TILE_SUBDIVISION_QUALITY = 16;
     using GOON = bool;
 
     using CONSUMED = bool;

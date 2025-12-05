@@ -15,6 +15,7 @@
 #include "fg/util/DiamondSquare.h"
 #include "fg/defines.h"
 #include "fg/util/Iteration.h"
+#include "fg/util/Rect.h"
 namespace fog
 {
 
@@ -72,17 +73,19 @@ namespace fog
 
             void init(std::vector<std::vector<Tile>> &tiles, int tWidth, int tHeight)
             {
+                float rectWidth = static_cast<float>(tWidth) * 2.0f / static_cast<float>(width);
+                float rectHeight = static_cast<float>(tHeight) * 2.0f / static_cast<float>(height) * std::sqrt(3) / 2.0f;
 
                 for (int x = 0; x < width; x++)
                 {
                     for (int y = 0; y < height; y++)
                     {
 
-                        float pX = 2.0 * static_cast<float>(x) * static_cast<float>(tWidth) / static_cast<float>(width);
-                        float pY = 2.0 * static_cast<float>(y) * static_cast<float>(tHeight) / static_cast<float>(height) * std::sqrt(3) / 2.0f;
+                        float centreX = static_cast<float>(x) * rectWidth;
+                        float centreY = static_cast<float>(y) * rectHeight;
 
-                        Vector2 pPos = Vector2(pX, pY) * 1.0f;
-                        CellKey cKey = Cell::getCellKey(pPos, 1.0);
+                        Vector2 centreP = Vector2(centreX, centreY) * 1.0f;
+                        CellKey cKey = Cell::getCellKey(centreP, 1.0);
 
                         int tx = std::clamp<int>(cKey.first, 0, tWidth - 1);
                         int ty = std::clamp<int>(cKey.second, 0, tHeight - 1);
@@ -92,22 +95,20 @@ namespace fog
 
                         Tiles::Tile &tl = tiles[tx][ty];
 
-                        Vector2 tP = Cell::getOrigin2D(cKey.first, cKey.second, 1.0f);
-                        Vector2 oIT = Vector2(pX - tP.x, pY - tP.y);
-                        int oXI = std::floor(oIT.x);
-                        int oYI = std::floor(oIT.y);
+                        // tile centre position.
+                        Vector2 tCP = Cell::getOrigin2D(cKey.first, cKey.second, 1.0f);
 
                         //
-                        if (oXI == 0 && oYI == 0)
-                        { // is the center of a tile.
-                            hMap[x][y].height = 0.53;//tileHeight(tl);
+                        if (Rect::isPointInSide(tCP, centreP, rectWidth, rectHeight))
+                        {                             // is the center rect of the tile.
+                            hMap[x][y].height = tileHeight(tl);
                         }
                         else
                         {
-                            hMap[x][y].height = 0.51f;
+                            hMap[x][y].height = 0.49f;
                         }
                         hMap[x][y].cKey = cKey;
-                        hMap[x][y].originInTile = oIT;
+                        hMap[x][y].originInTile = centreP - tCP;
                     }
                 }
             }
