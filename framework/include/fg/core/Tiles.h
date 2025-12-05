@@ -83,7 +83,31 @@ namespace fog
                                               hMap(width, std::vector<Vertex>(height, Vertex()))
             {
             }
+            float computeCorrectHeight(Ogre::Vector2 center, float rectWidth, float rectHeight,
+                                       std::function<float(CellKey)> getHeight)
+            {
+                const int SAMPLES = 3; // 3x3 = 9 points；可调为 5（25点）更准
+                float totalHeight = 0.0f;
 
+                for (int i = 0; i < SAMPLES; ++i)
+                {
+                    for (int j = 0; j < SAMPLES; ++j)
+                    {
+                        // 在矩形内均匀采样
+                        float u = (i + 0.5f) / SAMPLES; // 避免采样边界
+                        float v = (j + 0.5f) / SAMPLES;
+                        Ogre::Vector2 p(
+                            center.x + (u - 0.5f) * rectWidth,
+                            center.y + (v - 0.5f) * rectHeight);
+
+                        CellKey k = Cell::getCellKey(p, 1); // 使用你已修正的精确版本
+
+                        totalHeight += getHeight(k);
+                    }
+                }
+
+                return totalHeight / (SAMPLES * SAMPLES);
+            }
             void init(std::vector<std::vector<Tile>> &tiles, int tWidth, int tHeight)
             {
                 float rectWidth = static_cast<float>(tWidth) * 2.0f / static_cast<float>(width);
@@ -95,43 +119,75 @@ namespace fog
                 {
                     for (int y = 0; y < height; y++)
                     {
-
                         float centreX = static_cast<float>(x) * rectWidth;
                         float centreY = static_cast<float>(y) * rectHeight;
+                        Vector2 points[5];
+                        points[0] = Vector2(centreX, centreY);
+                        points[1] = Vector2(centreX, centreY - 1);
+                        points[2] = Vector2(centreX + 1, centreY);
+                        points[3] = Vector2(centreX, centreY + 1);
+                        points[4] = Vector2(centreX - 1, centreY);
 
-                        Vector2 rectCentreP = Vector2(centreX, centreY) * 1.0f;
-                        CellKey cKey = Cell::getCellKey(rectCentreP, 1.0);
+                        CellKey cKeys[5];
+                        for (int i = 0; i < 5; i++)
+                        {
 
-                        int tx = std::clamp<int>(cKey.first, 0, tWidth - 1);
-                        int ty = std::clamp<int>(cKey.second, 0, tHeight - 1);
-
-                        cKey.first = tx;
-                        cKey.second = ty;
-
-                        Tiles::Tile &tl = tiles[tx][ty];
-
-                        // tile centre position.
-                        Vector2 tillCentreP = Cell::getOrigin2D(cKey.first, cKey.second, 1.0f);
-
-                        //
-                        if (Rect::isPointInSide(tillCentreP, rectCentreP, rectWidth, rectHeight))
-                        { // is the center rect of the tile.
-                            hMap[x][y].height = defineTileHeight(tl);
-                            // remember the centre rect for each tile.
-                            tileCentreMap[tx][ty] = &hMap[x][y];
+                            cKeys[i] = Cell::getCellKey(points[i], 1.0); // centre
+                            int tx = std::clamp<int>(cKeys[i].first, 0, tWidth - 1);
+                            int ty = std::clamp<int>(cKeys[i].second, 0, tHeight - 1);
+                            cKeys[i].first = tx;
+                            cKeys[i].second = ty;
                         }
-                        hMap[x][y].cKey = cKey;
-                        //
 
+                        Tiles::Tile &tl0 = tiles[cKeys[0].first][cKeys[0].second];
+                        // tile centre position.
+                        Vector2 tillCentreP = Cell::getOrigin2D(cKeys[0].first, cKeys[0].second, 1.0f);
                         //
-                        hMap[x][y].originInTile = rectCentreP - tillCentreP;
-                        hMap[x][y].type = tl.type;
+                        hMap[x][y].cKey = cKeys[0];
+                        hMap[x][y].originInTile = points[0] - tillCentreP;
+                        hMap[x][y].type = tl0.type;
+
+                        // tile's centre is in this rect.
+                        if (Rect::isPointInSide(tillCentreP, points[0], rectWidth, rectHeight)) //
+                        {                                                                       // is the center rect of the tile.
+                            // remember the centre rect for each tile.
+                            tileCentreMap[cKeys[0].first][cKeys[0].second] = &hMap[x][y];
+                            hMap[x][y].height = defineTileHeight(tl0);
+                        }
+                        else // not the centre rect, check all the corner's tile type.
+                        {
+                            Tiles::Tile &tl1 = tiles[cKeys[1].first][cKeys[1].second];
+                            Tiles::Tile &tl2 = tiles[cKeys[2].first][cKeys[2].second];
+                            Tiles::Tile &tl3 = tiles[cKeys[3].first][cKeys[3].second];
+                            Tiles::Tile &tl4 = tiles[cKeys[4].first][cKeys[4].second];
+
+                            // check if 4 corner's type is same;
+                            // check if this rect is inside a certain type.
+                            if (tl1.type == tl2.type && tl1.type == tl3.type && tl1.type == tl4.type)
+                            {
+                                hMap[x][y].height = defineTileHeight(tl0);
+                            }
+                            else
+                            { // calculate
+                                float h = computeCorrectHeight(points[0], rectWidth, rectHeight, [this, &tiles, tWidth, tHeight](CellKey cKey)
+                                                               {
+                                                                   int tx = std::clamp<int>(cKey.first, 0, tWidth - 1);
+                                                                   int ty = std::clamp<int>(cKey.second, 0, tHeight - 1);
+                                                                   
+                                                                   Tiles::Tile &ttl = tiles[tx][ty];
+                                                                   return defineTileHeight(ttl); //
+                                                               });
+                                hMap[x][y].height = h;
+                            }
+                            //
+                        }
 
                         //
                     }
                 }
                 // calculate the height of non-centre but the inner circle is inside the same cell.
-
+                /*
+                 */
                 for (int x = 0; x < width; x++)
                 {
                     for (int y = 0; y < height; y++)
@@ -146,15 +202,9 @@ namespace fog
                                 int tx = hMap[x][y].cKey.first;
                                 int ty = hMap[x][y].cKey.second;
                                 Vertex *centreRect = tileCentreMap[tx][ty];
+                                assert(centreRect && "centreRest is missing?");
 
-                                if (!centreRect)
-                                {
-                                    // bug? no centre found for some tile.
-                                }
-                                if (centreRect)
-                                {
-                                    hMap[x][y].height = centreRect->height; // use the same height as the centre rect.
-                                }
+                                hMap[x][y].height = centreRect->height; // use the same height as the centre rect.
                             }
                         }
                     }
