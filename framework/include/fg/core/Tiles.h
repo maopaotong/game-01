@@ -88,6 +88,7 @@ namespace fog
             {
                 float rectWidth = static_cast<float>(tWidth) * 2.0f / static_cast<float>(width);
                 float rectHeight = static_cast<float>(tHeight) * 2.0f / static_cast<float>(height) * std::sqrt(3) / 2.0f;
+                float rectRad = (rectHeight + rectWidth) / 2.0;
                 std::vector<std::vector<Vertex *>> tileCentreMap(tWidth, std::vector<Vertex *>(tHeight, nullptr));
                 // resove the terrain height of the centre rect for each tile.
                 for (int x = 0; x < width; x++)
@@ -116,11 +117,37 @@ namespace fog
                         if (Rect::isPointInSide(tillCentreP, rectCentreP, rectWidth, rectHeight))
                         { // is the center rect of the tile.
                             hMap[x][y].height = defineTileHeight(tl);
+                            // remember the centre rect for each tile.
                             tileCentreMap[tx][ty] = &hMap[x][y];
                         }
                         hMap[x][y].cKey = cKey;
+                        //
+
+                        //
                         hMap[x][y].originInTile = rectCentreP - tillCentreP;
                         hMap[x][y].type = tl.type;
+
+                        //
+                    }
+                }
+                // calculate the height of non-centre but the inner circle is inside the same cell.
+
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        if (!hMap[x][y].isHeightResolved())
+                        {
+
+                            float distanceToTileCentre = hMap[x][y].originInTile.length();
+                            // rad of the tile is 1.0;
+                            if (distanceToTileCentre + rectRad < 1.0)
+                            {
+                                int tx = hMap[x][y].cKey.first;
+                                int ty = hMap[x][y].cKey.second;
+                                hMap[x][y].height = tileCentreMap[tx][ty]->height; // use the same height as the centre rect.
+                            }
+                        }
                     }
                 }
                 // calculate the height of non-centre by neiber's height.
@@ -173,7 +200,8 @@ namespace fog
                 }
             }
 
-            void createTexture(std::string name)
+            // World texture is used as the meta data for the shader to determine the child texture.
+            void createWorldTexture(std::string name)
             {
 
                 // 上传到 GPU 纹理
@@ -246,23 +274,25 @@ namespace fog
                 switch (tl.type)
                 {
                 case (Type::OCEAN):
-                    tlHeight = 0.49f;
+                    tlHeight = HEIGHT_OCEAN;
                     break;
                 case (Type::SHORE):
-                    tlHeight = 0.50f;
+                    tlHeight = HEIGHT_SHORE;
                     break;
                 case (Type::PLAIN):
-                    tlHeight = 0.51f;
+                    tlHeight = HEIGHT_PLAIN;
                     break;
                 case (Type::HILL):
-                    tlHeight = 0.52f;
+                    tlHeight = HEIGHT_HILL;
                     break;
                 case (Type::MOUNTAIN):
+                    tlHeight = HEIGHT_MOUNTAIN;
+                    break;
                 case (Type::FROZEN):
-                    tlHeight = 0.53f;
+                    tlHeight = HEIGHT_FROZEN;
                     break;
                 default:
-                    tlHeight = 0.51f;
+                    tlHeight = HEIGHT_FROZEN;
                     break;
                 }
                 return tlHeight;

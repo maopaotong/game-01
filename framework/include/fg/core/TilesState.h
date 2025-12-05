@@ -24,7 +24,6 @@ namespace fog
     {
 
     public:
-        static constexpr float HEIGHT_SCALE = 100.0f;
 
     public:
         TilesState() : ManualState()

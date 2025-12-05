@@ -52,7 +52,7 @@ namespace fog
         void afterResourceLoad() override
         {            
             std::string tName = "TerrainsTex001";
-            Context<Tiles::Terrains>::get()->createTexture(tName);
+            Context<Tiles::Terrains>::get()->createWorldTexture(tName);
             MaterialPtr mat = MaterialManager::getSingletonPtr()->getByName("Tiles");
             
             mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(tName);

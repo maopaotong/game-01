@@ -24,5 +24,5 @@ void main() {
 
 	vec2 tUV1 = vec2(fPosition.x, -fPosition.z);
 	tUV1 = vec2(tUV1.x / wWidth, tUV1.y / wHeight);
-	fUV1 = tUV1 + vec2(0.5, 0.5);
+	fUV1 = tUV1 + vec2(0.5, 0.58);
 }
