@@ -30,7 +30,8 @@ namespace fog
         Video::Mode videoMode{1920, 1080, 32};
 
     public:
-        std::function<void()> beforeLoadResource;
+        std::function<void()> beforeResourceLoad;
+        std::function<void()> afterResourceLoad;
 
     public:
         ImGuiAppContext(std::string name) : ApplicationContextSDL(name)
@@ -94,11 +95,14 @@ namespace fog
         void loadResources() override
         {
 
-            if (beforeLoadResource)
+            if (beforeResourceLoad)
             {
-                beforeLoadResource();
+                beforeResourceLoad();
             }
             ApplicationContextBase::loadResources();
+            if(afterResourceLoad){
+                afterResourceLoad();
+            }
         }
     };
 

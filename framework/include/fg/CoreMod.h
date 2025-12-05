@@ -20,6 +20,8 @@ namespace fog
         {
         public:
             virtual void beforeResourceLoad() = 0;
+            virtual void afterResourceLoad() = 0;
+
         };
 
     public:

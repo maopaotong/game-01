@@ -44,6 +44,7 @@ namespace fog
             int qHeight = terrains->height;
 
             std::vector<std::vector<Tiles::Vertex>> &vertexs = terrains->hMap;
+            
             obj->clear();
             obj->begin(material, Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
@@ -86,7 +87,6 @@ namespace fog
                     Vector3 normNs = calculateNorm(positions, qx, qy, qWidth, qHeight);
                     obj->normal(normNs);
                     obj->textureCoord(p1.x, -p1.z);
-
                 } // end of for
             } // end of for
 

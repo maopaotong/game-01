@@ -48,17 +48,32 @@ namespace fog
 
         void addCallback(Callback *callback)
         {
-
-            std::function<void()> func = appCtx->beforeLoadResource;
-
-            appCtx->beforeLoadResource = [func, callback]()
             {
-                if (func)
+
+                std::function<void()> func = appCtx->beforeResourceLoad;
+
+                appCtx->beforeResourceLoad = [func, callback]()
                 {
-                    func();
-                }
-                callback->beforeResourceLoad();
-            };
+                    if (func)
+                    {
+                        func();
+                    }
+                    callback->beforeResourceLoad();
+                };
+            }
+            {
+
+                std::function<void()> func = appCtx->afterResourceLoad;
+
+                appCtx->afterResourceLoad = [func, callback]()
+                {
+                    if (func)
+                    {
+                        func();
+                    }
+                    callback->afterResourceLoad();
+                };
+            }
         }
 
         void init()

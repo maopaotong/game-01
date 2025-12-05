@@ -15,21 +15,23 @@
 
 namespace fog
 {
+    static constexpr int TILES_WIDTH = 128 + 1;
     static constexpr int TILE_SUBDIVISION_QUALITY = 8;
     static constexpr float CELL_SCALE = 30.0f;
+    static constexpr float WORLD_WIDTH = CELL_SCALE * 2.0 * TILES_WIDTH;
+    static constexpr float WORLD_HEIGHT = WORLD_WIDTH * 1.73205080757 /*std::sqrt(3)*/ / 2.0;// 0.86602540378
     static constexpr bool DEBUG_COUT = false;
     static constexpr float TEXTURE_COORD_SCALE = 30.0f;
     static constexpr bool DEBUG_CHECK_IMPOSSIBLE_ERROR = false;
 
     static constexpr float DEFAULT_CAMERA_HEIGHT_MIN = 100.0f;
     static constexpr float DEFAULT_CAMERA_HEIGHT_MAX = 1000.0f * 5;
-    
+
     static constexpr float DEFAULT_CAMERA_ROLL_SPEED_MIN = 30;
     static constexpr float DEFAULT_CAMERA_ROLL_SPEED_MAX = 300;
-    
-    static constexpr float CAMERA_FAR_DISTANCE_MIN = 2000;//
-    static constexpr float CAMERA_FAR_DISTANCE_MAX = 5000;//
-    
+
+    static constexpr float CAMERA_FAR_DISTANCE_MIN = 2000; //
+    static constexpr float CAMERA_FAR_DISTANCE_MAX = 5000; //
 
     // camera speed when move within x-z plane.
     static constexpr float FOG_CAM_SPEED_MIN = 750;

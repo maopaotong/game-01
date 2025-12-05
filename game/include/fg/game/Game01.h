@@ -21,7 +21,7 @@ namespace fog
     class Game01 : public Mod, public FrameListener, CoreMod::Callback
     {
 
-        int width = 128 + 1;
+        int width = TILES_WIDTH;
         int height = width;
 
         bool breakRenderRequested = false;
@@ -46,9 +46,17 @@ namespace fog
         }
 
         //before ogre load material, create textures.
-        void beforeResourceLoad() override
+        void beforeResourceLoad() override{
+
+        }
+        void afterResourceLoad() override
         {            
-            Context<Tiles::Terrains>::get()->createTexture("TerrainsTex001");
+            std::string tName = "TerrainsTex001";
+            Context<Tiles::Terrains>::get()->createTexture(tName);
+            MaterialPtr mat = MaterialManager::getSingletonPtr()->getByName("Tiles");
+            
+            mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(tName);
+
         }
 
         void setup() override
