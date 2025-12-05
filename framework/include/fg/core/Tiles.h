@@ -79,64 +79,67 @@ namespace fog
                     {
 
                         float pX = 2.0 * static_cast<float>(x) * static_cast<float>(tWidth) / static_cast<float>(width);
-                        float pY = 2.0 *  static_cast<float>(y) * static_cast<float>(tHeight) / static_cast<float>(height);
+                        float pY = 2.0 * static_cast<float>(y) * static_cast<float>(tHeight) / static_cast<float>(height) * std::sqrt(3) / 2.0f;
+
                         Vector2 pPos = Vector2(pX, pY) * 1.0f;
                         CellKey cKey = Cell::getCellKey(pPos, 1.0);
 
-                        int tx = cKey.first;
-                        int ty = cKey.second;
-                        if (tx < 0)
-                        {
-                            tx = 0;
-                        }
-                        if (ty < 0)
-                        {
-                            ty = 0;
-                        }
-                        if (tx > tWidth - 1)
-                        {
-                            tx = tWidth - 1;
-                        }
-                        if (ty > tHeight - 1)
-                        {
-                            ty = tHeight - 1;
-                        }
+                        int tx = std::clamp<int>(cKey.first, 0, tWidth - 1);
+                        int ty = std::clamp<int>(cKey.second, 0, tHeight - 1);
 
                         cKey.first = tx;
                         cKey.second = ty;
+
                         Tiles::Tile &tl = tiles[tx][ty];
 
-                        float tlHeight = 0.0;
-
-                        switch (tl.type)
-                        {
-                        case (Type::OCEAN):
-                            tlHeight = 0.49f;
-                            break;
-                        case (Type::SHORE):
-                            tlHeight = 0.50f;
-                            break;
-                        case (Type::PLAIN):
-                            tlHeight = 0.51f;
-                            break;
-                        case (Type::HILL):
-                            tlHeight = 0.52f;
-                            break;
-                        case (Type::MOUNTAIN):
-                        case (Type::FROZEN):
-                            tlHeight = 0.53f;
-                            break;
-                        default:
-                            tlHeight = 0.51f;
-                            break;
-                        }
                         Vector2 tP = Cell::getOrigin2D(cKey.first, cKey.second, 1.0f);
+                        Vector2 oIT = Vector2(pX - tP.x, pY - tP.y);
+                        int oXI = std::floor(oIT.x);
+                        int oYI = std::floor(oIT.y);
 
+                        //
+                        if (oXI == 0 && oYI == 0)
+                        { // is the center of a tile.
+                            hMap[x][y].height = 0.53;//tileHeight(tl);
+                        }
+                        else
+                        {
+                            hMap[x][y].height = 0.51f;
+                        }
                         hMap[x][y].cKey = cKey;
-                        hMap[x][y].height = tlHeight;
-                        hMap[x][y].originInTile = Vector2(pX - tP.x, pY - tP.y);
+                        hMap[x][y].originInTile = oIT;
                     }
                 }
+            }
+
+            float tileHeight(Tiles::Tile &tl)
+            {
+
+                float tlHeight = 0.0;
+
+                switch (tl.type)
+                {
+                case (Type::OCEAN):
+                    tlHeight = 0.49f;
+                    break;
+                case (Type::SHORE):
+                    tlHeight = 0.50f;
+                    break;
+                case (Type::PLAIN):
+                    tlHeight = 0.51f;
+                    break;
+                case (Type::HILL):
+                    tlHeight = 0.52f;
+                    break;
+                case (Type::MOUNTAIN):
+                case (Type::FROZEN):
+                    tlHeight = 0.53f;
+                    break;
+                default:
+                    tlHeight = 0.51f;
+                    break;
+                }
+                return tlHeight;
             }
         };
 

@@ -25,7 +25,7 @@ namespace fog
 
     public:
         static constexpr float HEIGHT_SCALE = 100.0f;
-
+        int subQuality = TILE_SUBDIVISION_QUALITY;
     public:
         TilesState() : ManualState()
         {
@@ -45,10 +45,9 @@ namespace fog
 
             std::vector<std::vector<Tiles::Tile>> tiles(tWidth, std::vector<Tiles::Tile>(tHeight, Tiles::Tile()));
             Tiles::Generator::generateTiles(tiles, tWidth, tHeight);
-            int quality = 4;
 
-            int qWidth = tWidth * quality;
-            int qHeight = tHeight * quality * std::sqrt(3) / 2.0f;
+            int qWidth = tWidth * subQuality;
+            int qHeight = tHeight * subQuality * std::sqrt(3) / 2.0f;
             Tiles::Terrains terrains(qWidth, qHeight);
             terrains.init(tiles, tWidth, tHeight);
 

@@ -33,6 +33,7 @@ namespace fog
     static constexpr float FOG_CAM_SPEED_MIN = 750;
     static constexpr float FOG_CAM_SPEED_MAX = FOG_CAM_SPEED_MIN * 5;
 
+    static constexpr int TILE_SUBDIVISION_QUALITY = 16;
     using GOON = bool;
 
     using CONSUMED = bool;
