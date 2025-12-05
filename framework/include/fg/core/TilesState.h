@@ -25,7 +25,7 @@ namespace fog
 
     public:
         static constexpr float HEIGHT_SCALE = 100.0f;
-        int subQuality = TILE_SUBDIVISION_QUALITY;
+
     public:
         TilesState() : ManualState()
         {
@@ -38,20 +38,12 @@ namespace fog
         void rebuildMesh() override
         {
 
-            Cell::Center *cc = Context<Cell::Center>::get();
+            Tiles::Terrains *terrains = Context<Tiles::Terrains>::get();
 
-            int tWidth = Context<Cell::Center>::get()->getWidth();
-            int tHeight = Context<Cell::Center>::get()->getHeight();
+            int qWidth = terrains->width;
+            int qHeight = terrains->height;
 
-            std::vector<std::vector<Tiles::Tile>> tiles(tWidth, std::vector<Tiles::Tile>(tHeight, Tiles::Tile()));
-            Tiles::Generator::generateTiles(tiles, tWidth, tHeight);
-
-            int qWidth = tWidth * subQuality;
-            int qHeight = tHeight * subQuality * std::sqrt(3) / 2.0f;
-            Tiles::Terrains terrains(qWidth, qHeight);
-            terrains.init(tiles, tWidth, tHeight);
-
-            std::vector<std::vector<Tiles::Vertex>> &vertexs = terrains.hMap;
+            std::vector<std::vector<Tiles::Vertex>> &vertexs = terrains->hMap;
             obj->clear();
             obj->begin(material, Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
@@ -59,6 +51,8 @@ namespace fog
 
             std::vector<std::vector<Vector3>> norms(qWidth, std::vector<Vector3>(qHeight, Vector3::UNIT_Y));
             std::vector<std::vector<Vector3>> positions(qWidth, std::vector<Vector3>(qHeight, Vector3::ZERO));
+
+            Cell::Center *cc = Context<Cell::Center>::get();
 
             // collect position.
             for (int qy = 0; qy < qHeight; qy++)
@@ -97,7 +91,6 @@ namespace fog
             } // end of for
 
             // triangle
-
             for (int qy = 0; qy < qHeight - 1; qy++)
             {
                 for (int qx = 0; qx < qWidth - 1; qx++)
@@ -122,6 +115,7 @@ namespace fog
             }
 
             obj->end();
+            //
         }
 
         Vector3 calculateNorm(std::vector<std::vector<Vector3>> &positions, int qx, int qy, int qWidth, int qHeight)
@@ -189,6 +183,6 @@ namespace fog
                 normNs = Vector3(0, 1, 0);
             }
             return normNs;
-        }
-    };
+        } // end method.
+    }; // end class
 }; // end of namespace

@@ -43,8 +43,14 @@ namespace fog
             for (auto it = list.begin(); it != list.end(); it++)
             {
                 Mod *mod = *it;
+                mod->setup();
+            } //
+            for (auto it = list.begin(); it != list.end(); it++)
+            {
+                Mod *mod = *it;
                 mod->active();
             } //
+            
         }
 
         void startRendering() override

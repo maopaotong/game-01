@@ -15,7 +15,8 @@
 
 namespace fog
 {
-    static constexpr int TILE_SUBDIVISION_QUALITY = 4;
+    static constexpr int TILE_SUBDIVISION_QUALITY = 8;
+    static constexpr float CELL_SCALE = 30.0f;
     static constexpr bool DEBUG_COUT = false;
     static constexpr float TEXTURE_COORD_SCALE = 30.0f;
     static constexpr bool DEBUG_CHECK_IMPOSSIBLE_ERROR = false;

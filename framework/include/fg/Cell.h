@@ -14,7 +14,31 @@ namespace fog
 
     class Cell
     {
+
     public:
+
+        template <typename F>
+        static int forEachNeibers(int x, int y, int width, int height, F &&visit)
+        {
+            int neibersX[6] = {-1};
+            int neibersY[6] = {-1};
+            Cell::getNeibers(x, y, neibersX, neibersY);
+            //
+            int count = 0;
+            for (int i = 0; i < 6; i++)
+            {
+                int nX = neibersX[i];
+                int nY = neibersY[i];
+
+                if (nX >= 0 && nX < width && nY >= 0 && nY < height)
+                {
+                    visit(i, neibersX[i], neibersY[i]);
+                    count++;
+                }
+            }
+            
+            return count;
+        }
         /**
          *
          *    * * *     [0,3]     [1,3]    [2,3]
@@ -102,9 +126,9 @@ namespace fog
 
         /**
          * rad: inner circle radius.
-         * 
+         *
          * Translate the position(with scale applied) to the index of the cell.
-         *  
+         *
          */
         static CellKey getCellKey(Ogre::Vector2 origin2D, float rad)
         {
@@ -223,8 +247,9 @@ namespace fog
                 return forCellByPoint(positionIn3D, [&cell](Cell::Instance &cell2)
                                       { cell = cell2; });
             }
-            
-            CellKey getCellKeyByPoint(Vector2 pointIn2D){
+
+            CellKey getCellKeyByPoint(Vector2 pointIn2D)
+            {
                 return Cell::getCellKey(pointIn2D, root->scale);
             }
 

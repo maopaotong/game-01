@@ -11,10 +11,17 @@ using namespace Ogre;
 using namespace OgreBites;
 namespace fog
 {
-  
+
     class CoreMod : public Mod
     {
+
     public:
+        class Callback
+        {
+        public:
+            virtual void beforeResourceLoad() = 0;
+        };
+
     public:
         CoreMod()
         {
@@ -27,12 +34,11 @@ namespace fog
         virtual Camera *getCamera() = 0;
         virtual Root *getRoot() = 0;
         virtual RenderWindow *getWindow() = 0;
-        
+
         virtual void addStepListener(Stairs *listener) = 0;
 
         virtual void addInputListener(InputListener *listener) = 0;
 
-        
         virtual void addFrameListener(Ogre::FrameListener *listener) = 0;
         virtual MaterialManager *getMaterialManager() = 0;
 
@@ -73,5 +79,6 @@ namespace fog
             }
             return rt;
         }
+        virtual void addCallback(Callback *callback) = 0;
     };
 };

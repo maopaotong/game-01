@@ -22,7 +22,7 @@ material Tiles
 			}
 			fragment_program_ref fragmentShader
 			{				
-				param_named texTitles 	int 0
+				param_named texTerr		int 0
 				param_named texOcean 	int 1  
 				param_named texShore 	int 2
 				param_named texLand 	int 3
@@ -31,7 +31,7 @@ material Tiles
 			}
 			texture_unit
 			{
-				texture tileTypes	//
+				texture G0_col.png
 			}					
 			texture_unit
 			{

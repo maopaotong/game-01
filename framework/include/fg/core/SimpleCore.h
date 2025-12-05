@@ -36,7 +36,33 @@ namespace fog
         SimpleCore() : CoreMod()
         {
             appCtx = new ImGuiAppContext("HexagonalGridVisualizer");
+        }
+        virtual ~SimpleCore()
+        {
+            delete appCtx;
+        }
+        void setup() override
+        {
+            Context<CoreMod>::set(this);
+        }
 
+        void addCallback(Callback *callback)
+        {
+
+            std::function<void()> func = appCtx->beforeLoadResource;
+
+            appCtx->beforeLoadResource = [func, callback]()
+            {
+                if (func)
+                {
+                    func();
+                }
+                callback->beforeResourceLoad();
+            };
+        }
+
+        void init()
+        {
             appCtx->initApp();
             this->matMgr = MaterialManager::getSingletonPtr();
             this->root = appCtx->getRoot();
@@ -156,11 +182,11 @@ namespace fog
 
         void active() override
         {
-            Context<CoreMod >::set(this);
+            this->init();
         }
         void deactive() override
         {
-            Context<CoreMod >::set(nullptr);
+            Context<CoreMod>::set(nullptr);
         }
 
         bool frameStarted(const FrameEvent &evt)

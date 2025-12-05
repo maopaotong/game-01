@@ -11,80 +11,95 @@
 #include "fg/ImGuiApp.h"
 #include "ImGuiAppImpl.h"
 #include "fg/Video.h"
+#include <functional>
 
 #define MAO_IMGUI_BUTTON_LEFT 0
 #define MAO_IMGUI_BUTTON_RIGHT 1
 #define MAO_IMGUI_BUTTON_OTHER 2
 
-namespace fog{
-using namespace Ogre;
-using namespace OgreBites;
-
-class ImGuiAppContext : public ApplicationContextSDL
+namespace fog
 {
-protected:
-    ImGuiAppImpl *imGuiApp = nullptr;
+    using namespace Ogre;
+    using namespace OgreBites;
 
-    Video::Mode videoMode{1920, 1080, 32};
-
-public:
-    ImGuiAppContext(std::string name) : ApplicationContextSDL(name)
+    class ImGuiAppContext : public ApplicationContextSDL
     {
-        //
-    }
-    virtual ~ImGuiAppContext() override
-    {
-        if (this->imGuiApp)
-            delete this->imGuiApp;
-    }
+    protected:
+        ImGuiAppImpl *imGuiApp = nullptr;
 
-    void createRoot() override
-    {
-        ApplicationContextSDL::createRoot();
-    }
+        Video::Mode videoMode{1920, 1080, 32};
 
-    void initApp()
-    {
-        ApplicationContextSDL::initApp();
+    public:
+        std::function<void()> beforeLoadResource;
 
-        if (mWindows.empty())
+    public:
+        ImGuiAppContext(std::string name) : ApplicationContextSDL(name)
         {
-            throw new std::runtime_error("no window created?");
+            //
         }
-        NativeWindowPair window = mWindows[0];
-        this->imGuiApp = new ImGuiAppImpl(window);
-        imGuiApp->initApp();
-
-        // not this->addInputListener() ,us the super class to add the only one entry point listener.
-        ApplicationContextSDL::addInputListener(window.native, imGuiApp);
-    }
-    ImGuiApp *getImGuiApp()
-    {
-        return this->imGuiApp;
-    }
-    bool frameRenderingQueued(const FrameEvent &evt) override
-    {
-
-        if (!ApplicationContextBase::frameRenderingQueued(evt))
+        virtual ~ImGuiAppContext() override
         {
-            return false; // false:break,true:continue
-        } // call other listener if any.
+            if (this->imGuiApp)
+                delete this->imGuiApp;
+        }
 
-        return imGuiApp->frameRenderingQueued(evt);
-    }
+        void createRoot() override
+        {
+            ApplicationContextSDL::createRoot();
+        }
 
-    // To listen a event, use the ImGuiApp for adding listener. We deliver all input event to the imGuiApp.
-    void addInputListener(NativeWindowType *window, InputListener *listener) override
-    {
-        // to take over the dispathing task,so do not add to the entry listener list,
-        // only the dispatcher listener can be there.
-        this->imGuiApp->addInputListener(listener);
-    }
-    void windowResized(Ogre::RenderWindow *rw)
-    {
-        ApplicationContextSDL::windowResized(rw);
-        this->imGuiApp->windowResized(rw);
-    }
-};
+        void initApp()
+        {
+            ApplicationContextSDL::initApp();
 
-};//end of namespace
+            if (mWindows.empty())
+            {
+                throw new std::runtime_error("no window created?");
+            }
+            NativeWindowPair window = mWindows[0];
+            this->imGuiApp = new ImGuiAppImpl(window);
+            imGuiApp->initApp();
+
+            // not this->addInputListener() ,us the super class to add the only one entry point listener.
+            ApplicationContextSDL::addInputListener(window.native, imGuiApp);
+        }
+        ImGuiApp *getImGuiApp()
+        {
+            return this->imGuiApp;
+        }
+        bool frameRenderingQueued(const FrameEvent &evt) override
+        {
+
+            if (!ApplicationContextBase::frameRenderingQueued(evt))
+            {
+                return false; // false:break,true:continue
+            } // call other listener if any.
+
+            return imGuiApp->frameRenderingQueued(evt);
+        }
+
+        // To listen a event, use the ImGuiApp for adding listener. We deliver all input event to the imGuiApp.
+        void addInputListener(NativeWindowType *window, InputListener *listener) override
+        {
+            // to take over the dispathing task,so do not add to the entry listener list,
+            // only the dispatcher listener can be there.
+            this->imGuiApp->addInputListener(listener);
+        }
+        void windowResized(Ogre::RenderWindow *rw)
+        {
+            ApplicationContextSDL::windowResized(rw);
+            this->imGuiApp->windowResized(rw);
+        }
+
+        void loadResources() override
+        {
+
+            if (beforeLoadResource)
+            {
+                beforeLoadResource();
+            }
+            ApplicationContextBase::loadResources();
+        }
+    };
+
+}; // end of namespace

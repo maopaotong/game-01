@@ -3,9 +3,9 @@
 in vec3 fPosition;
 in vec2 fUV;
 in vec3 fNormal;
-out vec4 outFColor;  // ← 显式声明
+out vec4 outFColor;  //
 
-uniform sampler2D texTiles;
+uniform sampler2D texTerr;
 uniform sampler2D texOcean;
 uniform sampler2D texShore;
 uniform sampler2D texLand;
@@ -13,8 +13,8 @@ uniform sampler2D texMountain;
 
 const float HEIGHT_SCALE = 100;
 
-bool fEquals(float a, float b) {
-    return abs(a - b) < 0.001;
+bool isTypeEquals(float a, float b) {
+    return abs(a - b) < 1e-6;
 }
 
 bool isOcean(float height) {
@@ -22,7 +22,7 @@ bool isOcean(float height) {
 }
 
 bool isShore(float height) {
-    return height > 49.5 && height <= 50.5 ;
+    return height > 49.5 && height <= 50.5;
 }
 
 bool isLand(float height) {
@@ -40,6 +40,7 @@ void main() {
 //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
     vec4 color;
     vec3 normal = fNormal;
+    vec4 terr = texture(texTerr, fUV);
 
     //float noise = fract(sin(dot(fUV, vec2(1.234, 57.890123))) * 321.564);
 
