@@ -27,4 +27,6 @@ void main() {
 	vec2 posIn2D = vec2(fPosition.x, -fPosition.z) + wOffset;	
 	fUV1 = vec2(posIn2D.x / wWidth, posIn2D.y / wHeight) + vec2(0, 0.078);//
 
+	//vec2 pIn2D = vec2(fPosition.x, -fPosition.z) * (1.0 / 30.0) + vec2(-1.0, sqrt3 / 2.0);//offset and normal rad to 1.
+	
 }

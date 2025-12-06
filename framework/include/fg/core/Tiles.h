@@ -68,11 +68,15 @@ namespace fog
                 return std::abs(this->height - UNRESOLVED_HEIGHT) > 0.01f; // height is not unknown.
             }
 
+            float distanceToCell()
+            {
+                return originInTile.length();
+            }
+
             float distance(CellKey cKey2)
             {
                 return (Vector2(cKey.first, cKey.second) + originInTile).distance(Vector2(cKey2.first, cKey2.second));
             }
-
         };
 
         struct Terrains
@@ -324,10 +328,14 @@ namespace fog
 
                         int idx = (y * width + x) * 4;
 
-                        data[idx] = v.type;  // R
-                        data[idx + 1] = 255; // G
-                        data[idx + 2] = 255; // B
-                        data[idx + 3] = 255; // A
+                        // R as the type of the centre point of the rect, the precision is based on the qulity parameter configred.
+                        data[idx] = v.type; /** 0 .. 15 **/ 
+                        // G distance to the centre of the owner cell, used to render the edge of cells.
+                        data[idx + 1] = static_cast<unsigned char>(v.distanceToCell() * 100); /*0 .. 100 */
+                        // B
+                        data[idx + 2] = 255;                                                        
+                        // A
+                        data[idx + 3] = 255;                                                       
                     }
                 }
                 for (int i = 0; i < 11; i++)

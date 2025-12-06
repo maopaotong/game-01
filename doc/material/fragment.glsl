@@ -68,7 +68,6 @@ ivec2 getCellKey(vec2 pos2D, float rad) {
 }
 
 bool isOcean(int type) {
-    //return height > -0.001 && height <= 49.5;
     return type == TT_OCEAN;
 }
 
@@ -98,18 +97,47 @@ vec2 getOrigin2D(ivec2 cKey, float rad) {
     float centerY = cKey.y * rad * sqrt3;
     return vec2(centerX, centerY);
 }
+
+float distanceToCell(vec2 posIn2D, float rad) {
+    ivec2 cKey = getCellKey(posIn2D, rad);
+    vec2 cIn2D = getOrigin2D(cKey, rad);
+
+    return distance(cIn2D, posIn2D) / rad;
+}
+
+vec2 rotateClockwise60(vec2 p) {
+    const float c = 0.5;               // cos(60°)
+    const float s = sqrt3 / 2.0;   // sin(60°)
+    return vec2(c * p.x + s * p.y, -s * p.x + c * p.y);
+}
+//
+float distanceToEdge(vec2 posIn2D, float rad) {
+    ivec2 cKey = getCellKey(posIn2D, rad);
+    vec2 cIn2D = getOrigin2D(cKey, rad);
+    vec2 p = posIn2D - cIn2D;
+    p = abs(p);
+    if(p.y > 0.5 * sqrt3 * p.x) {
+        p = rotateClockwise60(p);
+    }
+    return p.x - rad; // < 0 inner, > 0 outer.
+}
+
 //
 const float radInUv = 0.5 / 129.0;//rad / width of tiles 
-const float BEACH_LOW = 41.05;
-const float BEACH_HIGH = 42.05;
+const float MOUNTAIN_FOOT = 52.50;
+const float HILL_FOOT = 51.50;
+const float PLAIN_FOOT = 42.05;
+const float BEACH_FOOT = 41.05;
+const float SHORE_FOOT = 40.50;
+const bool show_edge = false;
 
 void main() {
 
     vec4 color;
     vec3 normal = fNormal;
 
-    ivec2 cKey = getCellKey(fUV1, radInUv);//    
-    vec2 cUv = getOrigin2D(cKey, radInUv);
+    // ivec2 cKey = getCellKey(fUV1, radInUv);//    
+    // vec2 cUv = getOrigin2D(cKey, radInUv);
 
     //cUv = fUV1;
     vec4 terr = texture(tex_t, fUV1);
@@ -117,51 +145,83 @@ void main() {
 
     int type = int(terr.r * 255);
 
+    //
+
+    //distance to cell centre 0..1..(1 * 2 / sqrt3):centre..rad..R;
+    float distance = terr.g * 255.0 / 100.0;
+
     if(true) {
 
-        if(isOcean(type)) {
-            if(fPosition.y < BEACH_LOW) {
-                color = texture(tex_o, fUV);
-            } else if(fPosition.y < BEACH_HIGH) {
+        if(isFrozen(type)) {
+
+            color = texture(tex_f, fUV);
+
+        } else if(isMountain(type)) {
+
+            if(fPosition.y > MOUNTAIN_FOOT) { // higher
+                color = texture(tex_m, fUV);
+            } else {    //lower
+                color = texture(tex_h, fUV);//
+            }
+
+        } else if(isHill(type)) {
+            if(fPosition.y > HILL_FOOT) { // higher
+                color = texture(tex_h, fUV);
+            } else {    //lower
+                color = texture(tex_p, fUV);//
+            }
+
+        } else if(isPlain(type)) {
+
+            if(fPosition.y > PLAIN_FOOT) { // higher
+                color = texture(tex_p, fUV);
+            } else if(fPosition.y > BEACH_FOOT) {// 
                 color = texture(tex_b, fUV);
-            } else {
-                color = texture(tex_o, fUV);
+            } else {    //
+                color = texture(tex_s, fUV);// as shore
             }
 
         } else if(isShore(type)) {
-            if(fPosition.y < BEACH_LOW) {//low
+            if(fPosition.y > PLAIN_FOOT) {// higher
+                color = texture(tex_p, fUV); //as plain
+            } else if(fPosition.y > BEACH_FOOT) {
+                color = texture(tex_b, fUV); //as beach
+            } else if(fPosition.y > SHORE_FOOT) {
+                color = texture(tex_s, fUV); //shore itself
+            } else {
+                color = texture(tex_s, fUV); //shore itself
+            }
+        } else if(isOcean(type)) {
+            if(fPosition.y > SHORE_FOOT) {
                 color = texture(tex_s, fUV);
-            } else if(fPosition.y < BEACH_HIGH) {
-                color = texture(tex_b, fUV);
-            } else {//higher
-                color = texture(tex_p, fUV);
+            } else {
+                color = texture(tex_o, fUV);
             }
-        } else if(isPlain(type)) {
+        }
 
-            if(fPosition.y > BEACH_HIGH) { // higher
-                color = texture(tex_p, fUV);
-            } else if(fPosition.y > BEACH_LOW) {// 
-                color = texture(tex_b, fUV);
-            } else {    //lower
-                color = texture(tex_s, fUV);//
+        float ambient = 0.68;
+        if(show_edge) {
+            if(distance > 0.5) {
+                vec2 posIn2D = vec2(fPosition.x, -fPosition.z) * (1.0 / 30.0) + vec2(-1.0, sqrt3 / 2.0);//offset and normal rad to 1.
+                float distance2 = distanceToEdge(posIn2D, 1.0);//
+                distance2 = abs(distance2);
+
+                if(distance2 < 0.02) {
+                    //ambient *= 8;
+                    color = vec4(1, 1, 1, 1);
+                }
+
             }
-        } else if(isHill(type)) {
-            color = texture(tex_h, fUV);
-        } else if(isMountain(type)) {
-            color = texture(tex_m, fUV);
-        } else if(isFrozen(type)) {
-            color = texture(tex_f, fUV);
         }
 
         vec3 N = normalize(normal);           //
         vec3 L = normalize(vec3(0.75, 1.0, 0.0)); // light direction.
-        float ambient = 0.68;
         float diffuse = 1.2 * max(dot(N, L), 0.0);
         float diff = ambient + diffuse;
 
         outColor = vec4(color.rgb * (diff + 0.2), 1.0); // +0.2 
         //outColor = terr;
-    }
+    }//end if true
 
 }//end of main()
 
