@@ -40,7 +40,20 @@ namespace fog
 
             Tiles::Terrains *terrains = Context<Tiles::Terrains>::get();
 
-            std::vector<std::vector<Tiles::Vertex>> &vertexs = terrains->hMap;
+            int tsWidth = terrains->tWidth;
+            int tsHeight = terrains->tHeight;
+            int terWidth = terrains->width;
+            int terHeight = terrains->height;
+            
+            std::vector<std::vector<Tiles::Vertex>> vertexs(terWidth, std::vector<Tiles::Vertex>(terHeight, Tiles::Vertex()));
+            std::vector<std::vector<Tiles::Tile>> tiles(tsWidth, std::vector<Tiles::Tile>(tsHeight, Tiles::Tile()));
+            Tiles::Generator::generateTiles(tiles, tsWidth, tsHeight);     
+            terrains->buildVertexs(tiles,vertexs);
+
+            std::string texName = "TerrainsTex001";
+            Context<Tiles::Terrains>::get()->createWorldTexture(texName,vertexs);
+            MaterialPtr mat = MaterialManager::getSingletonPtr()->getByName("Tiles");
+            mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(texName);
 
             int step = Config::TILE_TERRAIN_QUALITY / Config::TILE_MESH_QUALITY;
 

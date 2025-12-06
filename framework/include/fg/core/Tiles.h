@@ -78,9 +78,13 @@ namespace fog
 
             int width;
             int height;
-            std::vector<std::vector<Vertex>> hMap;
-            Terrains(int width, int height) : width(width), height(height),
-                                              hMap(width, std::vector<Vertex>(height, Vertex()))
+            int tWidth;
+            int tHeight;
+            Terrains(int width, int height,                     
+                     int tWidth, int tHeight) : width(width),
+                                                height(height),
+                                                tWidth(tWidth),
+                                                tHeight(tHeight)
             {
             }
 
@@ -118,8 +122,9 @@ namespace fog
              * init the sub cell/rect.
              */
 
-            void init(std::vector<std::vector<Tile>> &tiles, int tWidth, int tHeight)
+            void buildVertexs(std::vector<std::vector<Tile>> &tiles,std::vector<std::vector<Vertex>> &hMap)
             {
+
                 float rectWidth = static_cast<float>(tWidth) * 2.0f / static_cast<float>(width);
                 float rectHeight = static_cast<float>(tHeight) * 2.0f / static_cast<float>(height) * std::sqrt(3) / 2.0f;
                 float rectRad = (rectHeight + rectWidth) / 2.0;
@@ -138,31 +143,35 @@ namespace fog
                         points[3] = Vector2(centreX, centreY + 1);
                         points[4] = Vector2(centreX - 1, centreY);
 
-                        CellKey cKeys[5];
+                        CellKey cKeys[5]; //
                         for (int i = 0; i < 5; i++)
                         {
 
-                            cKeys[i] = Cell::getCellKey(points[i], 1.0); // centre
-                            int tx = std::clamp<int>(cKeys[i].first, 0, tWidth - 1);
-                            int ty = std::clamp<int>(cKeys[i].second, 0, tHeight - 1);
-                            cKeys[i].first = tx;
-                            cKeys[i].second = ty;
+                            cKeys[i] = Cell::getCellKey(points[i], 1.0); //
+                            cKeys[i].first = std::clamp<int>(cKeys[i].first, 0, tWidth - 1);
+                            cKeys[i].second = std::clamp<int>(cKeys[i].second, 0, tHeight - 1);
                         }
 
                         Tiles::Tile &tl0 = tiles[cKeys[0].first][cKeys[0].second];
                         // tile centre position.
                         Vector2 tileCentreP = Cell::getOrigin2D(cKeys[0].first, cKeys[0].second, 1.0f);
                         //
-                        hMap[x][y].cKey = cKeys[0];
+                        hMap[x][y].cKey = cKeys[0]; // centre cell.
                         hMap[x][y].originInTile = points[0] - tileCentreP;
                         hMap[x][y].type = tl0.type;
 
+                        float typeHeight = defineTileHeight(tl0);
                         // tile's centre is in this rect.
                         if (Rect::isPointInSide(tileCentreP, points[0], rectWidth, rectHeight)) //
                         {                                                                       // is the center rect of the tile.
                             // remember the centre rect for each tile.
                             tileCentreMap[cKeys[0].first][cKeys[0].second] = &hMap[x][y];
-                            hMap[x][y].height = defineTileHeight(tl0);
+                            hMap[x][y].height = typeHeight;
+                        }
+                        else if (tl0.type == Type::OCEAN || tl0.type == Type::SHORE)
+                        {
+                            // for ocean , the height should be fixed.
+                            hMap[x][y].height = typeHeight;
                         }
                         else // not the centre rect, check all the corner's tile type.
                         {
@@ -175,11 +184,11 @@ namespace fog
                             // check if this rect is inside a certain type.
                             if (tl1.type == tl2.type && tl1.type == tl3.type && tl1.type == tl4.type)
                             {
-                                hMap[x][y].height = defineTileHeight(tl0);
+                                hMap[x][y].height = typeHeight;
                             }
                             else
                             { // calculate
-                                float h = calculateRectHeightBySamples(points[0], rectWidth, rectHeight, [this, &tiles, tWidth, tHeight](CellKey cKey)
+                                float h = calculateRectHeightBySamples(points[0], rectWidth, rectHeight, [this,&tiles](CellKey cKey)
                                                                        {
                                                                            int tx = std::clamp<int>(cKey.first, 0, tWidth - 1);
                                                                            int ty = std::clamp<int>(cKey.second, 0, tHeight - 1);
@@ -224,7 +233,7 @@ namespace fog
                 {
                     for (int y = 0; y < height; y++)
                     {
-                        Vertex &vertex = this->hMap[x][y];
+                        Vertex &vertex = hMap[x][y];
 
                         if (!vertex.isHeightResolved())
                         { // is the centre rect
@@ -268,10 +277,10 @@ namespace fog
                         }
                     }
                 }
-            }//end of init()
+            } // end of init()
 
             // World texture is used as the meta data for the shader to determine the child texture.
-            void createWorldTexture(std::string name)
+            void createWorldTexture(std::string name, std::vector<std::vector<Vertex>> &hMap)
             {
 
                 // 上传到 GPU 纹理
@@ -335,9 +344,9 @@ namespace fog
                 buffer->unlock();
                 delete[] data;
             }
-            
+
             /**
-             * 
+             *
              */
             float defineTileHeight(Tiles::Tile &tl)
             {
@@ -378,7 +387,6 @@ namespace fog
         {
 
         public:
-
             static void generateTiles(std::vector<std::vector<Tile>> &tiles, int w, int h)
             {
                 assert(w == h && "cannot generate tiles because w<>h.");

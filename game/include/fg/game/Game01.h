@@ -45,11 +45,7 @@ namespace fog
         }
         void afterResourceLoad() override
         {
-            std::string tName = "TerrainsTex001";
-            Context<Tiles::Terrains>::get()->createWorldTexture(tName);
-            MaterialPtr mat = MaterialManager::getSingletonPtr()->getByName("Tiles");
-
-            mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(tName);
+            
         }
 
         void setup() override
@@ -77,14 +73,10 @@ namespace fog
 
             int tWidth = Context<Cell::Center>::get()->getWidth();
             int tHeight = Context<Cell::Center>::get()->getHeight();
-
-            std::vector<std::vector<Tiles::Tile>> tiles(tWidth, std::vector<Tiles::Tile>(tHeight, Tiles::Tile()));
-            Tiles::Generator::generateTiles(tiles, tWidth, tHeight);
-
+            
             int qWidth = tWidth * Config::TILE_TERRAIN_QUALITY;
             int qHeight = tHeight * Config::TILE_TERRAIN_QUALITY * std::sqrt(3) / 2.0f;
-            Tiles::Terrains *terrains = new Tiles::Terrains(qWidth, qHeight);
-            terrains->init(tiles, tWidth, tHeight);
+            Tiles::Terrains *terrains = new Tiles::Terrains(qWidth, qHeight,tWidth, tHeight);
             Context<Tiles::Terrains>::set(terrains);
         }
 
