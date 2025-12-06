@@ -116,12 +116,13 @@ float distanceToEdge(vec2 posIn2D, float rad) {
     vec2 cIn2D = getOrigin2D(cKey, rad);
     vec2 p = posIn2D - cIn2D;
     p = abs(p);
-    if(p.y > 0.5 * sqrt3 * p.x) {
+    if(p.y > (1.0 / sqrt3) * p.x) {
         p = rotateClockwise60(p);
     }
     return p.x - rad; // < 0 inner, > 0 outer.
 }
-
+//
+const bool show_edge = true;
 //
 const float radInUv = 0.5 / 129.0;//rad / width of tiles 
 const float MOUNTAIN_FOOT = 52.50;
@@ -129,7 +130,6 @@ const float HILL_FOOT = 51.50;
 const float PLAIN_FOOT = 42.05;
 const float BEACH_FOOT = 41.05;
 const float SHORE_FOOT = 40.50;
-const bool show_edge = false;
 
 void main() {
 
@@ -201,14 +201,14 @@ void main() {
 
         float ambient = 0.68;
         if(show_edge) {
-            if(distance > 0.5) {
+            if(distance > 0.8) {
                 vec2 posIn2D = vec2(fPosition.x, -fPosition.z) * (1.0 / 30.0) + vec2(-1.0, sqrt3 / 2.0);//offset and normal rad to 1.
                 float distance2 = distanceToEdge(posIn2D, 1.0);//
-                distance2 = abs(distance2);
+                //distance2 = abs(distance2);
 
-                if(distance2 < 0.02) {
+                if(-0.01 < distance2 && distance2 < 0.01) {
                     //ambient *= 8;
-                    color = vec4(1, 1, 1, 1);
+                    color = mix(color, vec4(1, 1, 1, 1), 0.5);
                 }
 
             }
