@@ -11,6 +11,11 @@ out vec2 fUV1;
 out vec3 fPosition;
 out vec3 fNormal;
 
+const float sqrt3 = sqrt(3.0);
+const float wWidth = 30 * 2 * (128 + 1);
+const float wHeight = wWidth * sqrt3 / 2.0;
+const vec2 wOffset = vec2(wWidth / 2.0, wHeight / 2.0);
+
 void main() {
 
 	gl_Position = worldviewproj_matrix * vec4(vertex, 1.0);
@@ -19,11 +24,8 @@ void main() {
 	fPosition = vPosition.xyz;
 	fUV = uv0;
 	fNormal = normal;
-	float wWidth = 30 * 2 * (128 + 1);
-	float wHeight = wWidth * 0.86602540378;
+	vec2 posIn2D = vec2(fPosition.x, -fPosition.z) + wOffset;
 
-	vec2 tUV1 = vec2(fPosition.x, -fPosition.z);
-	tUV1 = vec2(tUV1.x / wWidth, tUV1.y / wHeight);
-	float offsetY = 0.078;
-	fUV1 = tUV1 + vec2(0.5, 0.5 + offsetY);//
+	fUV1 = vec2(posIn2D.x / wWidth, posIn2D.y / wHeight) + vec2(0, 0.078);//
+
 }

@@ -75,7 +75,7 @@ namespace fog
             int tHeight = Context<Cell::Center>::get()->getHeight();
             
             int qWidth = tWidth * Config::TILE_TERRAIN_QUALITY;
-            int qHeight = tHeight * Config::TILE_TERRAIN_QUALITY * std::sqrt(3) / 2.0f;
+            int qHeight = tHeight * Config::TILE_TERRAIN_QUALITY * std::sqrt(3) / 2.0f;            
             Tiles::Terrains *terrains = new Tiles::Terrains(qWidth, qHeight,tWidth, tHeight);
             Context<Tiles::Terrains>::set(terrains);
         }

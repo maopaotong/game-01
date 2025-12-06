@@ -98,18 +98,17 @@ vec2 getOrigin2D(ivec2 cKey, float rad) {
     return vec2(centerX, centerY);
 }
 //
+const float radInUv = 0.5 / 129.0;//rad / width of tiles 
+
 void main() {
 
     vec4 color;
     vec3 normal = fNormal;
-    vec2 pos2D = vec2(fPosition.x, -fPosition.z);
-    ivec2 cKey = getCellKey(pos2D, 30.0);//
 
-    float rad = 0.5 / 129.0 * 1;//
-    vec2 cUv = getOrigin2D(cKey, rad);
-    cUv = vec2(cUv.x, cUv.y);
-    vec2 offset = vec2(0, 0.0765);
-    cUv = cUv + vec2(0.5, 0.5) + offset;
+    ivec2 cKey = getCellKey(fUV1, radInUv);//    
+    vec2 cUv = getOrigin2D(cKey, radInUv);
+
+    //cUv = fUV1;
     vec4 terr = texture(tex_t, cUv);
     //outColor = terr;
 
