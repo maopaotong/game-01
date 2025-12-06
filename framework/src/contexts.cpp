@@ -74,4 +74,7 @@ namespace fog
     template <>
     Tiles::Terrains *Context<Tiles::Terrains>::ctxObj = nullptr;
 
+    template <>
+    Options *Context<Options>::ctxObj = new Options();
+
 };

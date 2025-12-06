@@ -15,24 +15,18 @@
 #include "fg/Options.h"
 #include "fg/TaskRunner.h"
 #include "fg/core/Tiles.h"
+#include "fg/Config.h"
 
 namespace fog
 {
     class Game01 : public Mod, public FrameListener, CoreMod::Callback
     {
 
-        int width = TILES_WIDTH;
-        int height = width;
-
         bool breakRenderRequested = false;
         RenderWindow *window;
         Viewport *vp;
         SceneManager *sceMgr;
         OnFrameUI *onFrameUI = nullptr;
-        
-
-                int subQuality = TILE_SUBDIVISION_QUALITY;
-
     public:
         Game01()
         {
@@ -45,32 +39,33 @@ namespace fog
             return "example.costMapMod";
         }
 
-        //before ogre load material, create textures.
-        void beforeResourceLoad() override{
-
+        // before ogre load material, create textures.
+        void beforeResourceLoad() override
+        {
         }
         void afterResourceLoad() override
-        {            
+        {
             std::string tName = "TerrainsTex001";
             Context<Tiles::Terrains>::get()->createWorldTexture(tName);
             MaterialPtr mat = MaterialManager::getSingletonPtr()->getByName("Tiles");
-            
-            mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(tName);
 
+            mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(tName);
         }
 
         void setup() override
         {
+
+            Config::init("game/config/fog.cfg");
             Context<CoreMod>::get()->addCallback(this);
 
-            CostMap *costMap = createCostMap();
-            Context<CostMap>::set(costMap);      
+            CostMap *costMap = createCostMap(Config::TILES_WIDTH, Config::TILES_WIDTH);
+            Context<CostMap>::set(costMap);
 
             fog::Plane *p = new fog::Plane();
             Context<Plane>::set(p);
-           
+
             {
-                Node2D *root2D = new Node2D(p, CELL_SCALE); //                
+                Node2D *root2D = new Node2D(p, Config::CELL_SCALE); //
                 Context<Node2D>::set(root2D);
             }
             {
@@ -80,21 +75,18 @@ namespace fog
                 Context<Cell::Center>::set(cells);
             }
 
-            
             int tWidth = Context<Cell::Center>::get()->getWidth();
             int tHeight = Context<Cell::Center>::get()->getHeight();
 
             std::vector<std::vector<Tiles::Tile>> tiles(tWidth, std::vector<Tiles::Tile>(tHeight, Tiles::Tile()));
             Tiles::Generator::generateTiles(tiles, tWidth, tHeight);
 
-            int qWidth = tWidth * subQuality;
-            int qHeight = tHeight * subQuality * std::sqrt(3) / 2.0f;
-            Tiles::Terrains* terrains = new Tiles::Terrains(qWidth, qHeight);
+            int qWidth = tWidth * Config::TILE_SUBDIVISION_QUALITY;
+            int qHeight = tHeight * Config::TILE_SUBDIVISION_QUALITY * std::sqrt(3) / 2.0f;
+            Tiles::Terrains *terrains = new Tiles::Terrains(qWidth, qHeight);
             terrains->init(tiles, tWidth, tHeight);
-            Context<Tiles::Terrains>::set(terrains);            
-
+            Context<Tiles::Terrains>::set(terrains);
         }
-
 
         void deactive() override
         {
@@ -109,7 +101,7 @@ namespace fog
             CoreMod *core = Context<CoreMod>::get();
             this->window = core->getWindow();
             this->vp = core->getViewport();
-            this->sceMgr = core->getSceneManager();            
+            this->sceMgr = core->getSceneManager();
 
             this->onFrameUI = new OnFrameUI();
             Context<CoreMod>::get()->getImGuiApp()->addFrameListener(this->onFrameUI);
@@ -125,9 +117,9 @@ namespace fog
             // terrains->load(rSys, sceMgr, light);
             // Context<Terrains>::set(terrains);
             // //
-            
+
             // root2D->position = -cells->getCenterIn2D(); // move center to (0,0)
-            
+
             // Ground *ground = new CostMapGround(costMap);
 
             //
@@ -160,7 +152,7 @@ namespace fog
             //                                  });              //
             return true;
         }
-        CostMap *createCostMap()
+        CostMap *createCostMap(int width, int height)
         {
 
             CostMap *cm = new CostMap(width, height);

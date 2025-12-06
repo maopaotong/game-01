@@ -1,8 +1,10 @@
 #pragma once
+#include "defines.h"
 #include <string>
 #include <vector>
 #include <typeindex>
 #include "fg/VarBag.h"
+#include <any>
 #include <memory>
 
 namespace fog
@@ -51,20 +53,37 @@ namespace fog
             }
         };
 
+    public:
+        template <typename T>
+        static T get(Options &opts, std::string name, T defValue)
+        {
+            Option *opt = opts.getOption(name);
+            if (!opt)
+            {
+                return defValue;
+            }
+            if (opt->isType<T>())
+            {
+                return opt->getValueRef<T>();
+            }
+            throw std::runtime_error("type of option is mismatch.");
+        }
+
     protected:
         std::unordered_map<std::string, std::unique_ptr<Option>> options;
 
     public:
+    public:
         ~Options()
         {
         }
-
         Option *getOption(std::string name)
         {
             auto &it = options.find(name);
-            if(it==options.end()){
+            if (it == options.end())
+            {
                 return nullptr;
-            } 
+            }
             return it->second.get();
         }
 

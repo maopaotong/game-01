@@ -15,6 +15,8 @@
 #include "fg/util/DiamondSquare.h"
 #include "fg/defines.h"
 #include "fg/core/Tiles.h"
+#include "fg/Config.h"
+
 namespace fog
 {
     using namespace Ogre;
@@ -68,7 +70,7 @@ namespace fog
                     float scale = cis.node->getScale();
                     Vector2 qP = tP + vertexs[qx][qy].originInTile * scale;
                     // scale
-                    float h = vertexs[qx][qy].height * HEIGHT_SCALE;
+                    float h = vertexs[qx][qy].height * Config::HEIGHT_SCALE;
                     Vector3 position = cis.node->to3D(qP);
                     position.y = h;
                     positions[qx][qy] = position;
