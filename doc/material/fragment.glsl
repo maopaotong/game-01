@@ -16,6 +16,7 @@ uniform sampler2D tex_p;//3 plain
 uniform sampler2D tex_h;//4 hill
 uniform sampler2D tex_m;//5 mountain
 uniform sampler2D tex_f;//6 frozen
+uniform sampler2D tex_b;//7 beach
 
 //
 const float TT_OCEAN = 1;
@@ -99,6 +100,8 @@ vec2 getOrigin2D(ivec2 cKey, float rad) {
 }
 //
 const float radInUv = 0.5 / 129.0;//rad / width of tiles 
+const float BEACH_LOW = 41.05;
+const float BEACH_HIGH = 42.05;
 
 void main() {
 
@@ -109,7 +112,7 @@ void main() {
     vec2 cUv = getOrigin2D(cKey, radInUv);
 
     //cUv = fUV1;
-    vec4 terr = texture(tex_t, cUv);
+    vec4 terr = texture(tex_t, fUV1);
     //outColor = terr;
 
     int type = int(terr.r * 255);
@@ -117,11 +120,31 @@ void main() {
     if(true) {
 
         if(isOcean(type)) {
-            color = texture(tex_o, fUV);
+            if(fPosition.y < BEACH_LOW) {
+                color = texture(tex_o, fUV);
+            } else if(fPosition.y < BEACH_HIGH) {
+                color = texture(tex_b, fUV);
+            } else {
+                color = texture(tex_o, fUV);
+            }
+
         } else if(isShore(type)) {
-            color = texture(tex_s, fUV);
+            if(fPosition.y < BEACH_LOW) {//low
+                color = texture(tex_s, fUV);
+            } else if(fPosition.y < BEACH_HIGH) {
+                color = texture(tex_b, fUV);
+            } else {//higher
+                color = texture(tex_p, fUV);
+            }
         } else if(isPlain(type)) {
-            color = texture(tex_p, fUV);
+
+            if(fPosition.y > BEACH_HIGH) { // higher
+                color = texture(tex_p, fUV);
+            } else if(fPosition.y > BEACH_LOW) {// 
+                color = texture(tex_b, fUV);
+            } else {    //lower
+                color = texture(tex_s, fUV);//
+            }
         } else if(isHill(type)) {
             color = texture(tex_h, fUV);
         } else if(isMountain(type)) {

@@ -54,6 +54,7 @@ namespace fog
             Context<Tiles::Terrains>::get()->createWorldTexture(texName,vertexs);
             MaterialPtr mat = MaterialManager::getSingletonPtr()->getByName("Tiles");
             mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(texName);
+            mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureFiltering(Ogre::TFO_NONE);
 
             int step = Config::TILE_TERRAIN_QUALITY / Config::TILE_MESH_QUALITY;
 

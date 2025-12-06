@@ -28,7 +28,8 @@ material Tiles
 				param_named tex_p 	int 3
 				param_named tex_h 	int 4
 				param_named tex_m 	int 5
-				param_named tex_f 	int 6				
+				param_named tex_f 	int 6	
+				param_named tex_b 	int 7 //beach				
 
 			}
 
@@ -66,7 +67,13 @@ material Tiles
 			texture_unit
 			{
 				texture tex_f.png
-			}			
+			}		
+			//7
+			texture_unit
+			{
+				texture tex_b.png
+			}		
+				
 			
 		}
 	}

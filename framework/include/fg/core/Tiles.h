@@ -72,6 +72,7 @@ namespace fog
             {
                 return (Vector2(cKey.first, cKey.second) + originInTile).distance(Vector2(cKey2.first, cKey2.second));
             }
+
         };
 
         struct Terrains
@@ -81,7 +82,7 @@ namespace fog
             int height;
             int tWidth;
             int tHeight;
-            Terrains(int width, int height,                     
+            Terrains(int width, int height,
                      int tWidth, int tHeight) : width(width),
                                                 height(height),
                                                 tWidth(tWidth),
@@ -123,7 +124,7 @@ namespace fog
              * init the sub cell/rect.
              */
 
-            void buildVertexs(std::vector<std::vector<Tile>> &tiles,std::vector<std::vector<Vertex>> &hMap)
+            void buildVertexs(std::vector<std::vector<Tile>> &tiles, std::vector<std::vector<Vertex>> &hMap)
             {
 
                 float rectWidth = static_cast<float>(tWidth) * 2.0f / static_cast<float>(width);
@@ -189,7 +190,7 @@ namespace fog
                             }
                             else
                             { // calculate
-                                float h = calculateRectHeightBySamples(points[0], rectWidth, rectHeight, [this,&tiles](CellKey cKey)
+                                float h = calculateRectHeightBySamples(points[0], rectWidth, rectHeight, [this, &tiles](CellKey cKey)
                                                                        {
                                                                            int tx = std::clamp<int>(cKey.first, 0, tWidth - 1);
                                                                            int ty = std::clamp<int>(cKey.second, 0, tHeight - 1);

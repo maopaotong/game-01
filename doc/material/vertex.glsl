@@ -24,8 +24,7 @@ void main() {
 	fPosition = vPosition.xyz;
 	fUV = uv0;
 	fNormal = normal;
-	vec2 posIn2D = vec2(fPosition.x, -fPosition.z) + wOffset;
-
+	vec2 posIn2D = vec2(fPosition.x, -fPosition.z) + wOffset;	
 	fUV1 = vec2(posIn2D.x / wWidth, posIn2D.y / wHeight) + vec2(0, 0.078);//
 
 }
