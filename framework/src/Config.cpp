@@ -10,6 +10,15 @@ namespace fog
     float Config::CELL_SCALE = 30.0f;
     float Config::WORLD_WIDTH = CELL_SCALE * 2.0 * TILES_WIDTH;
     float Config::WORLD_HEIGHT = WORLD_WIDTH * 1.73205080757 /*std::sqrt(3)*/ / 2.0; // 0.86602540378
+
+    //
+    float Config::HEIGHT_OCEAN = 0.49f * 0.9f;
+    float Config::HEIGHT_SHORE = 0.50f * 0.9f;
+    float Config::HEIGHT_PLAIN = 0.51f * 1.1f;
+    float Config::HEIGHT_HILL = 0.52f * 1.2f;
+    float Config::HEIGHT_MOUNTAIN = 0.53f * 1.f;
+    float Config::HEIGHT_FROZEN = 0.54f * 1.f;
+
     void Config::init(std::string file)
     {
         Options opts;
@@ -17,11 +26,19 @@ namespace fog
         HEIGHT_SCALE = Options::get<float>(opts, "HEIGHT_SCALE", HEIGHT_SCALE);
         TILES_WIDTH = Options::get<int>(opts, "TILES_WIDTH", TILES_WIDTH);
         TILE_TERRAIN_QUALITY = Options::get<int>(opts, "TILE_TERRAIN_QUALITY", TILE_TERRAIN_QUALITY);
-        TILE_MESH_QUALITY  = Options::get<int>(opts, "TILE_MESH_QUALITY", TILE_MESH_QUALITY);
+        TILE_MESH_QUALITY = Options::get<int>(opts, "TILE_MESH_QUALITY", TILE_MESH_QUALITY);
         CELL_SCALE = Options::get<float>(opts, "CELL_SCALE", CELL_SCALE);
 
         WORLD_WIDTH = CELL_SCALE * 2.0 * TILES_WIDTH;
         WORLD_HEIGHT = WORLD_WIDTH * 1.73205080757 /*std::sqrt(3)*/ / 2.0; // 0.86602540378
+                                                                           //
+
+        HEIGHT_OCEAN = Options::get<float>(opts, "HEIGHT_OCEAN", HEIGHT_OCEAN);
+        HEIGHT_SHORE = Options::get<float>(opts, "HEIGHT_SHORE", HEIGHT_SHORE);
+        HEIGHT_PLAIN = Options::get<float>(opts, "HEIGHT_PLAIN", HEIGHT_PLAIN);
+        HEIGHT_HILL = Options::get<float>(opts, "HEIGHT_HILL", HEIGHT_HILL);
+        HEIGHT_MOUNTAIN = Options::get<float>(opts, "HEIGHT_MOUNTAIN", HEIGHT_MOUNTAIN);
+        HEIGHT_FROZEN = Options::get<float>(opts, "HEIGHT_FROZEN", HEIGHT_FROZEN);
     }
 
     void Config::load(std::string file, Options &opts)

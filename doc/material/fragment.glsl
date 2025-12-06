@@ -29,6 +29,43 @@ const float TT_LAKE = 8;
 const float TT_RIVER = 9;
 const float TT_UNKNOW = 0;
 
+const float sqrt3 = sqrt(3.0);
+
+// 
+ivec2 getCellKey(vec2 pos2D, float rad) {
+    float R = (2.0 / sqrt3) * rad;
+    // 
+    // Step 1: (q, r)
+    float q = ((sqrt3 / 3.0) * pos2D.x - (1.0 / 3.0) * pos2D.y) / R;
+    float r = ((2.0 / 3.0) * pos2D.y) / R; 
+
+    // Cube
+    float x = q;
+    float z = r;
+    float y = -x - z;
+    // 
+    int rx = int(round(x));
+    int ry = int(round(y));
+    int rz = int(round(z));
+
+    float dx = abs(rx - x);
+    float dy = abs(ry - y);
+    float dz = abs(rz - z);
+
+    if(dx > dy && dx > dz) {
+        rx = -ry - rz;
+    } else if(dy > dz) {
+        ry = -rx - rz;
+    } else {
+        rz = -rx - ry;
+    }
+
+    // Fix rounding to ensure q + r + s == 0
+    int row = rz;
+    int col = rx + (row - (row & 1)) / 2;
+    return ivec2(col, row);
+}
+
 bool isOcean(int type) {
     //return height > -0.001 && height <= 49.5;
     return type == TT_OCEAN;
@@ -55,12 +92,25 @@ bool isFrozen(int type) {
     return type == TT_FROZEN;
 }
 
+vec2 getOrigin2D(ivec2 cKey, float rad) {
+    float centerX = cKey.x * 2 * rad + (cKey.y % 2 == 0 ? 0 : rad);
+    float centerY = cKey.y * rad * sqrt3;
+    return vec2(centerX, centerY);
+}
 //
 void main() {
 
     vec4 color;
     vec3 normal = fNormal;
-    vec4 terr = texture(tex_t, fUV1);
+    vec2 pos2D = vec2(fPosition.x, -fPosition.z);
+    ivec2 cKey = getCellKey(pos2D, 30.0);//
+
+    float rad = 0.5 / 129.0 * 1;//
+    vec2 cUv = getOrigin2D(cKey, rad);
+    cUv = vec2(cUv.x, cUv.y);
+    vec2 offset = vec2(0, 0.0765);
+    cUv = cUv + vec2(0.5, 0.5) + offset;
+    vec4 terr = texture(tex_t, cUv);
     //outColor = terr;
 
     int type = int(terr.r * 255);
@@ -89,7 +139,7 @@ void main() {
 
         outColor = vec4(color.rgb * (diff + 0.2), 1.0); // +0.2 
         //outColor = terr;
-    }    
+    }
 
 }//end of main()
 

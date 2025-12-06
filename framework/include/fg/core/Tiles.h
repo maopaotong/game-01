@@ -16,6 +16,7 @@
 #include "fg/defines.h"
 #include "fg/util/Iteration.h"
 #include "fg/util/Rect.h"
+#include "fg/Config.h"
 namespace fog
 {
 
@@ -356,25 +357,25 @@ namespace fog
                 switch (tl.type)
                 {
                 case (Type::OCEAN):
-                    tlHeight = HEIGHT_OCEAN;
+                    tlHeight = Config::HEIGHT_OCEAN;
                     break;
                 case (Type::SHORE):
-                    tlHeight = HEIGHT_SHORE;
+                    tlHeight = Config::HEIGHT_SHORE;
                     break;
                 case (Type::PLAIN):
-                    tlHeight = HEIGHT_PLAIN;
+                    tlHeight = Config::HEIGHT_PLAIN;
                     break;
                 case (Type::HILL):
-                    tlHeight = HEIGHT_HILL;
+                    tlHeight = Config::HEIGHT_HILL;
                     break;
                 case (Type::MOUNTAIN):
-                    tlHeight = HEIGHT_MOUNTAIN;
+                    tlHeight = Config::HEIGHT_MOUNTAIN;
                     break;
                 case (Type::FROZEN):
-                    tlHeight = HEIGHT_FROZEN;
+                    tlHeight = Config::HEIGHT_FROZEN;
                     break;
                 default:
-                    tlHeight = HEIGHT_FROZEN;
+                    tlHeight = Config::HEIGHT_FROZEN;
                     break;
                 }
                 return tlHeight;
