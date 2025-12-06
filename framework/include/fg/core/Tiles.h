@@ -83,8 +83,13 @@ namespace fog
                                               hMap(width, std::vector<Vertex>(height, Vertex()))
             {
             }
-            float computeCorrectHeight(Ogre::Vector2 center, float rectWidth, float rectHeight,
-                                       std::function<float(CellKey)> getHeight)
+
+            /**
+             * Deal with the sub cell which span multiple different type of terrain.
+             * Calculate the height by sampling points's avg height.
+             */
+            float calculateRectHeightBySamples(Ogre::Vector2 center, float rectWidth, float rectHeight,
+                                               std::function<float(CellKey)> getHeight)
             {
                 const int SAMPLES = 3; // 3x3 = 9 points；可调为 5（25点）更准
                 float totalHeight = 0.0f;
@@ -108,6 +113,11 @@ namespace fog
 
                 return totalHeight / (SAMPLES * SAMPLES);
             }
+
+            /**
+             * init the sub cell/rect.
+             */
+
             void init(std::vector<std::vector<Tile>> &tiles, int tWidth, int tHeight)
             {
                 float rectWidth = static_cast<float>(tWidth) * 2.0f / static_cast<float>(width);
@@ -141,14 +151,14 @@ namespace fog
 
                         Tiles::Tile &tl0 = tiles[cKeys[0].first][cKeys[0].second];
                         // tile centre position.
-                        Vector2 tillCentreP = Cell::getOrigin2D(cKeys[0].first, cKeys[0].second, 1.0f);
+                        Vector2 tileCentreP = Cell::getOrigin2D(cKeys[0].first, cKeys[0].second, 1.0f);
                         //
                         hMap[x][y].cKey = cKeys[0];
-                        hMap[x][y].originInTile = points[0] - tillCentreP;
+                        hMap[x][y].originInTile = points[0] - tileCentreP;
                         hMap[x][y].type = tl0.type;
 
                         // tile's centre is in this rect.
-                        if (Rect::isPointInSide(tillCentreP, points[0], rectWidth, rectHeight)) //
+                        if (Rect::isPointInSide(tileCentreP, points[0], rectWidth, rectHeight)) //
                         {                                                                       // is the center rect of the tile.
                             // remember the centre rect for each tile.
                             tileCentreMap[cKeys[0].first][cKeys[0].second] = &hMap[x][y];
@@ -169,14 +179,14 @@ namespace fog
                             }
                             else
                             { // calculate
-                                float h = computeCorrectHeight(points[0], rectWidth, rectHeight, [this, &tiles, tWidth, tHeight](CellKey cKey)
-                                                               {
-                                                                   int tx = std::clamp<int>(cKey.first, 0, tWidth - 1);
-                                                                   int ty = std::clamp<int>(cKey.second, 0, tHeight - 1);
-                                                                   
-                                                                   Tiles::Tile &ttl = tiles[tx][ty];
-                                                                   return defineTileHeight(ttl); //
-                                                               });
+                                float h = calculateRectHeightBySamples(points[0], rectWidth, rectHeight, [this, &tiles, tWidth, tHeight](CellKey cKey)
+                                                                       {
+                                                                           int tx = std::clamp<int>(cKey.first, 0, tWidth - 1);
+                                                                           int ty = std::clamp<int>(cKey.second, 0, tHeight - 1);
+
+                                                                           Tiles::Tile &ttl = tiles[tx][ty];
+                                                                           return defineTileHeight(ttl); //
+                                                                       });
                                 hMap[x][y].height = h;
                             }
                             //
@@ -258,7 +268,7 @@ namespace fog
                         }
                     }
                 }
-            }
+            }//end of init()
 
             // World texture is used as the meta data for the shader to determine the child texture.
             void createWorldTexture(std::string name)
@@ -325,7 +335,10 @@ namespace fog
                 buffer->unlock();
                 delete[] data;
             }
-
+            
+            /**
+             * 
+             */
             float defineTileHeight(Tiles::Tile &tl)
             {
 
@@ -358,12 +371,13 @@ namespace fog
                 return tlHeight;
             }
         };
-
+        /**
+         * Generator of tiles with types.
+         */
         class Generator
         {
 
         public:
-            static constexpr float HEIGHT_SCALE = 100.0f;
 
             static void generateTiles(std::vector<std::vector<Tile>> &tiles, int w, int h)
             {

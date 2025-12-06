@@ -81,8 +81,8 @@ namespace fog
             std::vector<std::vector<Tiles::Tile>> tiles(tWidth, std::vector<Tiles::Tile>(tHeight, Tiles::Tile()));
             Tiles::Generator::generateTiles(tiles, tWidth, tHeight);
 
-            int qWidth = tWidth * Config::TILE_SUBDIVISION_QUALITY;
-            int qHeight = tHeight * Config::TILE_SUBDIVISION_QUALITY * std::sqrt(3) / 2.0f;
+            int qWidth = tWidth * Config::TILE_TERRAIN_QUALITY;
+            int qHeight = tHeight * Config::TILE_TERRAIN_QUALITY * std::sqrt(3) / 2.0f;
             Tiles::Terrains *terrains = new Tiles::Terrains(qWidth, qHeight);
             terrains->init(tiles, tWidth, tHeight);
             Context<Tiles::Terrains>::set(terrains);

@@ -11,7 +11,8 @@ namespace fog
     public:
         static float HEIGHT_SCALE;
         static int TILES_WIDTH;
-        static int TILE_SUBDIVISION_QUALITY;
+        static int TILE_TERRAIN_QUALITY;
+        static int TILE_MESH_QUALITY;
         static float CELL_SCALE;
         static float WORLD_WIDTH;  // = CELL_SCALE * 2.0 * TILES_WIDTH;
         static float WORLD_HEIGHT; // = WORLD_WIDTH * 1.73205080757 /*std::sqrt(3)*/ / 2.0; // 0.86602540378

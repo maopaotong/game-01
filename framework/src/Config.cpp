@@ -5,7 +5,8 @@ namespace fog
 
     float Config::HEIGHT_SCALE = 100;
     int Config::TILES_WIDTH = 128 + 1;
-    int Config::TILE_SUBDIVISION_QUALITY = 4;
+    int Config::TILE_TERRAIN_QUALITY = 4;
+    int Config::TILE_MESH_QUALITY = 2;
     float Config::CELL_SCALE = 30.0f;
     float Config::WORLD_WIDTH = CELL_SCALE * 2.0 * TILES_WIDTH;
     float Config::WORLD_HEIGHT = WORLD_WIDTH * 1.73205080757 /*std::sqrt(3)*/ / 2.0; // 0.86602540378
@@ -15,7 +16,8 @@ namespace fog
         load(file, opts);
         HEIGHT_SCALE = Options::get<float>(opts, "HEIGHT_SCALE", HEIGHT_SCALE);
         TILES_WIDTH = Options::get<int>(opts, "TILES_WIDTH", TILES_WIDTH);
-        TILE_SUBDIVISION_QUALITY = Options::get<int>(opts, "TILE_SUBDIVISION_QUALITY", TILE_SUBDIVISION_QUALITY);
+        TILE_TERRAIN_QUALITY = Options::get<int>(opts, "TILE_TERRAIN_QUALITY", TILE_TERRAIN_QUALITY);
+        TILE_MESH_QUALITY  = Options::get<int>(opts, "TILE_MESH_QUALITY", TILE_MESH_QUALITY);
         CELL_SCALE = Options::get<float>(opts, "CELL_SCALE", CELL_SCALE);
 
         WORLD_WIDTH = CELL_SCALE * 2.0 * TILES_WIDTH;

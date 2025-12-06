@@ -26,7 +26,6 @@ namespace fog
     {
 
     public:
-
     public:
         TilesState() : ManualState()
         {
@@ -41,11 +40,13 @@ namespace fog
 
             Tiles::Terrains *terrains = Context<Tiles::Terrains>::get();
 
-            int qWidth = terrains->width;
-            int qHeight = terrains->height;
-
             std::vector<std::vector<Tiles::Vertex>> &vertexs = terrains->hMap;
-            
+
+            int step = Config::TILE_TERRAIN_QUALITY / Config::TILE_MESH_QUALITY;
+
+            int qWidth = terrains->width / step;
+            int qHeight = terrains->height / step;
+
             obj->clear();
             obj->begin(material, Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
@@ -57,50 +58,51 @@ namespace fog
             Cell::Center *cc = Context<Cell::Center>::get();
 
             // collect position.
-            for (int qy = 0; qy < qHeight; qy++)
+            for (int y = 0; y < qHeight; y++)
             {
-                for (int qx = 0; qx < qWidth; qx++)
+                for (int x = 0; x < qWidth; x++)
                 {
-
+                    int qy = y * step;
+                    int qx = x * step;
                     CellKey cKey = vertexs[qx][qy].cKey;
 
                     Cell::Instance cis = cc->getCell(cKey);
 
                     Vector2 tP = cis.getOrigin2D();
                     float scale = cis.node->getScale();
+
                     Vector2 qP = tP + vertexs[qx][qy].originInTile * scale;
                     // scale
                     float h = vertexs[qx][qy].height * Config::HEIGHT_SCALE;
                     Vector3 position = cis.node->to3D(qP);
                     position.y = h;
-                    positions[qx][qy] = position;
+                    positions[x][y] = position;
                 }
             }
             // calculate norms
 
-            for (int qy = 0; qy < qHeight; qy++)
+            for (int y = 0; y < qHeight; y++)
             {
-                for (int qx = 0; qx < qWidth; qx++)
-                {
-
-                    Vector3 p1 = positions[qx][qy];
+                for (int x = 0; x < qWidth; x++)
+                {                    
+                    Vector3 p1 = positions[x][y];
                     obj->position(p1);
-                    Vector3 normNs = calculateNorm(positions, qx, qy, qWidth, qHeight);
+                    Vector3 normNs = calculateNorm(positions, x, y, qWidth, qHeight);
                     obj->normal(normNs);
                     obj->textureCoord(p1.x, -p1.z);
                 } // end of for
             } // end of for
 
             // triangle
-            for (int qy = 0; qy < qHeight - 1; qy++)
+            for (int y = 0; y < qHeight - 1; y++)
             {
-                for (int qx = 0; qx < qWidth - 1; qx++)
+                for (int x = 0; x < qWidth - 1; x++)
                 {
-
-                    int a = qy * qWidth + qx;
-                    int b = qy * qWidth + (qx + 1);
-                    int c = (qy + 1) * qWidth + (qx + 1);
-                    int d = (qy + 1) * qWidth + qx;
+                    
+                    int a = y * qWidth + x;
+                    int b = y * qWidth + (x + 1);
+                    int c = (y + 1) * qWidth + (x + 1);
+                    int d = (y + 1) * qWidth + x;
 
                     int ba = baseIdx + a;
                     int bb = baseIdx + b;
